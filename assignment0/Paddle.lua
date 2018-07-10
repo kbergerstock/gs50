@@ -9,6 +9,19 @@
 
     Represents a paddle that can move up and down. Used in the main
     program to deflect the ball back toward the opponent.
+
+    refactored by K. r. bergerstock (krbergerstock@e4kountdown.com)
+    added vatiables
+        score : it makes more sense to track the score by player object
+        sx,sy : home position for paddle
+    added functions
+        resetScore()
+        incScore()
+        Won()
+        resetPos()
+        track(ball)  : AI addition 
+        move(up,down): code reductiom
+
 ]]
 
 Paddle = Class{}
@@ -75,6 +88,11 @@ function Paddle:update(dt)
 end
 
 function Paddle:track(ball)
+    -- track the incoming ball and place the paddle in front of it
+    -- it uses the Y component of the AABM
+    -- if the paddle is not in front of the ball it sets up paddle.dy to move it there
+    -- all we have to do is set the paddle rate and the normal update routine will move the paddle
+    -- krb
     bh2 = ball.height / 2
     if self.y > ball.y + ball.height - bh2 or ball.y > self.y + self.height-bh2 then
         self.dy = sign(ball.y - self.y) * PADDLE_SPEED
@@ -82,7 +100,9 @@ function Paddle:track(ball)
         self.dy = 0
     end
 end
-
+--[[ refactored this chunk out of main improves code maintainability, readability,
+     and encapsulation all code that can change a class attributes is now owned by the class
+     krb ]]
 function Paddle:move(up, down)
     if love.keyboard.isDown(up) then
         self.dy = -PADDLE_SPEED

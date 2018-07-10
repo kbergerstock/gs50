@@ -10,6 +10,14 @@
     Represents a ball which will bounce back and forth between paddles
     and walls until it passes a left or right boundary of the screen,
     scoring a point for the opponent.
+
+    refactored by K. r. bergerstock (krbergerstock@e4kountdown.com)
+    added functions
+        handleBallCollision
+        handleServe
+        handleWallCollision
+            improving encapsulatoin and readability
+        added global function sign(d) needed for A! task
 ]]
 
 Ball = Class{}
@@ -67,7 +75,8 @@ end
 
 --[[
     handles the collision with a paddle
-    input is offset to use to avoid getting stuck in paddle
+    input is the offset to use to avoid getting stuck in paddle
+    krb
 ]]
 function Ball:handlePaddleCollision(offset)
     self.dx = -self.dx * 1.03
@@ -77,6 +86,7 @@ function Ball:handlePaddleCollision(offset)
 end
 
 -- handle the ball serve
+-- krb
 function Ball:handleServe(player)
     -- before switching to play, initialize ball's velocity based
     -- on player who last scored
@@ -88,6 +98,7 @@ end
 -- handle a wall collision
 -- detect upper and lower screen boundary collision, playing a sound
 -- effect and reversing dy if true
+-- krb
 function Ball:handleWallCollision()
     if ball.y <= 0 then
         ball.y = 0

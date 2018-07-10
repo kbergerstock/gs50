@@ -160,9 +160,9 @@ function love.update(dt)
             else
                 servingPlayer = 1
                 gameState = 'serve'
-                -- places the ball in the middle of the screen, no velocity
-                ball:reset()
             end
+            -- places the ball in the middle of the screen, no velocity
+            ball:reset()            
         end
 
         -- if we reach the right edge of the screen, go back to serve
@@ -179,9 +179,9 @@ function love.update(dt)
             else
                 servingPlayer = 2
                 gameState = 'serve'
-                -- places the ball in the middle of the screen, no velocity
-                ball:reset()
             end
+            -- places the ball in the middle of the screen, no velocity
+            ball:reset()
         end
     end
 
@@ -190,8 +190,10 @@ function love.update(dt)
     --
     -- player 1
     if true then
+        -- AI move paddle
         player1:track(ball)
     else
+        -- paler move paddle
         player1:move('w','s')
     end
 
