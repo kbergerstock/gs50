@@ -92,6 +92,8 @@ function love.load()
     -- detected by other functions and modules
     player1 = Paddle(10, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
+    AIplayer1 = false
+    AIplayer2 = false
 
     -- place a ball in the middle of the screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
@@ -189,7 +191,7 @@ function love.update(dt)
     -- paddles can move no matter what state we're in
     --
     -- player 1
-    if true then
+    if AIplayer1 then
         -- AI move paddle
         player1:track(ball)
     else
@@ -198,7 +200,7 @@ function love.update(dt)
     end
 
     -- player 2
-    if false then
+    if AIplayer2 then
         player2:track(ball)
     else  
         player2:move('up','down')      
@@ -252,6 +254,12 @@ function love.keypressed(key)
             player1:resetScore()
             player2:resetScore()
         end
+    elseif key == '1' then
+        AIplayer1 = not AIplayer1 
+        player1:resetPos()
+    elseif key == '2' then
+        AIplayer2 = not AIplayer2 
+        player2:resetPos()
     end
 end
 --[[
@@ -309,7 +317,20 @@ function displayStart()
     -- UI messages
     love.graphics.setFont(smallFont)
     love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')    
+    if AIplayer1 then
+        love.graphics.setColor(0, 255, 0, 255)      
+    else
+        love.graphics.setColor(255,255, 255, 255)     
+    end
+    love.graphics.printf('Press 1 for compter player one', 0, 20, VIRTUAL_WIDTH, 'center')
+    if AIplayer2 then
+        love.graphics.setColor(0, 255, 0, 255)           
+    else
+        love.graphics.setColor(255,255, 255, 255)     
+    end        
+    love.graphics.printf('Press 2 for compter player two', 0, 30, VIRTUAL_WIDTH, 'center')
+    love.graphics.setColor(255,255, 255, 255)    
+    love.graphics.printf('Press Enter to begin!', 0, 40, VIRTUAL_WIDTH, 'center')    
 end
 -- renders serve message
 function displayServe(player)
