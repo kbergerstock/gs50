@@ -5,6 +5,8 @@
 
     The TitleScreenState is the starting screen of the game, shown on startup. It should
     display "Press Enter" and also our highest score.
+
+    removed dependency on gStateMachine global variable   07/15/2018 KRB
 ]]
 
 TitleScreenState = Class{__includes = BaseState}

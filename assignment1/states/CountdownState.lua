@@ -6,6 +6,8 @@
     Counts down visually on the screen (3,2,1) so that the player knows the
     game is about to begin. Transitions to the PlayState as soon as the
     countdown is complete.
+    
+    removed dependency on gStateMachine global variable   07/15/2018 KRB
 ]]
 
 CountdownState = Class{__includes = BaseState}

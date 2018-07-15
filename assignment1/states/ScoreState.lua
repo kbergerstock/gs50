@@ -6,6 +6,8 @@
     A simple state used to display the player's score before they
     transition back into the play state. Transitioned to from the
     PlayState when they collide with a Pipe.
+
+    removed dependency on gStateMachine global variable   07/15/2018 KRB
 ]]
 
 ScoreState = Class{__includes = BaseState}

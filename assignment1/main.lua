@@ -140,7 +140,6 @@ end
 function love.mousepressed(x, y, button) 
     -- bug found !! pressing an up event fast enough weill allow the bird to fly above the pipes
     love.mouse.buttonsPressed[button] = true
-
 end
 
 --[[

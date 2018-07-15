@@ -6,6 +6,9 @@
     The PlayState class is the bulk of the game, where the player actually controls the bird and
     avoids pipes. When the player collides with a pipe, we should go to the GameOver state, where
     we then go back to the main menu.
+        
+`   removed dependency on gStateMachine global variable   07/15/2018 KRB
+    added varaible (alarm) and  code to impement random spacing between pipe pairs    07/15/2018 KRB
 ]]
 
 PlayState = Class{__includes = BaseState}
@@ -21,7 +24,8 @@ BIRD_HEIGHT = 24
 function PlayState:init()
     self.bird = Bird()
     self.pipePairs = {}
-    self.timer = 0
+    self.timer = 0          -- timer acumulator got timer
+    self.alarm = 2          -- alarm to control whrn new pipes should be added KRB
     self.score = 0
     -- initialize our last recorded Y value for a gap placement to base other gaps off of
     self.lastY = 0
@@ -45,7 +49,7 @@ function PlayState:update(dt)
     self.timer = self.timer + dt
 
     -- spawn a new pipe pair every second and a half
-    if self.timer > 2 then
+    if self.timer > self.alarm then
         -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
         -- no higher than 10 pixels below the top edge of the screen,
         -- and no lower than a gap length (90 pixels) from the bottom
@@ -58,6 +62,9 @@ function PlayState:update(dt)
 
         -- reset timer
         self.timer = 0
+        -- set up the alarm interval meed to wait befor drawing the pipes
+        -- increase the resoltion of the alarm so it looks conyinous rather than discreete KRB
+        self.alarm = math.random(150,350) / 100.0
     end
 
     -- for every pair of pipes..
