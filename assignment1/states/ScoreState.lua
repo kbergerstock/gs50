@@ -10,18 +10,28 @@
 
 ScoreState = Class{__includes = BaseState}
 
+function ScoreState:init()
+    self.score = 0
+end   
+
+function ScoreState:enter()
+    self.score = 0
+end    
+
 --[[
     When we enter the score state, we expect to receive the score
     from the play state so we know what to render to the State.
 ]]
 function ScoreState:enter(params)
-    self.score = params.score
+    self.score = params['score']
 end
 
 function ScoreState:update(dt)
     -- go back to play if enter is pressed
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        gStateMachine:change('countdown')
+        r = {}
+        r['state'] =  'countdown'
+        return r
     end
 end
 

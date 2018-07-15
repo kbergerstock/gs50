@@ -13,14 +13,21 @@ Bird = Class{}
 local GRAVITY = 20
 
 function Bird:init()
-    self.image = love.graphics.newImage('bird.png')
+    self.image = love.graphics.newImage('img/bird.png')
     self.x = VIRTUAL_WIDTH / 2 - 8
     self.y = VIRTUAL_HEIGHT / 2 - 8
 
-    self.width = self.image:getWidth()
+    self.width = self.image:getWidth() 
     self.height = self.image:getHeight()
 
     self.dy = 0
+end
+
+--  reset the bird's position used when playstate is entered
+function Bird:reset()
+    self.x = VIRTUAL_WIDTH / 2 - 8
+    self.y = VIRTUAL_HEIGHT / 2 - 8    
+    self.dy =  0
 end
 
 --[[

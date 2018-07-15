@@ -16,15 +16,28 @@ PIPE_HEIGHT = 288
 
 BIRD_WIDTH = 38
 BIRD_HEIGHT = 24
-
+ 
+-- constructor
 function PlayState:init()
     self.bird = Bird()
     self.pipePairs = {}
     self.timer = 0
     self.score = 0
-
     -- initialize our last recorded Y value for a gap placement to base other gaps off of
-    self.lastY = -PIPE_HEIGHT + math.random(80) + 20
+    self.lastY = 0
+    scrolling = false
+end
+
+--[[
+    Called when this state is transitioned to from another state.
+]]
+function PlayState:enter()
+    self.bird:reset() 
+    self.timer = 0
+    self.score = 0
+    -- initialize our last recorded Y value for a gap placement to base other gaps off of
+    self.lastY = -PIPE_HEIGHT + math.random(80) + 20    
+    scrolling = true
 end
 
 function PlayState:update(dt)
@@ -79,25 +92,25 @@ function PlayState:update(dt)
             if self.bird:collides(pipe) then
                 sounds['explosion']:play()
                 sounds['hurt']:play()
-
-                gStateMachine:change('score', {
-                    score = self.score
-                })
+                r = {}
+                r['state'] = 'score'
+                r['score'] = self.score
+                return r
             end
         end
     end
 
     -- update bird based on gravity and input
     self.bird:update(dt)
-
+    -- new feature found the bird can fly over the top of pipes - seems there is no upper bound check
     -- reset if we get to the ground
     if self.bird.y > VIRTUAL_HEIGHT - 15 then
         sounds['explosion']:play()
         sounds['hurt']:play()
-
-        gStateMachine:change('score', {
-            score = self.score
-        })
+        r = {}
+        r['state'] = 'score'
+        r['score'] = self.score
+        return r  
     end
 end
 
@@ -113,17 +126,14 @@ function PlayState:render()
 end
 
 --[[
-    Called when this state is transitioned to from another state.
-]]
-function PlayState:enter()
-    -- if we're coming from death, restart scrolling
-    scrolling = true
-end
-
---[[
     Called when this state changes to another state.
 ]]
 function PlayState:exit()
     -- stop scrolling for the death/score screen
     scrolling = false
+    -- clean up memory used to store pipe data
+    for k, pair in pairs(self.pipePairs) do
+        table.remove(self.pipePairs, k)
+    end
+    self.pipePairs = {}
 end

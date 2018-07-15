@@ -51,16 +51,18 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
 
-local background = love.graphics.newImage('background.png')
+local background = love.graphics.newImage('img/background.png')
 local backgroundScroll = 0
 
-local ground = love.graphics.newImage('ground.png')
+local ground = love.graphics.newImage('img/ground.png')
 local groundScroll = 0
 
 local BACKGROUND_SCROLL_SPEED = 30
 local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
+
+local gStateMachine 
 
 function love.load()
     -- initialize our nearest-neighbor filter
@@ -81,13 +83,13 @@ function love.load()
 
     -- initialize our table of sounds
     sounds = {
-        ['jump'] = love.audio.newSource('jump.wav', 'static'),
-        ['explosion'] = love.audio.newSource('explosion.wav', 'static'),
-        ['hurt'] = love.audio.newSource('hurt.wav', 'static'),
-        ['score'] = love.audio.newSource('score.wav', 'static'),
+        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
+        ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
+        ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
 
         -- https://freesound.org/people/xsgianni/sounds/388079/
-        ['music'] = love.audio.newSource('marios_way.mp3', 'static')
+        ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static')
     }
 
     -- kick off music
@@ -101,14 +103,15 @@ function love.load()
         resizable = true
     })
 
-    -- initialize state machine with all state-returning functions
+    -- initialize state machine with all state-classes
     gStateMachine = StateMachine {
-        ['title'] = function() return TitleScreenState() end,
-        ['countdown'] = function() return CountdownState() end,
-        ['play'] = function() return PlayState() end,
-        ['score'] = function() return ScoreState() end
+        ['title'] =  TitleScreenState(),
+        ['countdown'] =  CountdownState(),
+        ['play'] =  PlayState() ,
+        ['score'] =  ScoreState()
     }
-    gStateMachine:change('title')
+    -- start the execution of the state machine
+    gStateMachine:run('title')
 
     -- initialize input table
     love.keyboard.keysPressed = {}
@@ -134,8 +137,10 @@ end
     LÖVE2D callback fired each time a mouse button is pressed; gives us the
     X and Y of the mouse, as well as the button in question.
 ]]
-function love.mousepressed(x, y, button)
+function love.mousepressed(x, y, button) 
+    -- bug found !! pressing an up event fast enough weill allow the bird to fly above the pipes
     love.mouse.buttonsPressed[button] = true
+
 end
 
 --[[
