@@ -30,6 +30,7 @@ Class = require 'class'
 
 -- a basic StateMachine class which will allow us to transition to and from
 -- game states smoothly and avoid monolithic code in one file
+-- removed dependency on global instane of this class and made it local 07/15/2018 KRB
 require 'StateMachine'
 
 -- all states our StateMachine can transition between

@@ -33,12 +33,21 @@
 	State identifiers should have the same name as the state table, unless there's a good
 	reason not to. i.e. MainMenu creates a state using the MainMenu table. This keeps things
 	straight forward.
+
+	07/15/2018	Keith R. Bergerstock 
+	Software , Test and Quality Engineer for over 30 years currently retired from Marquardt switches 
+	I modified this code to eliminate dependency of using an instance global variable in state classes 
+	derived from BaseState:
+	a very dangerous practise that would / will cause problems as the state machine grows more involed.
+	The modfications now allow the instance to be declared local which keeps the state classes encapsulated 
+	and easier to test and debug.
+
 ]]
 
 StateMachine = Class{}
 
 function StateMachine:init(states)
-	self.states = states or {} -- [name] -> [function that returns class representing a stste]
+	self.states = states or {} -- [name] -> [function that returns class representing a state]
 	self.states['empty'] = BaseState
 	self.current = 'empty'
 	self.next = ''
