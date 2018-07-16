@@ -12,9 +12,6 @@
 
 CountdownState = Class{__includes = BaseState}
 
--- takes 1 second to count down each time
-COUNTDOWN_TIME = 0.75
-
 function CountdownState:init()
     self.count = 0
     self.timer = 0

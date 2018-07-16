@@ -32,6 +32,7 @@ Class = require 'class'
 -- game states smoothly and avoid monolithic code in one file
 -- removed dependency on global instane of this class and made it local 07/15/2018 KRB
 require 'StateMachine'
+require 'global'
 
 -- all states our StateMachine can transition between
 require 'states/BaseState'
@@ -39,18 +40,11 @@ require 'states/CountdownState'
 require 'states/PlayState'
 require 'states/ScoreState'
 require 'states/TitleScreenState'
+require 'states/pauseState'
 
 require 'Bird'
 require 'Pipe'
 require 'PipePair'
-
--- physical screen dimensions
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
-
--- virtual resolution dimensions
-VIRTUAL_WIDTH = 512
-VIRTUAL_HEIGHT = 288
 
 local background = love.graphics.newImage('img/background.png')
 local backgroundScroll = 0
@@ -109,7 +103,8 @@ function love.load()
         ['title'] =  TitleScreenState(),
         ['countdown'] =  CountdownState(),
         ['play'] =  PlayState() ,
-        ['score'] =  ScoreState()
+        ['score'] =  ScoreState(),
+        ['pause'] = pauseState()
     }
     -- start the execution of the state machine
     gStateMachine:run('title')
@@ -159,9 +154,11 @@ function love.mouse.wasPressed(button)
 end
 
 function love.update(dt)
-    -- scroll our background and ground, looping back to 0 after a certain amount
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    if SCROLLING then
+        -- scroll our background and ground, looping back to 0 after a certain amount
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    end
 
     gStateMachine:update(dt)
 
@@ -171,10 +168,10 @@ end
 
 function love.draw()
     push:start()
-    
+
     love.graphics.draw(background, -backgroundScroll, 0)
     gStateMachine:render()
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
-    
+  
     push:finish()
 end

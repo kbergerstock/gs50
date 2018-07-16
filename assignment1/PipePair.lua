@@ -12,6 +12,9 @@ PipePair = Class{}
 
 -- size of the gap between pipes
 local GAP_HEIGHT = 90
+-- orientation of the image 
+local TOP  = -1
+local BOTTOM =  1
 
 function PipePair:init(y)
     -- flag to hold whether this pair has been scored (jumped through)
@@ -22,11 +25,11 @@ function PipePair:init(y)
 
     -- y value is for the topmost pipe; gap is a vertical shift of the second lower pipe
     self.y = y
-
+    local crazyGap = math.random(0,5)
     -- instantiate two pipes that belong to this pair
     self.pipes = {
-        ['upper'] = Pipe('top', self.y),
-        ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + GAP_HEIGHT)
+        ['upper'] = Pipe( TOP, y + PIPE_HEIGHT + crazyGap),
+        ['lower'] = Pipe( BOTTOM, y + PIPE_HEIGHT + GAP_HEIGHT - crazyGap)
     }
 
     -- whether this pipe pair is ready to be removed from the scene

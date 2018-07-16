@@ -13,13 +13,13 @@
 
 PlayState = Class{__includes = BaseState}
 
-PIPE_SPEED = 60
-PIPE_WIDTH = 70
-PIPE_HEIGHT = 288
+-- this function is ot part f the class 
+-- it needs to usable to check y boundries
 
-BIRD_WIDTH = 38
-BIRD_HEIGHT = 24
- 
+function checkBoundries(y)
+     return math.max(-PIPE_HEIGHT + 10, math.min( y , VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT) )
+end         
+
 -- constructor
 function PlayState:init()
     self.bird = Bird()
@@ -29,19 +29,23 @@ function PlayState:init()
     self.score = 0
     -- initialize our last recorded Y value for a gap placement to base other gaps off of
     self.lastY = 0
-    scrolling = false
+    -- scrolling = false
+    self.paused = false
 end
 
 --[[
     Called when this state is transitioned to from another state.
 ]]
-function PlayState:enter()
-    self.bird:reset() 
-    self.timer = 0
-    self.score = 0
-    -- initialize our last recorded Y value for a gap placement to base other gaps off of
-    self.lastY = -PIPE_HEIGHT + math.random(80) + 20    
-    scrolling = true
+function PlayState:enter(params)
+    if not self.paused then
+        self.bird:reset() 
+        self.timer = 0
+        self.score = 0
+        -- initialize our last recorded Y value for a gap placement to base other gaps off of
+        self.lastY = -PIPE_HEIGHT + math.random(80) + 20    
+    end
+    SCROLLING = true
+    self.paused = false
 end
 
 function PlayState:update(dt)
@@ -53,13 +57,11 @@ function PlayState:update(dt)
         -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
         -- no higher than 10 pixels below the top edge of the screen,
         -- and no lower than a gap length (90 pixels) from the bottom
-        local y = math.max(-PIPE_HEIGHT + 10, 
-            math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
-        self.lastY = y
+        local y = checkBoundries(self.lastY + math.random(-20, 20))
 
         -- add a new pipe pair at the end of the screen at our new Y
         table.insert(self.pipePairs, PipePair(y))
-
+        self.lasty = y
         -- reset timer
         self.timer = 0
         -- set up the alarm interval meed to wait befor drawing the pipes
@@ -119,6 +121,15 @@ function PlayState:update(dt)
         r['score'] = self.score
         return r  
     end
+
+    -- change to pause state if key 'P' is deceted
+    if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
+        self.paused = true
+        r = {}
+        r['state'] = 'pause'
+        r['pause'] = true
+        return r
+    end
 end
 
 function PlayState:render()
@@ -136,11 +147,13 @@ end
     Called when this state changes to another state.
 ]]
 function PlayState:exit()
-    -- stop scrolling for the death/score screen
-    scrolling = false
-    -- clean up memory used to store pipe data
-    for k, pair in pairs(self.pipePairs) do
-        table.remove(self.pipePairs, k)
+    if not self.paused then
+        -- clean up memory used to store pipe data
+        for k, pair in pairs(self.pipePairs) do
+            table.remove(self.pipePairs, k)
+        end
+        self.pipePairs = {}
     end
-    self.pipePairs = {}
+    -- stop scrolling for the death/score screen
+    SCROLLING = false
 end
