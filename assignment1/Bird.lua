@@ -10,7 +10,7 @@
 
 Bird = Class{}
 
-local GRAVITY = 8
+local GRAVITY = 7
 local ANTIGRAVITY = -2
 
 function Bird:init()
@@ -41,13 +41,12 @@ function Bird:collides(pipe)
     -- both offsets are used to shrink the bounding box to give the player
     -- a little bit of leeway with the collision
     if (self.x + 2) + (self.width - 4) >= pipe.x and self.x + 2 <= pipe.x + PIPE_WIDTH then
-        if pipe.orientation == -1 then -- top pipe
+        if pipe.orientation < 0 then -- top pipe
             if (self.y + 2) < pipe.y then return true end
-        else    
-            if (self.y - 2 + self.height ) > pipe.y then return true end  -- bottom pipe        
+        else                -- otherwise bottom pipe
+            if (self.y - 2 + self.height ) > pipe.y then return true end      
         end
     end
-
     return false
 end
 

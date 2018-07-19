@@ -24,12 +24,13 @@ function PipePair:init(y)
     self.x = VIRTUAL_WIDTH + 32
 
     -- y value is for the topmost pipe; gap is a vertical shift of the second lower pipe
-    self.y = y
-    local crazyGap = math.random(0,5)
+    self.y = y + PIPE_HEIGHT
+    local yb = self.y + GAP_HEIGHT + math.random(0,GAP_LEVEL)
+    if yb > (PIPE_HEIGHT -15) then yb = PIPE_HEIGHT - 15 end
     -- instantiate two pipes that belong to this pair
     self.pipes = {
-        ['upper'] = Pipe( TOP, y + PIPE_HEIGHT + crazyGap),
-        ['lower'] = Pipe( BOTTOM, y + PIPE_HEIGHT + GAP_HEIGHT - crazyGap)
+        ['upper'] = Pipe( TOP, self.y ),
+        ['lower'] = Pipe( BOTTOM, yb )
     }
 
     -- whether this pipe pair is ready to be removed from the scene

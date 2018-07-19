@@ -14,10 +14,12 @@ ScoreState = Class{__includes = BaseState}
 
 function ScoreState:init()
     self.score = 0
+    GAP_LEVEL = 15
 end   
 
-function ScoreState:enter()
+function ScoreState:exit()
     self.score = 0
+    GAP_LEVEL = 15
 end    
 
 --[[
@@ -32,7 +34,7 @@ function ScoreState:update(dt)
     -- go back to play if enter is pressed
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         r = {}
-        r['state'] =  'countdown'
+        r['state'] = 'countdown'
         return r
     end
 end
@@ -40,10 +42,21 @@ end
 function ScoreState:render()
     -- simply render the score to the middle of the screen
     love.graphics.setFont(flappyFont)
-    love.graphics.printf('Oof! You lost!', 0, 64, VIRTUAL_WIDTH, 'center')
+    local msg = 'OOF! YOU LOST!'
+    -- the offset of three is to allow for the 2-3 pipes 
+    -- that were already on the screen to pass by before the gap change is oberved
+    if self.score > 33 then  -- gao width avg 92.5
+        msg = 'YOU ARE A MASTER AT THIS GAME '
+    elseif self.score > 23 then -- gap witdh avg = 95
+        msg = 'EXPERT LEVEL COMPLETE : EXCELLANT'
+    elseif self.score > 13 then -- gap width avg = 97.5
+        msg = 'BEGINNER LEVEL COMPLETE : GOOD GOING'
+    end
+
+    love.graphics.printf(msg, 0, 64, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(mediumFont)
-    love.graphics.printf('Score: ' .. tostring(self.score), 0, 100, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('SCORE: ' .. tostring(self.score), 0, 120, VIRTUAL_WIDTH, 'center')
 
-    love.graphics.printf('Press Enter to Play Again!', 0, 160, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('PRESS ENTER TO PLAY AGAIN!', 0, 160, VIRTUAL_WIDTH, 'center')
 end

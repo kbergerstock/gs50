@@ -12,14 +12,7 @@
 ]]
 
 PlayState = Class{__includes = BaseState}
-
--- this function is ot part f the class 
--- it needs to usable to check y boundries
-
-function checkBoundries(y)
-     return math.max(-PIPE_HEIGHT + 10, math.min( y , VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT) )
-end         
-
+   
 -- constructor
 function PlayState:init()
     self.bird = Bird()
@@ -47,6 +40,10 @@ function PlayState:enter(params)
     SCROLLING = true
     self.paused = false
 end
+-- check y boundries. y is negitive at this point and represents the top pipe
+function PlayState:checkBoundries(y)
+    return math.max(-PIPE_HEIGHT + 10, math.min( y , VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT) )
+end 
 
 function PlayState:update(dt)
     -- update timer for pipe spawning
@@ -65,8 +62,8 @@ function PlayState:update(dt)
         -- reset timer
         self.timer = 0
         -- set up the alarm interval meed to wait befor drawing the pipes
-        -- increase the resoltion of the alarm so it looks conyinous rather than discreete KRB
-        self.alarm = math.random(150,350) / 100.0
+        -- increase the resoltion of the alarm so it looks continous rather than discreete KRB
+        self.alarm = math.random(175,275) / 100.0
     end
 
     -- for every pair of pipes..
@@ -78,6 +75,12 @@ function PlayState:update(dt)
                 self.score = self.score + 1
                 pair.scored = true
                 sounds['score']:play()
+                if self.score == 10 or self.score == 20 then
+                    -- shorten the distance between the pipes
+                    GAP_LEVEL = GAP_LEVEL - 5
+                    -- allow a longer time between levels
+                    self.alarm = 3.5
+                end    
             end
         end
 
@@ -138,7 +141,7 @@ function PlayState:render()
     end
 
     love.graphics.setFont(flappyFont)
-    love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
+    love.graphics.print('SCORE: ' .. tostring(self.score), 8, 8)
 
     self.bird:render()
 end
