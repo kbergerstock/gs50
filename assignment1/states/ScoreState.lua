@@ -33,9 +33,7 @@ end
 function ScoreState:update(dt)
     -- go back to play if enter is pressed
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        r = {}
-        r['state'] = 'countdown'
-        return r
+        return { state = 'countdown' }
     end
 end
 
@@ -44,12 +42,12 @@ function ScoreState:render()
     love.graphics.setFont(flappyFont)
     local msg = 'OOF! YOU LOST!'
     -- the offset of three is to allow for the 2-3 pipes 
-    -- that were already on the screen to pass by before the gap change is oberved
-    if self.score > 33 then  -- gao width avg 92.5
+    -- that were already on the screen to pass by before the gap change is observed
+    if self.score > 32.5 then  -- gao width avg 92.5
         msg = 'YOU ARE A MASTER AT THIS GAME '
-    elseif self.score > 23 then -- gap witdh avg = 95
+    elseif self.score > 22.5 then -- gap witdh avg = 95
         msg = 'EXPERT LEVEL COMPLETE : EXCELLANT'
-    elseif self.score > 13 then -- gap width avg = 97.5
+    elseif self.score > 12.5 then -- gap width avg = 97.5
         msg = 'BEGINNER LEVEL COMPLETE : GOOD GOING'
     end
 

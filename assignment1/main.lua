@@ -57,7 +57,7 @@ local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
 
-local gStateMachine 
+local gameStateMachine 
 
 function love.load()
     -- initialize our nearest-neighbor filter
@@ -70,10 +70,10 @@ function love.load()
     love.window.setTitle('Fifty Bird')
 
     -- initialize our nice-looking retro text fonts
-    smallFont = love.graphics.newFont('font.ttf', 8)
-    mediumFont = love.graphics.newFont('flappy.ttf', 14)
-    flappyFont = love.graphics.newFont('flappy.ttf', 28)
-    hugeFont = love.graphics.newFont('flappy.ttf', 56)
+    smallFont = love.graphics.newFont('fonts/font.ttf', 8)
+    mediumFont = love.graphics.newFont('fonts/flappy.ttf', 14)
+    flappyFont = love.graphics.newFont('fonts/flappy.ttf', 28)
+    hugeFont = love.graphics.newFont('fonts/flappy.ttf', 56)
     love.graphics.setFont(flappyFont)
 
     -- initialize our table of sounds
@@ -100,7 +100,7 @@ function love.load()
     })
 
     -- initialize state machine with all state-classes
-    gStateMachine = StateMachine {
+    gameStateMachine = StateMachine {
         ['title'] =  TitleScreenState(),
         ['countdown'] =  CountdownState(),
         ['play'] =  PlayState() ,
@@ -108,7 +108,7 @@ function love.load()
         ['pause'] = pauseState()
     }
     -- start the execution of the state machine
-    gStateMachine:run('title')
+    gameStateMachine:run({state = 'title'})
 
     -- initialize input table
     love.keyboard.keysPressed = {}
@@ -161,7 +161,7 @@ function love.update(dt)
         groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
     end
 
-    gStateMachine:update(dt)
+    gameStateMachine:update(dt)
 
     love.keyboard.keysPressed = {}
     love.mouse.buttonsPressed = {}
@@ -171,7 +171,7 @@ function love.draw()
     push:start()
 
     love.graphics.draw(background, -backgroundScroll, 0)
-    gStateMachine:render()
+    gameStateMachine:render()
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
   
     push:finish()

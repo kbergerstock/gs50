@@ -104,10 +104,7 @@ function PlayState:update(dt)
             if self.bird:collides(pipe) then
                 sounds['explosion']:play()
                 sounds['hurt']:play()
-                r = {}
-                r['state'] = 'score'
-                r['score'] = self.score
-                return r
+                return { state = 'score', score = self.score }
             end
         end
     end
@@ -119,19 +116,13 @@ function PlayState:update(dt)
     if self.bird.y > VIRTUAL_HEIGHT - 15 then
         sounds['explosion']:play()
         sounds['hurt']:play()
-        r = {}
-        r['state'] = 'score'
-        r['score'] = self.score
-        return r  
+        return { state = 'score', score = self.score }
     end
 
     -- change to pause state if key 'P' is deceted
     if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
         self.paused = true
-        r = {}
-        r['state'] = 'pause'
-        r['pause'] = true
-        return r
+        return { state = 'pause', pause = true}
     end
 end
 

@@ -10,6 +10,7 @@
     removed dependency on gStateMachine global variable   07/15/2018 KRB
 ]]
 
+
 CountdownState = Class{__includes = BaseState}
 
 function CountdownState:init()
@@ -38,9 +39,7 @@ function CountdownState:update(dt)
 
         -- when 0 is reached, we should enter the PlayState
         if self.count == 0 then
-            r = {}
-            r['state'] =  'play'
-            return r
+             return {state = 'play'}
         end
     end
 end

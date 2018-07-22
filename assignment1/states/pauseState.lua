@@ -21,9 +21,7 @@ end
 
 function pauseState:update(dt)
     if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
-        r = {}
-        r['state'] = 'play'
-        return r
+        return {state = 'play'}
     end
 end
 
