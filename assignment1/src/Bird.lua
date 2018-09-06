@@ -63,5 +63,5 @@ function Bird:update(inputs,msg,dt)
 end
 
 function Bird:render()
-    love.graphics.draw(self.image, self.x, self.y)
+ love.graphics.draw(self.image, self.x, self.y)   
 end

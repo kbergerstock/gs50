@@ -46,6 +46,7 @@ require 'src/Bird'
 require 'src/Pipe'
 require 'src/PipePair'
 require 'src/message'
+require 'src/trophies'
 
 local background = love.graphics.newImage('img/background.png')
 local backgroundScroll = 0
