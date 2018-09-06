@@ -100,14 +100,14 @@ end
 -- effect and reversing dy if true
 -- krb
 function Ball:handleWallCollision()
-    if ball.y <= 0 then
-        ball.y = 0
-        ball.dy = -ball.dy
+    if self.y <= 0 then
+        self.y = 0
+        self.dy = -self.dy
         return true
     end
-    if ball.y >= VIRTUAL_HEIGHT - self.height then
-        ball.y = VIRTUAL_HEIGHT - self.height
-        ball.dy = -ball.dy
+    if self.y >= VIRTUAL_HEIGHT - self.height then
+        self.y = VIRTUAL_HEIGHT - self.height
+        self.dy = -self.dy
         return true
     end
     return false    

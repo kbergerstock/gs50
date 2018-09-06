@@ -15,6 +15,9 @@
     the original Pong machines or the Atari 2600 in terms of
     resolution, though in widescreen (16:9) so it looks nicer on 
     modern systems.
+
+    modified by Keith R> bergerstock aug/2018
+    
 ]]
 
 -- push is a library that will allow us to draw our game at a virtual
@@ -22,14 +25,14 @@
 -- a more retro aesthetic
 --
 -- https://github.com/Ulydev/push
-push = require 'push'
+push = require 'lib/push'
 
 -- the "Class" library we're using will allow us to represent anything in
 -- our game as code, rather than keeping track of many disparate variables and
 -- methods
 --
 -- https://github.com/vrld/hump/blob/master/class.lua
-Class = require 'class'
+Class = require 'lib/class'
 
 -- our Paddle class, which stores position and dimensions for each Paddle
 -- and the logic for rendering them
@@ -229,7 +232,7 @@ function love.keypressed(key)
         love.event.quit()
     -- if we press enter during either the start or serve phase, it should
     -- transition to the next appropriate state
-    elseif key == 'enter' or key == 'return' then
+    elseif key == 'space' then
         if gameState == 'start' then
             gameState = 'serve'
         elseif gameState == 'serve' then      
@@ -330,14 +333,14 @@ function displayStart()
     end        
     love.graphics.printf('Press 2 for compter player two', 0, 30, VIRTUAL_WIDTH, 'center')
     love.graphics.setColor(255,255, 255, 255)    
-    love.graphics.printf('Press Enter to begin!', 0, 40, VIRTUAL_WIDTH, 'center')    
+    love.graphics.printf('Press SpaceBar to begin!', 0, 40, VIRTUAL_WIDTH, 'center')    
 end
 -- renders serve message
 function displayServe(player)
     -- UI messages
     love.graphics.setFont(smallFont)
     love.graphics.printf('Player ' .. tostring(player) .. "'s serve!", 0, 10, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press SpaceBar to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
 end
 -- renders done message
 function displayWinner(player)
