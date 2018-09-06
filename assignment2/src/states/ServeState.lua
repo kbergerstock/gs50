@@ -16,62 +16,65 @@
 
 ServeState = Class{__includes = BaseState}
 
-function ServeState:enter(params)
-    -- grab game state from params
-    self.paddle = params.paddle
-    self.bricks = params.bricks
-    self.health = params.health
-    self.score = params.score
-    self.highScores = params.highScores
-    self.level = params.level
-    self.recoverPoints = params.recoverPoints
 
-    -- init new ball (random color for fun)
-    self.ball = Ball()
-    self.ball.skin = math.random(7)
+function ServeState:init()
+
 end
 
-function ServeState:update(dt)
+function ServeState:enter(msgs)    
+    self:MakeLevel(msgs)
+    msgs.paddle:reset()
+    msgs.balls:reset()
+    msg.powerUps:reset()
+end
+
+function ServeState:MakeLevel(msgs)
+    if msgs.makeLevel  then        
+        msgs.bricks, msgs.keyBrickFlag  = LevelMaker.createMap(msgs.level)
+        msgs.keyCaught = false
+        msgs.breakout = false
+        msgs.makeLevel = (msgs.bricks == nil )
+    end
+end
+
+function ServeState:update(keysPressed, msgs, dt)
     -- have the ball track the player
-    self.paddle:update(dt)
-    self.ball.x = self.paddle.x + (self.paddle.width / 2) - 4
-    self.ball.y = self.paddle.y - 8
+    msgs.paddle:update(dt)
+    msgs.balls:track(msgs.paddle)
 
-    if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        -- pass in all important state info to the PlayState
-        gStateMachine:change('play', {
-            paddle = self.paddle,
-            bricks = self.bricks,
-            health = self.health,
-            score = self.score,
-            highScores = self.highScores,
-            ball = self.ball,
-            level = self.level,
-            recoverPoints = self.recoverPoints
-        })
-    end
-
-    if love.keyboard.wasPressed('escape') then
-        love.event.quit()
-    end
+    if keysPressed:getSpace() then
+        if msgs.makeLevel then
+            self:MakeLevel(msgs)
+        else
+            -- pass in all important state info to the PlayState
+            msgs.next = 'play'
+        end
+     end
 end
 
-function ServeState:render()
-    self.paddle:render()
-    self.ball:render()
+function ServeState:render(msgs)
+    msgs.paddle:render()
+    msgs.balls:render()
+    msgs.powerUps:render()
 
-    for k, brick in pairs(self.bricks) do
-        brick:render()
+    if msgs.makeLevel then 
+        love.graphics.setFont(gFonts['large'])
+        love.graphics.printf('Level creation error press space again ', 0, VIRTUAL_HEIGHT / 3,
+            VIRTUAL_WIDTH, 'center')
+    else
+        for k, brick in pairs(msgs.bricks) do
+            brick:render()
+        end
     end
 
-    renderScore(self.score)
-    renderHealth(self.health)
+    renderScore(msgs.score)
+    renderHealth(msgs.health)
 
     love.graphics.setFont(gFonts['large'])
-    love.graphics.printf('Level ' .. tostring(self.level), 0, VIRTUAL_HEIGHT / 3,
+    love.graphics.printf('Level ' .. tostring(msgs.level), 0, VIRTUAL_HEIGHT / 3,
         VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(gFonts['medium'])
-    love.graphics.printf('Press Enter to serve!', 0, VIRTUAL_HEIGHT / 2,
+    love.graphics.printf('Press Space to serve!', 0, VIRTUAL_HEIGHT / 2,
         VIRTUAL_WIDTH, 'center')
 end
