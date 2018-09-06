@@ -10,8 +10,8 @@
 
 Bird = Class{}
 
-local GRAVITY = 7
-local ANTIGRAVITY = -2
+local GRAVITY = 5.0
+local ANTIGRAVITY = -1.5
 
 function Bird:init()
     self.image = love.graphics.newImage('img/bird.png')
@@ -21,14 +21,14 @@ function Bird:init()
     self.width = self.image:getWidth() 
     self.height = self.image:getHeight()
 
-    self.dy = 0
+    self.dy = 0.0
 end
 
 --  reset the bird's position used when playstate is entered
 function Bird:reset()
     self.x = VIRTUAL_WIDTH / 2 - 8
     self.y = VIRTUAL_HEIGHT / 2 - 8    
-    self.dy =  0
+    self.dy =  0.0
 end
 
 --[[
@@ -50,11 +50,11 @@ function Bird:collides(pipe)
     return false
 end
 
-function Bird:update(dt)
+function Bird:update(inputs,msg,dt)
     self.dy = self.dy + GRAVITY * dt
 
     -- burst of anti-gravity when space or left mouse are pressed
-    if love.keyboard.wasPressed('space') or love.mouse.wasPressed(1) then
+    if inputs:isSpace()  or inputs:rightButton() then
         self.dy = ANTIGRAVITY
         sounds['jump']:play()
     end

@@ -19,20 +19,21 @@
 -- a more retro aesthetic
 --
 -- https://github.com/Ulydev/push
-push = require 'push'
+push = require 'lib/push'
 
 -- the "Class" library we're using will allow us to represent anything in
 -- our game as code, rather than keeping track of many disparate variables and
 -- methods
 --
 -- https://github.com/vrld/hump/blob/master/class.lua
-Class = require 'class'
+Class = require 'lib/class'
 
 -- a basic StateMachine class which will allow us to transition to and from
 -- game states smoothly and avoid monolithic code in one file
 -- removed dependency on global instane of this class and made it local 07/15/2018 KRB
-require 'StateMachine'
-require 'global'
+require 'lib/StateMachine'
+require 'lib/HID'
+require 'src/constants'
 
 -- all states our StateMachine can transition between
 require 'states/BaseState'
@@ -40,11 +41,11 @@ require 'states/CountdownState'
 require 'states/PlayState'
 require 'states/ScoreState'
 require 'states/TitleScreenState'
-require 'states/pauseState'
 
-require 'Bird'
-require 'Pipe'
-require 'PipePair'
+require 'src/Bird'
+require 'src/Pipe'
+require 'src/PipePair'
+require 'src/message'
 
 local background = love.graphics.newImage('img/background.png')
 local backgroundScroll = 0
@@ -57,7 +58,10 @@ local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
 
-local gameStateMachine 
+local gameStateMachine = nil
+-- create our keyboard / mouse interface
+local inputs = cHID{}
+
 
 function love.load()
     -- initialize our nearest-neighbor filter
@@ -105,28 +109,31 @@ function love.load()
         ['countdown'] =  CountdownState(),
         ['play'] =  PlayState() ,
         ['score'] =  ScoreState(),
-        ['pause'] = pauseState()
-    }
+        ['idle'] = BaseState(),
+        }
+    msg = init_msg_packet()
     -- start the execution of the state machine
-    gameStateMachine:run({state = 'title'})
-
-    -- initialize input table
-    love.keyboard.keysPressed = {}
-
-    -- initialize mouse input table
-    love.mouse.buttonsPressed = {}
+    gameStateMachine:run( msg, 'title')
 end
 
 function love.resize(w, h)
     push:resize(w, h)
 end
 
+    --[[
+    A callback that processes key strokes as they happen, just the once.
+    Does not account for keys that are held down, which is handled by a
+    separate function (`love.keyboard.isDown`). Useful for when we want
+    things to happen right away, just once, like when we want to quit.
+]]
 function love.keypressed(key)
-    -- add to our table of keys pressed this frame
-    love.keyboard.keysPressed[key] = true
-
-    if key == 'escape' then
+    -- add to our table of keys pressed this frame    
+    if key == 'escape' then    
+        -- quit if the escape was detectd   
+        gMusic:stop()
         love.event.quit()
+    else
+        inputs:set(key)
     end
 end
 
@@ -136,43 +143,26 @@ end
 ]]
 function love.mousepressed(x, y, button) 
     -- bug found !! pressing an up event fast enough weill allow the bird to fly above the pipes
-    love.mouse.buttonsPressed[button] = true
-end
-
---[[
-    Custom function to extend LÖVE's input handling; returns whether a given
-    key was set to true in our input table this frame.
-]]
-function love.keyboard.wasPressed(key)
-    return love.keyboard.keysPressed[key]
-end
-
---[[
-    Equivalent to our keyboard function from before, but for the mouse buttons.
-]]
-function love.mouse.wasPressed(button)
-    return love.mouse.buttonsPressed[button]
+    inputs:set(button)
 end
 
 function love.update(dt)
-    if SCROLLING then
-        -- scroll our background and ground, looping back to 0 after a certain amount
-        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
-    end
-
-    gameStateMachine:update(dt)
-
-    love.keyboard.keysPressed = {}
-    love.mouse.buttonsPressed = {}
+    gameStateMachine:update(inputs, msg, dt)
+    inputs:reset()
 end
 
 function love.draw()
     push:start()
 
     love.graphics.draw(background, -backgroundScroll, 0)
-    gameStateMachine:render()
+    gameStateMachine:render(msg)
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
   
     push:finish()
+end
+
+function scrollBackground(dt)
+    -- scroll our background and ground, looping back to 0 after a certain amount
+    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 end

@@ -19,36 +19,54 @@ function PlayState:init()
     self.pipePairs = {}
     self.timer = 0          -- timer acumulator got timer
     self.alarm = 2          -- alarm to control whrn new pipes should be added KRB
-    self.score = 0
     -- initialize our last recorded Y value for a gap placement to base other gaps off of
     self.lastY = 0
-    -- scrolling = false
     self.paused = false
 end
 
 --[[
     Called when this state is transitioned to from another state.
 ]]
-function PlayState:enter(params)
-    if not self.paused then
-        self.bird:reset() 
-        self.timer = 0
-        self.score = 0
-        -- initialize our last recorded Y value for a gap placement to base other gaps off of
-        self.lastY = -PIPE_HEIGHT + math.random(80) + 20    
-    end
+function PlayState:enter(msg)
+    self.bird:reset() 
+    msg.score = 0
+    self.timer = 0
+    -- initialize our last recorded Y value for a gap placement to base other gaps off of
+    self.lastY = -PIPE_HEIGHT + math.random(80) + 20    
     SCROLLING = true
     self.paused = false
 end
+
 -- check y boundries. y is negitive at this point and represents the top pipe
 function PlayState:checkBoundries(y)
     return math.max(-PIPE_HEIGHT + 10, math.min( y , VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT) )
 end 
 
-function PlayState:update(dt)
-    -- update timer for pipe spawning
-    self.timer = self.timer + dt
+function PlayState:update(inputs, msg, dt)
+      -- change to pause state if key 'P' is deceted
+      if inputs:isPaused() then
+        self.paused = not self.paused
+    
+        if self.paused then
+            sounds['music']:stop()
+            sounds['music']:setLooping(false)
+            sounds['pause']:setLooping(true)
+            sounds['pause']:play()
+        else
+            sounds['pause']:stop()
+            sounds['pause']:setLooping(false)
+            sounds['music']:setLooping(true)
+            sounds['music']:play()
+        end
+    end
 
+    if self.paused then
+        return nil 
+    end
+
+    -- update timer for pipe spawning
+    self.timer = self.timer + dt    
+    scrollBackground(dt)
     -- spawn a new pipe pair every second and a half
     if self.timer > self.alarm then
         -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
@@ -72,10 +90,10 @@ function PlayState:update(dt)
         -- be sure to ignore it if it's already been scored
         if not pair.scored then
             if pair.x + PIPE_WIDTH < self.bird.x then
-                self.score = self.score + 1
+                msg.score = msg.score + 1
                 pair.scored = true
                 sounds['score']:play()
-                if self.score == 10 or self.score == 20 then
+                if msg.score == 10 or msg.score == 20 or msg.score == 43 then
                     -- shorten the distance between the pipes
                     GAP_LEVEL = GAP_LEVEL - 5
                     -- allow a longer time between levels
@@ -104,50 +122,52 @@ function PlayState:update(dt)
             if self.bird:collides(pipe) then
                 sounds['explosion']:play()
                 sounds['hurt']:play()
-                return { state = 'score', score = self.score }
+                msg.next = 'score'
             end
         end
     end
-
+    
     -- update bird based on gravity and input
-    self.bird:update(dt)
+    self.bird:update(inputs, msg, dt)
     -- new feature found the bird can fly over the top of pipes - seems there is no upper bound check
     -- reset if we get to the ground
     if self.bird.y > VIRTUAL_HEIGHT - 15 then
         sounds['explosion']:play()
         sounds['hurt']:play()
-        return { state = 'score', score = self.score }
+        msg.next = 'score'
     end
-
-    -- change to pause state if key 'P' is deceted
-    if love.keyboard.wasPressed('p') or love.keyboard.wasPressed('P') then
-        self.paused = true
-        return { state = 'pause', pause = true}
-    end
+ 
 end
 
-function PlayState:render()
+function PlayState:render(msg)
     for k, pair in pairs(self.pipePairs) do
         pair:render()
     end
 
     love.graphics.setFont(flappyFont)
-    love.graphics.print('SCORE: ' .. tostring(self.score), 8, 8)
+    love.graphics.print('SCORE: ' .. tostring(msg.score), 8, 8)
 
     self.bird:render()
+
+    if self.paused then    love.graphics.setColor(1, 0, 0, 1)
+        love.graphics.setFont(flappyFont)
+        love.graphics.printf('GAME PAUSED', 0, 64, VIRTUAL_WIDTH, 'center')
+        love.graphics.setColor(1, 1, 1, 1)    
+        love.graphics.setFont(mediumFont)
+        love.graphics.printf('PRESS P TO EXIT',0,100,VIRTUAL_WIDTH, 'center')
+    end
 end
 
 --[[
     Called when this state changes to another state.
 ]]
 function PlayState:exit()
-    if not self.paused then
-        -- clean up memory used to store pipe data
-        for k, pair in pairs(self.pipePairs) do
-            table.remove(self.pipePairs, k)
-        end
-        self.pipePairs = {}
+    -- clean up memory used to store pipe data
+    for k, pair in pairs(self.pipePairs) do
+        table.remove(self.pipePairs, k)
     end
+    self.pipePairs = {}
+
     -- stop scrolling for the death/score screen
     SCROLLING = false
 end

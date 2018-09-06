@@ -11,18 +11,18 @@
 
 TitleScreenState = Class{__includes = BaseState}
 
-function TitleScreenState:update(dt)
+function TitleScreenState:update(inputs,msg,dt)
     -- transition to countdown when enter/return are pressed
-    if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        return { state = 'countdown'}
+    if inputs:isSpace() then 
+        msg.next = 'countdown'
     end
 end
 
-function TitleScreenState:render()
+function TitleScreenState:render(msg)
     -- simple UI code
     love.graphics.setFont(flappyFont)
     love.graphics.printf('FIFTY BIRD', 0, 64, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(mediumFont)
-    love.graphics.printf('PRESS ENTER', 0, 100, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('PRESS SPACE', 0, 100, VIRTUAL_WIDTH, 'center')
 end

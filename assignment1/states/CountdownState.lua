@@ -28,7 +28,7 @@ end
     timer has exceeded our countdown time. If we have gone down to 0,
     we should transition to our PlayState.
 ]]
-function CountdownState:update(dt)
+function CountdownState:update(inputs,msg,dt)
     self.timer = self.timer + dt
 
     -- loop timer back to 0 (plus however far past COUNTDOWN_TIME we've gone)
@@ -39,7 +39,9 @@ function CountdownState:update(dt)
 
         -- when 0 is reached, we should enter the PlayState
         if self.count == 0 then
-             return {state = 'play'}
+             --msg.next  = 'play'
+             msg.score = msg.score + 7
+             msg.next = 'score'
         end
     end
 end

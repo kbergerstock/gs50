@@ -13,48 +13,43 @@
 ScoreState = Class{__includes = BaseState}
 
 function ScoreState:init()
-    self.score = 0
     GAP_LEVEL = 15
 end   
 
 function ScoreState:exit()
-    self.score = 0
     GAP_LEVEL = 15
 end    
 
---[[
-    When we enter the score state, we expect to receive the score
-    from the play state so we know what to render to the State.
-]]
-function ScoreState:enter(params)
-    self.score = params['score']
-end
-
-function ScoreState:update(dt)
-    -- go back to play if enter is pressed
-    if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        return { state = 'countdown' }
+function ScoreState:update(inputs, msg,  dt)
+    if inputs:isSpace() then
+        if msg.score > 62.5 then
+            love.event.quit(0)
+        else
+            msg.next = 'countdown'
+        end
     end
 end
 
-function ScoreState:render()
+function ScoreState:render(msg)
     -- simply render the score to the middle of the screen
     love.graphics.setFont(flappyFont)
-    local msg = 'OOF! YOU LOST!'
+    local usr_msg = 'OOF! YOU LOST!'
     -- the offset of three is to allow for the 2-3 pipes 
     -- that were already on the screen to pass by before the gap change is observed
-    if self.score > 32.5 then  -- gao width avg 92.5
-        msg = 'YOU ARE A MASTER AT THIS GAME '
-    elseif self.score > 22.5 then -- gap witdh avg = 95
-        msg = 'EXPERT LEVEL COMPLETE : EXCELLANT'
-    elseif self.score > 12.5 then -- gap width avg = 97.5
-        msg = 'BEGINNER LEVEL COMPLETE : GOOD GOING'
+    if msg.score > 62.5 then
+        usr_msg = ' I GIVE UP, YOU ARE TOO GOOD, I AM CRAWLING BACK IN MY DIMENSIONAL HOLE'
+    elseif msg.score > 32.5 then  -- gap width avg 92.5
+        usr_msg = 'YOU ARE A MASTER AT THIS GAME '
+    elseif msg.score > 22.5 then -- gap witdh avg = 95
+        usr_msg = 'EXPERT LEVEL COMPLETE : EXCELLANT'
+    elseif msg.score > 12.5 then -- gap width avg = 97.5
+        usr_msg = 'BEGINNER LEVEL COMPLETE : GOOD GOING'
     end
 
-    love.graphics.printf(msg, 0, 64, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf(usr_msg, 0, 64, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(mediumFont)
-    love.graphics.printf('SCORE: ' .. tostring(self.score), 0, 120, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('SCORE: ' .. tostring(msg.score), 0, 120, VIRTUAL_WIDTH, 'center')
 
-    love.graphics.printf('PRESS ENTER TO PLAY AGAIN!', 0, 160, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('PRESS SPACE TO PLAY AGAIN!', 0, 160, VIRTUAL_WIDTH, 'center')
 end
