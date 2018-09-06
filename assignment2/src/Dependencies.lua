@@ -11,15 +11,27 @@ push = require 'lib/push'
 --
 -- https://github.com/vrld/hump/blob/master/class.lua
 Class = require 'lib/class'
+require 'lib/Keyboard'
+-- a basic StateMachine class which will allow us to transition to and from
+-- game states smoothly and avoid monolithic code in one file
+require 'lib/StateMachine'
+require 'lib/HighScoreTracker'
 
 -- a few global constants, centralized
 require 'src/constants'
+--  defines a target that interacts with the paddle or gricks (base class for ball and powerups)
+require 'src/Target'
+
+-- the messages passed between states
+require 'src/init_message_packet'
 
 -- the ball that travels around, breaking bricks and triggering lives lost
 require 'src/Ball'
+require 'src/balls'
 
 -- the entities in our game map that give us points when we collide with them
 require 'src/Brick'
+require 'src/bricks'
 
 -- a class used to generate our brick layouts (levels)
 require 'src/LevelMaker'
@@ -27,9 +39,9 @@ require 'src/LevelMaker'
 -- the rectangular entity the player controls, which deflects the ball
 require 'src/Paddle'
 
--- a basic StateMachine class which will allow us to transition to and from
--- game states smoothly and avoid monolithic code in one file
-require 'src/StateMachine'
+-- pwerup sprites
+require 'src/powerUp'
+require 'src/PowerUps'
 
 -- utility functions, mainly for splitting our sprite sheet into various Quads
 -- of differing sizes for paddles, balls, bricks, etc.

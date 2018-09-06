@@ -55,7 +55,10 @@ end
     we have to return a subset of GenerateQuads.
 ]]
 function GenerateQuadsBricks(atlas)
-    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    local quads = GenerateQuads(atlas, 32, 16)
+    local r = table.slice(quads, 1, 21)
+    r['key'] = quads[24]
+    return r 
 end
 
 --[[
@@ -67,27 +70,21 @@ function GenerateQuadsPaddles(atlas)
     local x = 0
     local y = 64
 
-    local counter = 1
     local quads = {}
 
     for i = 0, 3 do
         -- smallest
-        quads[counter] = love.graphics.newQuad(x, y, 32, 16,
-            atlas:getDimensions())
-        counter = counter + 1
+        quads[1 + 4 * i] = love.graphics.newQuad(x, y, 32, 16,
+            atlas:getDimensions())    
         -- medium
-        quads[counter] = love.graphics.newQuad(x + 32, y, 64, 16,
-            atlas:getDimensions())
-        counter = counter + 1
+        quads[2 + 4 * i] = love.graphics.newQuad(x + 32, y, 64, 16,
+            atlas:getDimensions())   
         -- large
-        quads[counter] = love.graphics.newQuad(x + 96, y, 96, 16,
+        quads[3 + 4 * i] = love.graphics.newQuad(x + 96, y, 96, 16,
             atlas:getDimensions())
-        counter = counter + 1
         -- huge
-        quads[counter] = love.graphics.newQuad(x, y + 16, 128, 16,
+        quads[4 + 4 * i] = love.graphics.newQuad(x, y + 16, 128, 16,
             atlas:getDimensions())
-        counter = counter + 1
-
         -- prepare X and Y for the next set of paddles
         x = 0
         y = y + 32
@@ -105,23 +102,19 @@ function GenerateQuadsBalls(atlas)
     local x = 96
     local y = 48
 
-    local counter = 1
     local quads = {}
 
     for i = 0, 3 do
-        quads[counter] = love.graphics.newQuad(x, y, 8, 8, atlas:getDimensions())
+        quads[1 + i] = love.graphics.newQuad(x, y, 8, 8, atlas:getDimensions())
         x = x + 8
-        counter = counter + 1
     end
 
     x = 96
     y = 56
 
     for i = 0, 2 do
-        quads[counter] = love.graphics.newQuad(x, y, 8, 8, atlas:getDimensions())
+        quads[5 + i] = love.graphics.newQuad(x, y, 8, 8, atlas:getDimensions())
         x = x + 8
-        counter = counter + 1
     end
-
     return quads
 end

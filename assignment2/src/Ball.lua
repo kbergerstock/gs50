@@ -13,13 +13,20 @@
     for visual variety.
 ]]
 
-Ball = Class{}
+
+
+Ball = Class{ __includes = Target}
 
 function Ball:init(skin)
+    -- flag to control if an instance is active
+    self.active = false 
+    
     -- simple positional and dimensional variables
     self.width = 8
     self.height = 8
-
+    
+    self.x = VIRTUAL_WIDTH / 2 - 2
+    self.y = VIRTUAL_HEIGHT / 2 - 2
     -- these variables are for keeping track of our velocity on both the
     -- X and Y axis, since the ball can move in two dimensions
     self.dy = 0
@@ -30,64 +37,107 @@ function Ball:init(skin)
     self.skin = skin
 end
 
---[[
-    Expects an argument with a bounding box, be that a paddle or a brick,
-    and returns true if the bounding boxes of this and the argument overlap.
-]]
-function Ball:collides(target)
-    -- first, check to see if the left edge of either is farther to the right
-    -- than the right edge of the other
-    if self.x > target.x + target.width or target.x > self.x + self.width then
-        return false
-    end
-
-    -- then check to see if the bottom edge of either is higher than the top
-    -- edge of the other
-    if self.y > target.y + target.height or target.y > self.y + self.height then
-        return false
-    end 
-
-    -- if the above aren't true, they're overlapping
-    return true
+function Ball:setActive()
+    self.active = true 
 end
 
---[[
-    Places the ball in the middle of the screen, with no movement.
-]]
-function Ball:reset()
-    self.x = VIRTUAL_WIDTH / 2 - 2
-    self.y = VIRTUAL_HEIGHT / 2 - 2
-    self.dx = 0
-    self.dy = 0
+function Ball:clrActive()
+    self.active = false  
+end
+
+function Ball:isActive()
+    return self.active  
+end
+
+function Ball:beep()
+    gSounds['wall-hit']:play()
+end
+
+
+function Ball:handleCollision(paddle)
+    if self.active then
+        -- raise ball above paddle in case it goes below it, then reverse dy
+        self.y = paddle.y - 8
+        self.dy = -self.dy
+
+        -- tweak angle of bounce based on where it hits the paddle
+
+        -- if we hit the paddle on its left side while moving left...
+        if self.x < paddle.x + (paddle.width / 2) and paddle.dx < 0 then
+            self.dx = -50 + -(8 * (paddle.x + (paddle.width / 2) - self.x))
+        
+        -- else if we hit the paddle on its right side while moving right...
+        elseif self.x > paddle.x + (paddle.width / 2) and paddle.dx > 0 then
+            self.dx = 50 + (8 * math.abs(paddle.x + paddle.width / 2 - self.x))
+        end
+    end
+end
+
+-- handle out of bounds condition
+function Ball:checkBoundry()
+    if self.y >= VIRTUAL_HEIGHT then
+        self.active = false 
+    end
+end
+
+--Places the ball in the middle of the screen, with no movement.
+function Ball:reset(skin)
+    if self.active then
+        self.x = VIRTUAL_WIDTH / 2 - 2
+        self.y = VIRTUAL_HEIGHT / 2 - 2
+        self.dx = 0
+        self.dy = 0
+    end
+    self.skin = skin
 end
 
 function Ball:update(dt)
-    self.x = self.x + self.dx * dt
-    self.y = self.y + self.dy * dt
+    if self.active then
+        local snd = false 
+        self.x = self.x + self.dx * dt
+        self.y = self.y + self.dy * dt
 
-    -- allow ball to bounce off walls
-    if self.x <= 0 then
-        self.x = 0
-        self.dx = -self.dx
-        gSounds['wall-hit']:play()
-    end
+        -- allow ball to bounce off walls
+        if self.x <= 0 then
+            self.x = 0
+            self.dx = -self.dx
+            snd = true            
+        end
 
-    if self.x >= VIRTUAL_WIDTH - 8 then
-        self.x = VIRTUAL_WIDTH - 8
-        self.dx = -self.dx
-        gSounds['wall-hit']:play()
-    end
+        if self.x >= VIRTUAL_WIDTH - 8 then
+            self.x = VIRTUAL_WIDTH - 8
+            self.dx = -self.dx
+            snd = true
+        end
 
-    if self.y <= 0 then
-        self.y = 0
-        self.dy = -self.dy
-        gSounds['wall-hit']:play()
+        if self.y <= 0 then
+            self.y = 0
+            self.dy = -self.dy
+            snd = true
+        end
+        if snd then    
+           self:beep()
+        end
+        self:checkBoundry()
     end
 end
 
 function Ball:render()
-    -- gTexture is our global texture for all blocks
-    -- gBallFrames is a table of quads mapping to each individual ball skin in the texture
-    love.graphics.draw(gTextures['main'], gFrames['balls'][self.skin],
-        self.x, self.y)
+    if self.active then
+        -- gTexture is our global texture for all blocks
+        -- gBallFrames is a table of quads mapping to each individual ball skin in the texture
+        love.graphics.draw(gTextures['main'], gFrames['balls'][self.skin], self.x, self.y)
+    end 
+end
+
+function Ball:setStartVelocity()
+    self.dx = math.random(-200, 200)
+    self.dy = math.random(-50, -60)
+end
+
+function Ball:startBall()
+    self:setStartVelocity()
+    self.x = 25 + math.random(0,382)
+    self.y = 7
+    self:setActive()
 end

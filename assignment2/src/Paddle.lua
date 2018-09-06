@@ -40,14 +40,43 @@ function Paddle:init(skin)
     -- the variant is which of the four paddle sizes we currently are; 2
     -- is the starting size, as the smallest is too tough to start with
     self.size = 2
+    self.speed = PADDLE_SPEED
 end
+
+function Paddle:reset()
+    self.speed = PADDLE_SPEED    
+    self:setSize(2)
+end
+
+function Paddle:setSkin(skin)
+    self.skin = skin
+end
+
+function Paddle:setSize(size)    
+    local w = {32,64,96,128}
+    self.size = size
+    self.width = w[size] or 64
+    return self.size , self.width
+end
+
+function Paddle:incPaddleSpeed()
+    self.speed = PADDLE_SPEED + math.random(0,96)
+end
+
+function Paddle:resetPaddleSpeed()
+    self.speed = PADDLE_SPEED
+end
+
+function Paddle:readSpeed()
+    return self.speed
+end 
 
 function Paddle:update(dt)
     -- keyboard input
     if love.keyboard.isDown('left') then
-        self.dx = -PADDLE_SPEED
+        self.dx = -self.speed
     elseif love.keyboard.isDown('right') then
-        self.dx = PADDLE_SPEED
+        self.dx = self.speed
     else
         self.dx = 0
     end

@@ -26,6 +26,10 @@
 
 require 'src/Dependencies'
 
+local gameStateMachine = nil
+-- create our keyboard interface
+local keysPressed = Keyboard()  
+
 --[[
     Called just once at the beginning of the game; used to set up
     game objects, variables, etc. and prepare the game world.
@@ -93,9 +97,13 @@ function love.load()
         ['recover'] = love.audio.newSource('sounds/recover.wav','static'),
         ['high-score'] = love.audio.newSource('sounds/high_score.wav','static'),
         ['pause'] = love.audio.newSource('sounds/pause.wav','static'),
-
-        ['music'] = love.audio.newSource('sounds/music.wav','static')
     }
+
+    gMusic = love.audio.newSource('sounds/music.wav','stream')
+    gMusic:setLooping(true)
+    gMusic:setVolume(0.3)
+    gMusic:play()
+
 
     -- the state machine we'll be using to transition between various states
     -- in our game instead of clumping them together in our update and draw
@@ -108,29 +116,23 @@ function love.load()
     -- 4. 'play' (the ball is in play, bouncing between paddles)
     -- 5. 'victory' (the current level is over, with a victory jingle)
     -- 6. 'game-over' (the player has lost; display score and allow restart)
-    gStateMachine = StateMachine {
-        ['start'] = function() return StartState() end,
-        ['play'] = function() return PlayState() end,
-        ['serve'] = function() return ServeState() end,
-        ['game-over'] = function() return GameOverState() end,
-        ['victory'] = function() return VictoryState() end,
-        ['high-scores'] = function() return HighScoreState() end,
-        ['enter-high-score'] = function() return EnterHighScoreState() end,
-        ['paddle-select'] = function() return PaddleSelectState() end
+    gameStateMachine = StateMachine {
+        ['idle']        =  BaseState(),
+        ['start']       =  StartState(),
+        ['play']        =  PlayState(),
+        ['serve']       =  ServeState(),
+        ['game_over']   =  GameOverState(),
+        ['victory']     =  VictoryState(),
+        ['high_scores'] =  HighScoreState(),
+        ['enter_name']  =  EnterHighScoreState(),
+        ['paddle_select'] =  PaddleSelectState()
     }
-    gStateMachine:change('start', {
-        highScores = loadHighScores()
-    })
-
-    -- play our music outside of all states and set it to looping
-    gSounds['music']:play()
-    gSounds['music']:setLooping(true)
-
-    -- a table we'll use to keep track of which keys have been pressed this
-    -- frame, to get around the fact that LÖVE's default callback won't let us
-    -- test for input from within other functions
-    love.keyboard.keysPressed = {}
-end
+    
+    --  start the state machine up
+    msgs = init_msg_packet()
+    msgs.powerUps:generateQuads(gTextures['main'])
+    gameStateMachine:run(msgs,'start')
+  end
 
 --[[
     Called whenever we change the dimensions of our window, as by dragging
@@ -152,10 +154,7 @@ end
 ]]
 function love.update(dt)
     -- this time, we pass in dt to the state object we're currently using
-    gStateMachine:update(dt)
-
-    -- reset keys pressed
-    love.keyboard.keysPressed = {}
+    gameStateMachine:update(keysPressed, msgs ,dt)
 end
 
 --[[
@@ -165,20 +164,16 @@ end
     things to happen right away, just once, like when we want to quit.
 ]]
 function love.keypressed(key)
-    -- add to our table of keys pressed this frame
-    love.keyboard.keysPressed[key] = true
-end
-
---[[
-    A custom function that will let us test for individual keystrokes outside
-    of the default `love.keypressed` callback, since we can't call that logic
-    elsewhere by default.
-]]
-function love.keyboard.wasPressed(key)
-    if love.keyboard.keysPressed[key] then
-        return true
+    -- add to our table of keys pressed this frame    
+    if (key == 'f1') then
+        gMusic:stop()  
+    elseif (key == 'f2') then 
+        gMusic:play() 
+    elseif key == 'escape' then    
+        gMusic:stop()
+        love.event.quit()
     else
-        return false
+        keysPressed:set(key)
     end
 end
 
@@ -204,7 +199,7 @@ function love.draw()
         VIRTUAL_WIDTH / (backgroundWidth - 1), VIRTUAL_HEIGHT / (backgroundHeight - 1))
     
     -- use the state machine to defer rendering to the current state we're in
-    gStateMachine:render()
+    gameStateMachine:render(msgs)
     
     -- display FPS for debugging; simply comment out to remove
     displayFPS()
@@ -213,72 +208,17 @@ function love.draw()
 end
 
 --[[
-    Loads high scores from a .lst file, saved in LÖVE2D's default save directory in a subfolder
-    called 'breakout'.
-]]
-function loadHighScores()
-    love.filesystem.setIdentity('breakout')
-
-    -- if the file doesn't exist, initialize it with some default scores
-    if not love.filesystem.exists('breakout.lst') then
-        local scores = ''
-        for i = 10, 1, -1 do
-            scores = scores .. 'CTO\n'
-            scores = scores .. tostring(i * 1000) .. '\n'
-        end
-
-        love.filesystem.write('breakout.lst', scores)
-    end
-
-    -- flag for whether we're reading a name or not
-    local name = true
-    local currentName = nil
-    local counter = 1
-
-    -- initialize scores table with at least 10 blank entries
-    local scores = {}
-
-    for i = 1, 10 do
-        -- blank table; each will hold a name and a score
-        scores[i] = {
-            name = nil,
-            score = nil
-        }
-    end
-
-    -- iterate over each line in the file, filling in names and scores
-    for line in love.filesystem.lines('breakout.lst') do
-        if name then
-            scores[counter].name = string.sub(line, 1, 3)
-        else
-            scores[counter].score = tonumber(line)
-            counter = counter + 1
-        end
-
-        -- flip the name flag
-        name = not name
-    end
-
-    return scores
-end
-
---[[
     Renders hearts based on how much health the player has. First renders
     full hearts, then empty hearts for however much health we're missing.
 ]]
 function renderHealth(health)
     -- start of our health rendering
-    local healthX = VIRTUAL_WIDTH - 100
-    
+    local healthX = VIRTUAL_WIDTH - 120
+    local h = 1    
     -- render health left
-    for i = 1, health do
-        love.graphics.draw(gTextures['hearts'], gFrames['hearts'][1], healthX, 4)
-        healthX = healthX + 11
-    end
-
-    -- render missing health
-    for i = 1, 3 - health do
-        love.graphics.draw(gTextures['hearts'], gFrames['hearts'][2], healthX, 4)
+    for i = 1, 3 do
+        if i <= health then h = 1 else h = 2 end
+        love.graphics.draw(gTextures['hearts'], gFrames['hearts'][h], healthX, 4)
         healthX = healthX + 11
     end
 end
@@ -289,7 +229,7 @@ end
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(gFonts['small'])
-    love.graphics.setColor(0, 255, 0, 255)
+    love.graphics.setColor(0, 1, 0, 1)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
 end
 
@@ -299,6 +239,6 @@ end
 ]]
 function renderScore(score)
     love.graphics.setFont(gFonts['small'])
-    love.graphics.print('Score:', VIRTUAL_WIDTH - 60, 5)
-    love.graphics.printf(tostring(score), VIRTUAL_WIDTH - 50, 5, 40, 'right')
+    love.graphics.print('Score:', VIRTUAL_WIDTH - 80, 5)
+    love.graphics.printf(tostring(score), VIRTUAL_WIDTH - 70, 5, 60, 'right')
 end

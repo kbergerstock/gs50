@@ -20,37 +20,37 @@ Brick = Class{}
 paletteColors = {
     -- blue
     [1] = {
-        ['r'] = 99,
-        ['g'] = 155,
-        ['b'] = 255
+        ['r'] = 99.0/255.0,
+        ['g'] = 155.0/255.0,
+        ['b'] = 255.0/255.0
     },
     -- green
     [2] = {
-        ['r'] = 106,
-        ['g'] = 190,
-        ['b'] = 47
+        ['r'] = 106.0/255.0,
+        ['g'] = 190.0/255.0,
+        ['b'] = 47.0/255.0
     },
     -- red
     [3] = {
-        ['r'] = 217,
-        ['g'] = 87,
-        ['b'] = 99
+        ['r'] = 217.0/255.0,
+        ['g'] = 87.0/255.0,
+        ['b'] = 99.0/255.0
     },
     -- purple
     [4] = {
-        ['r'] = 215,
-        ['g'] = 123,
-        ['b'] = 186
+        ['r'] = 215.0/255.0,
+        ['g'] = 123.0/255.0,
+        ['b'] = 186.0/255.0
     },
     -- gold
     [5] = {
-        ['r'] = 251,
-        ['g'] = 242,
-        ['b'] = 54
+        ['r'] = 251.0/255.0,
+        ['g'] = 242.0/255.0,
+        ['b'] = 54.0/255.0
     }
 }
 
-function Brick:init(x, y)
+function Brick:init(x, y, keyBrickFlag)
     -- used for coloring and score calculation
     self.tier = 0
     self.color = 1
@@ -59,7 +59,9 @@ function Brick:init(x, y)
     self.y = y
     self.width = 32
     self.height = 16
-    
+
+    -- is this a keybrick
+    self.keyBrick = keyBrickFlag
     -- used to determine whether this brick should be rendered
     self.inPlay = true
 
@@ -77,7 +79,7 @@ function Brick:init(x, y)
     self.psystem:setLinearAcceleration(-15, 0, 15, 80)
 
     -- spread of particles; normal looks more natural than uniform
-    self.psystem:setAreaSpread('normal', 10, 10)
+    self.psystem:setEmissionArea('normal', 10, 10)
 end
 
 --[[
@@ -88,11 +90,12 @@ function Brick:hit()
     -- set the particle system to interpolate between two colors; in this case, we give
     -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
     -- over the particle's lifetime (the second color)
+    local alpha = self.keyBrick and 0.95 or (55*(self.tier +1))/255.0 
     self.psystem:setColors(
         paletteColors[self.color].r,
         paletteColors[self.color].g,
         paletteColors[self.color].b,
-        55 * (self.tier + 1),
+        alpha,
         paletteColors[self.color].r,
         paletteColors[self.color].g,
         paletteColors[self.color].b,
@@ -135,11 +138,11 @@ end
 
 function Brick:render()
     if self.inPlay then
+        local ndx = self.keyBrick and 'key' or (1 + ((self.color - 1) * 4) + self.tier)
         love.graphics.draw(gTextures['main'], 
             -- multiply color by 4 (-1) to get our color offset, then add tier to that
             -- to draw the correct tier and color brick onto the screen
-            gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
-            self.x, self.y)
+            gFrames['bricks'][ndx], self.x, self.y)
     end
 end
 
