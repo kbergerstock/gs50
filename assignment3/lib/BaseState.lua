@@ -1,6 +1,6 @@
 --[[
     GD50
-    Match-3 Remake
+    Breakout Remake
 
     -- BaseState Class --
 
@@ -15,10 +15,17 @@
     ourselves in the actual classes.
 ]]
 
+-- luacheck: globals BaseState Class o
+-- luacheck: no unused args , no self
+
+if not rawget(getmetatable(o) or {},'__Class') then
+	Class = require 'lib/class'
+end
 BaseState = Class{}
 
 function BaseState:init() end
-function BaseState:enter() end
-function BaseState:exit() end
-function BaseState:update(dt) end
-function BaseState:render() end
+function BaseState:enter(msg) end
+function BaseState:exit(msg) end
+function BaseState:update(inputs, msg, dt) end
+function BaseState:render(msg) end
+function BaseState:handle_input(input, msg) end

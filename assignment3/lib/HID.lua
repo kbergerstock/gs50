@@ -1,7 +1,10 @@
 --[[
-    HID input class 
+    HID input class
     k.r.bergerstock
 ]]
+
+-- luacheck: allow_defined, no unused, globals Class setColor love BaseState o
+
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -34,27 +37,27 @@ function cHID:getEnter()
 end
 
 function cHID:isSpace()
-    return self.inputs['space'] or false 
+    return self.inputs['space'] or false
 end
 
 function cHID:isEscape()
-    return self.inputs['escape'] or false 
-end    
+    return self.inputs['escape'] or false
+end
 
 function cHID:leftButton()
-    return self.inputs[2] or false 
+    return self.inputs[2] or false
 end
 
 function cHID:rightButton()
-    return self.inputs[1] or false 
+    return self.inputs[1] or false
 end
 
 function cHID:middleButton()
-    return self.inputs[3] or false 
+    return self.inputs[3] or false
 end
 
 function cHID:isPaused()
-    return self.inputs['p'] or self.inputs['P'] or false 
+    return self.inputs['p'] or self.inputs['P'] or false
 end
 
 

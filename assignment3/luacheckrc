@@ -1,0 +1,2 @@
+allowed_define = {true}
+ignore = {VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT }
