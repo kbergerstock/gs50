@@ -1,6 +1,6 @@
 
 if not rawget(getmetatable(o) or {},'__Class') then
-	Class = require 'class'
+	Class = require 'lib/class'
 end
 
 --[[     class PowerUps   an array of powerups                                        ]]--

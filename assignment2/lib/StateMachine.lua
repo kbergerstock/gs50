@@ -62,7 +62,7 @@
 ]]
 
 if not rawget(getmetatable(o) or {},'__Class') then
-	Class = require 'class'
+	Class = require 'lib/class'
 end
 
 StateMachine = Class{}

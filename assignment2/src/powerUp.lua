@@ -2,7 +2,7 @@
 -- krbergerstock
 
 if not rawget(getmetatable(o) or {},'__Class') then
-	Class = require 'class'
+	Class = require 'lib/class'
 end
 
 _PowerUp = Class{__includes = Target}
