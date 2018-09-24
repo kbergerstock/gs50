@@ -32,18 +32,22 @@ end
 
 function BeginGameState:enter(msg)
     -- spawn a board and place it toward the right
-    msg.board = Board(VIRTUAL_WIDTH - 272, 16)
+    msg.board = Board(VIRTUAL_WIDTH - 272, 16, msg.level)
     --
     -- animate our white screen fade-in, then animate a drop-down with
     -- the level text
+    -- once that's finished, start a transition of our text label to
+    -- the center of the screen over 0.25 seconds
     --
     self.nerr = false
     self.done = false
     self.alpha = 1.0
     self.fade_co = coroutine.create(fade,-1)
-    -- once that's finished, start a transition of our text label to
-    -- the center of the screen over 0.25 seconds
+    if msg.level > 1 and msg.seconds > 20 then
+        msg.seconds = msg.seconds - 5
+    end
 end
+
 
 function BeginGameState:render(msg)
 

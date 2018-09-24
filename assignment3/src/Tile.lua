@@ -43,7 +43,7 @@ end
 function Tile:render(x, y, tick)
     if self.matched > 0 then
         if self.w > self.y then
-            self.y = self.y + 2
+            self.y = self.y + 4
         elseif self.y >= self.w then
             self.y = self.w
         end

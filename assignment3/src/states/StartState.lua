@@ -72,7 +72,9 @@ function StartState:enter(msg)
     self.error = false
     self.alpha = 0.0
     msg.level = 1
+    msg.score = 0
     self.next = 'idle'
+    msg.seconds = 60
     self.fade_co = coroutine.create(function() end)
     coroutine.resume(self.fade_co)
     self.positions = self:generateTable()

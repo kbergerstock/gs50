@@ -30,8 +30,6 @@ function PlayState:init()
     self.tick = false
     self.alpha = 1.0
     self.seconds = 0
-    self.st = 0
-    self.et = 0
     self.m = 'not started'
 
     -- position in the grid which we're highlighting
@@ -47,20 +45,27 @@ end
 
 function PlayState:enter(msg)
     assert(msg.board,'no board in message packet')
-    self.kd_co = coroutine.create(countdown,90)
+
+    self.kd_co = coroutine.create(countdown,1)
+    coroutine.resume(self.kd_co,msg.seconds)
+
     self.update_co = coroutine.create(updateBoard,msg,1)
+
     -- score we have to reach to get to the next level
     msg.goal =  msg.level * 1.25 * 1000
 end
 
 function PlayState:exit(msg)
-    coroutine.resume(
-        self.update_co, msg, 99)
+    coroutine.resume(self.update_co, msg, 99)
+    if msg.seconds > 20
+        then msg.seconds = msg.seconds - 5
+        end
 end
 
 
 
 function PlayState:update(inputs, msg, dt)
+
     if coroutine.status(self.update_co) ~= 'dead' then
         self.nerr , self.m = coroutine.resume(self.update_co,msg,1)
         assert(self.nerr,'there is an error in update board')
@@ -101,7 +106,7 @@ function PlayState:render(msg)
     end
     -- execute the countdown timer
     if coroutine.status(self.kd_co) ~= 'dead' then
-        self.nerr,self.done,self.tick,self.seconds = coroutine.resume( self.kd_co, 120)
+        self.nerr,self.done,self.tick,self.seconds = coroutine.resume( self.kd_co,1)
         assert(self.nerr,"there is an error in countdown !!")
     end
     -- render board of tiles
@@ -120,7 +125,7 @@ function PlayState:render(msg)
 
     -- GUI text
     setColor(56, 56, 56, 234)
-    love.graphics.rectangle('fill', 16, 16, 186, 156, 6, 4) -- org 116
+    love.graphics.rectangle('fill', 16, 16, 186, 186, 6, 4) -- org 116
 
     setColor(99, 155, 255, 255)
     love.graphics.setFont(gFonts['medium'])
@@ -129,5 +134,5 @@ function PlayState:render(msg)
     love.graphics.printf('Goal : ' .. tostring(msg.goal), 20, 80, 182, 'center')
     love.graphics.printf('Timer: ' .. tostring(self.seconds), 20, 108, 182, 'center')
     love.graphics.setFont(gFonts['small'])
-    love.graphics.printf(self.m , 20, 128, 182, 'center')
+     -- love.graphics.printf(self.m , 20, 128, 182, 'center')for debug only
 end

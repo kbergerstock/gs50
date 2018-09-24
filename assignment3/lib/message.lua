@@ -3,12 +3,11 @@
 -- Message is a closure based object
 
 
-
  function Message(start)
-    
-    local self =  { 
+
+    local self =   {
                         score = 0,
-                        level = 0, 
+                        level = 0,
                         health = 3,
     }
 
@@ -17,13 +16,10 @@
     function  self.nextState(state)
         next = state
     end
-    
+
     function self.next()
         return next
     end
 
     return self
 end
-
-
-    

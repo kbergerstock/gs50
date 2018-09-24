@@ -16,11 +16,15 @@
 GameOverState = Class{__includes = BaseState}
 
 function GameOverState:init()
-
+    self.highScores = HighScoreTracker(10)
+    self.highScores:loadHighScores('match3')
 end
 
 function GameOverState:enter(msg)
-
+    if self.highScores:checkScore(msg.score) then
+        self.highScores:add('EVE',msg.score)
+        self.highScores:writeHighScores()
+    end
 end
 
 function GameOverState:handle_input(input, msg)
@@ -31,14 +35,19 @@ function GameOverState:handle_input(input, msg)
 end
 
 function GameOverState:render(msg)
+    local w = 190
+    local h = 66
+    local xs = VIRTUAL_WIDTH / 2 - 64
+    local ys =16
     love.graphics.setFont(gFonts['large'])
 
     setColor(56, 56, 56, 234)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 64, 64, 128, 136, 4)
+    love.graphics.rectangle('fill',xs , ys, w, h, 4)
 
     setColor(99, 155, 255, 255)
-    love.graphics.printf('GAME OVER', VIRTUAL_WIDTH / 2 - 64, 64, 128, 'center')
+    love.graphics.printf('GAME OVER', xs, ys + 4, w, 'center')
     love.graphics.setFont(gFonts['medium'])
-    love.graphics.printf('Your Score: ' .. tostring(msg.score), VIRTUAL_WIDTH / 2 - 64, 140, 128, 'center')
-    love.graphics.printf('Press Enter', VIRTUAL_WIDTH / 2 - 64, 180, 128, 'center')
+    love.graphics.printf('Your Score: ' .. tostring(msg.score), xs , ys +30 , w, 'center')
+    love.graphics.printf('Press Space Bar', xs, ys + 46 , w, 'center')
+    self.highScores:render(xs,ys + h + 2, gFonts['medium'])
 end

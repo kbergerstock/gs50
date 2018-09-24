@@ -13,17 +13,55 @@
 
 -- luacheck: allow_defined, globals Class setColor love Tile
 
+-- helper functions
+function __compare(c,cc)
+    for i = 1, #cc do
+        if (cc[i] == c) then
+            return true
+        end
+    end
+    return false
+end
+
+function __create_color_table()
+    local cc = {}
+    local c = math.random(18)
+    local k = 2
+    cc[1] = c
+    repeat
+        c = math.random(18)
+        if not __compare(c,cc) then
+            cc[k] = c
+            k = k + 1
+        end
+    until k == 7
+    return cc
+ end
+
+ -----------------------------------
+
 Board = Class{}
 
-function Board:init(x, y)
+function Board:init(x, y, level)
     -- this coordinate is for the upper left corner of the board
     self.x = x
     self.y = y
-    self.colors = {}        -- an arrary of the 6 piedes used in this board
+    self.colors = {}        -- an arrary of the 6 pieces used in this board
     self.ndx = 0            -- index of current tile hilite
     self.match_found = false
-    self:initializeTiles()
     self.swaps = ''
+    -- generate the colors we need for this board
+    if level == 1 then
+        self.colors = {1,4,7,10,13,16 }
+    elseif level == 2 then
+        self.colors = {2,5,8,11,14,17 }
+    elseif level == 3 then
+        self.colors = {3,5,9,12,15,18 }
+    else
+        self.colors = __create_color_table()
+    end
+    -- and lastly !! create the board for this level
+    self:initializeTiles()
 end
 
 function Board:initializeTiles()
@@ -31,18 +69,14 @@ function Board:initializeTiles()
         self.tiles = {}
         local row = 1           -- bottom left corner
         local col = 1           -- ndx = (row - 1) * 10 + col
-           -- generate the pieces we need for this board
-        for i = 1, 6 do
-            local c = math.random(18)
-            self.colors[i] = c
-        end
         -- generate the board
         for i = 1,100 do
             if row == 1 or row == 10 or col == 1 or col == 10 then
                 self.tiles[i] = Tile(col,row,0,0)
             else
                 local p = math.random(6)
-                self.tiles[i] =  Tile(col, row,self.colors[p], p)
+                local cc = self.colors[p]
+                self.tiles[i] =  Tile(col, row, cc, p)
             end
             col = col + 1
             if col > 10 then

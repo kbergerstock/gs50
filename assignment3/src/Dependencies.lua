@@ -13,7 +13,7 @@
 
 -- luacheck: allow_defined, no unused
 -- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
---
+-- luacheck: ignore EXTRA_TIME
 -- libraries
 --
 require 'lib/message'
@@ -24,9 +24,10 @@ require 'lib/HID'
 require 'lib/BaseState'
 require 'lib/StateMachine'
 require 'lib/handy'
+require 'lib/HighScoreTracker'
 
 --
--- our own code
+-- the application code
 --
 -- utility
 require 'src/Util'
@@ -45,6 +46,8 @@ require 'src/states/StartState'
 --
 -- constants
 --
+EXTRA_TIME = 0
+--
 -- physical screen dimensions
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -52,4 +55,3 @@ WINDOW_HEIGHT = 720
 -- virtual resolution dimensions
 VIRTUAL_WIDTH = 512
 VIRTUAL_HEIGHT = 288
-

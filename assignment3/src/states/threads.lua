@@ -6,22 +6,33 @@
 
 -- thread
 function updateBoard(msg, action)
-    local m = 'start'
-    local ms = 0
-
+    local m = 'start'   -- debug only
+    local ms = 0        -- matches found
+    local sf = 50       -- score factor
     repeat
         if msg.board.match_found then
             while msg.board.match_found do
                 m = 'mew match '
                 ms = msg.board:calculateTileMatches()
                 m = m .. ' match calc: '.. tostring(ms) .. '\n'
-                msg.score = msg.score + 50 * ms
+                if ms == 1 then 
+                    sf = 50
+                elseif ms == 2 then 
+                    sf = 75
+                else
+                    sf = 100
+                end
+                msg.score = msg.score + sf * ms
+                if EXTRA_TIME == 0 then
+                    EXTRA_TIME = ms * 2
+                end
                 msg.board:updateRow()
                 coroutine.yield(m)
+                ms = 0
                 msg.board.match_found = (msg.board:doesTileMatchExist() > 0) and true or false
             end
         else
-            coroutine.yield(m)
+            coroutine.yield(m,0)
         end
     until action == 99
 end
@@ -113,19 +124,23 @@ function countdown(seconds)
     local lt = 0
     local wt = 0
     local tick = false
+    local allowed_time = seconds
     lt = love.timer.getTime()
     wt = lt
-    for i = seconds, 1, -1 do
+    repeat
         repeat
             repeat
-                coroutine.yield(false, tick, i)
+                coroutine.yield(false, tick, allowed_time)
+                allowed_time  = allowed_time  + EXTRA_TIME
+                EXTRA_TIME = 0
                 et = love.timer.getTime()
             until (et - lt) * 1000 > 499
             lt = et
             tick = not tick
         until (et - wt) * 1000 > 997
         wt = et
-    end
+        allowed_time  = allowed_time - 1 
+    until allowed_time < 0
     return true, tick, 0
 end
 

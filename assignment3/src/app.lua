@@ -17,6 +17,8 @@ function APP:init()
     self.msg.goal = 0
     self.msg.board = {}
     self.msg.quit = false
+    self.msg.seconds = 60              -- allowed time to find matches per board
+    self.msg.clear_level_time = 120
 
     self.gameStateMachine = StateMachine {
         ['start']       =  StartState(),
