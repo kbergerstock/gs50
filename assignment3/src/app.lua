@@ -18,7 +18,8 @@ function APP:init()
     self.msg.board = {}
     self.msg.quit = false
     self.msg.seconds = 60              -- allowed time to find matches per board
-    self.msg.clear_level_time = 120
+   self.msg.clear_level_time = 120
+
 
     self.gameStateMachine = StateMachine {
         ['start']       =  StartState(),
@@ -30,6 +31,7 @@ function APP:init()
     -- keep track of scrolling our background on the X axis
     self.bgX = 0        -- x location of background
     self.bgS = 80       -- background scroll speed
+    self.bgW = -1024 + VIRTUAL_WIDTH - 4 + 51
 end
 
 function APP:load()
@@ -57,7 +59,7 @@ function APP:update(dt)
     self.bgX = self.bgX - self.bgS * dt
 
     -- if we've scrolled the entire image, reset it to 0
-    if self.bgX <= -1024 + VIRTUAL_WIDTH - 4 + 51 then
+    if self.bgX <= self.bgW then
         self.bgX = 0
     end
     -- execute the specific instance of the game states

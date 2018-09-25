@@ -4,35 +4,30 @@
 -- luacheck: allow_defined, no unused
 -- luacheck: globals love
 
+local EXTRA_TIME = 0
 -- thread
 function updateBoard(msg, action)
-    local m = 'start'   -- debug only
     local ms = 0        -- matches found
-    local sf = 50       -- score factor
+    local sf = 0        -- current board score
+    local et = 0
     repeat
         if msg.board.match_found then
             while msg.board.match_found do
-                m = 'mew match '
-                ms = msg.board:calculateTileMatches()
-                m = m .. ' match calc: '.. tostring(ms) .. '\n'
-                if ms == 1 then 
-                    sf = 50
-                elseif ms == 2 then 
-                    sf = 75
-                else
-                    sf = 100
-                end
-                msg.score = msg.score + sf * ms
+                ms, sf  = msg.board:calculateTileMatches()
+                msg.score = msg.score + sf
+                et = et + ms * 2
                 if EXTRA_TIME == 0 then
-                    EXTRA_TIME = ms * 2
+                    EXTRA_TIME = et
+                    et = 0
                 end
                 msg.board:updateRow()
-                coroutine.yield(m)
+                coroutine.yield()
                 ms = 0
+                sf = 0
                 msg.board.match_found = (msg.board:doesTileMatchExist() > 0) and true or false
             end
         else
-            coroutine.yield(m,0)
+            coroutine.yield()
         end
     until action == 99
 end

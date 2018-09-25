@@ -43,9 +43,6 @@ function BeginGameState:enter(msg)
     self.done = false
     self.alpha = 1.0
     self.fade_co = coroutine.create(fade,-1)
-    if msg.level > 1 and msg.seconds > 20 then
-        msg.seconds = msg.seconds - 5
-    end
 end
 
 

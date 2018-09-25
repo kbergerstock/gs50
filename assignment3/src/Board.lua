@@ -38,6 +38,9 @@ function __create_color_table()
     return cc
  end
 
+ function scoreMatch(w)
+    return 50 + (w-3) * 100
+end
  -----------------------------------
 
 Board = Class{}
@@ -131,45 +134,73 @@ function Board:toggleTile(col,row)
     end
 end
 
+function Board:setBomb(col,row)
+    local idx = (row + 1) * 10 + col + 2
+    if self.tiles[idx].piece > 0 then
+        self.tiles[idx].bomb = true
+    end
+end
+
 function Board:set(idx, tile)
-    -- assert(idx ~= nil,'error idx is nil')
-    -- self:addSwaps(idx,999)
     self.tiles[idx].piece  = tile.piece
     self.tiles[idx].color  = tile.color
     self.tiles[idx].variety = tile.variety
     self.tiles[idx].matched = tile.matched
+    self.tiles[idx].bomb = tile.bomb
 end
 
 function Board:swap(idx,jdx)
-    -- assert(jdx ~= nil,'error jdx is nil')
-    -- assert(idx ~= nil,'error idx is nil')
-    -- self:addSwaps(idx,jdx)
+    -- step 1
     local piece = self.tiles[idx].piece
     local color = self.tiles[idx].color
     local variety = self.tiles[idx].variety
     local matched = self.tiles[idx].matched
+    local bomb = self.tiles[idx].bomb
+    -- step 2
     self.tiles[idx].piece  = self.tiles[jdx].piece
     self.tiles[idx].color  = self.tiles[jdx].color
     self.tiles[idx].variety = self.tiles[jdx].variety
-    self.tiles[idx].varoety = self.tiles[jdx].matched
+    self.tiles[idx].matched = self.tiles[jdx].matched
+    self.tiles[idx].bomb = self.tiles[jdx].bomb
+    -- step 3
     self.tiles[jdx].piece  = piece
     self.tiles[jdx].color  = color
     self.tiles[jdx].variety = variety
     self.tiles[jdx].matched = matched
+    self.tiles[jdx].bomb = bomb
 end
 
 function Board:render(tick)
     for i = 11 , 90 do
-        -- this fumction is being passed the upper right corner as the origin
+        -- this function is being passed the upper right corner as the origin
         -- the render function will transcribe this to the lower left
         self.tiles[i]:render(self.x, self.y ,tick)
     end
 end
 
--- by adding am empty square around the outside perimeter
+function Board:calculateMatchWidth(piece,idx,step)
+    local j = idx - step
+    local k = idx + step
+    local n = 1
+    self.tiles[idx].matched = -1
+    while piece == self.tiles[j].piece do
+        self.tiles[j].matched = -1
+        n = n + 1
+        j = j - step
+    end
+    while piece == self.tiles[k].piece do
+        self.tiles[k].matched = -1
+        n = n + 1
+        k = k + step
+    end
+    return n
+end
+
+-- by adding an empty square around the outside perimeter
 -- it allowd us iterate / index over the board without checking for boundries
 function Board:calculateTileMatches()
     local matches = 0
+    local score = 0
     for i = 11, 90 do
         local p0 = self.tiles[i].piece
         if p0 > 0 then
@@ -177,28 +208,23 @@ function Board:calculateTileMatches()
             local p3 = self.tiles[i-1].piece
             local p5 = self.tiles[i+10].piece
             local p7 = self.tiles[i-10].piece
+            local n = 0
 
             if p0 == p1 and p0 == p3 then
-                self.tiles[i].matched = -1
-                self.tiles[i+1].matched = -1
-                self.tiles[i-1].matched = -1
                 matches = matches + 1
+                n = self:calculateMatchWidth(p0,i,1)
+                score = score + scoreMatch(n)
             end
 
             if p0 == p5 and p0 == p7 then
-                self.tiles[i].matched = -1
-                self.tiles[i+10].matched = -1
-                self.tiles[i-10].matched = -1
+                n = 0
                 matches = matches + 1
+                n = self:calculateMatchWidth(p0,i,10)
+                score = score + scoreMatch(n)
             end
         end
     end
-    return matches
-end
-
--- debug routine
-function Board:addSwaps(idx,jdx)
-    self.swaps = self.swaps .. 'from : ' .. tostring(jdx) .. " to -> " .. tostring(idx) ..'\n'
+    return matches, score
 end
 
 function Board:fillBlank(jdx)

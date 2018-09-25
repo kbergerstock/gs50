@@ -11,7 +11,7 @@
     color and a variety, with the varietes adding extra points to the matches.
 ]]
 
--- luacheck: allow_defined, globals Class setColor love
+-- luacheck: allow_defined, globals Class setColor love gFrames gTextures
 
 Tile = Class{}
 
@@ -37,6 +37,7 @@ function Tile:init(col, row, color, variety)
     -- with 18 colors amd 6 variety's there are 108 unique pieces
     self.piece = color * 10 + variety
     self.matched = self.piece
+    self.bomb = false                   -- bomb mode == true
     self.hilite  = false                -- true if hilite
 end
 
@@ -49,23 +50,27 @@ function Tile:render(x, y, tick)
         end
 
         -- draw shadow
+        love.graphics.setLineWidth(1)
         setColor(34, 32, 52, 255)
         love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],
             self.x + x + 2, self.y + y + 2)
 
         -- draw tile itself
         setColor(255, 255, 255, 255)
-        love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],
-            self.x + x, self.y + y)
+        love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],self.x + x, self.y + y)
         if self.w > self.y then
             self.y = self.y + 2
         else
             self.y = self.w
         end
-        if self.hilite and tick then
+        if (self.hilite or self.bomb) and tick then
             -- multiply so drawing white rect makes it brighter
             love.graphics.setBlendMode('add')
-            setColor(255, 255, 255, 96)
+            if self.bomb then
+                setColor(255,255,0,96)
+            else
+                setColor(255, 255, 255, 96)
+            end
             love.graphics.rectangle('fill', (self.x + x),(self.y + y), 32, 32, 4)
             -- back to alpha
             love.graphics.setBlendMode('alpha')

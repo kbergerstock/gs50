@@ -53,13 +53,15 @@ function PlayState:enter(msg)
 
     -- score we have to reach to get to the next level
     msg.goal =  msg.level * 1.25 * 1000
+
+    msg.board:setBomb(2,2)
 end
 
 function PlayState:exit(msg)
-    coroutine.resume(self.update_co, msg, 99)
-    if msg.seconds > 20
-        then msg.seconds = msg.seconds - 5
-        end
+    self.nerr = coroutine.resume(self.update_co, msg, 99)
+    if msg.seconds > 20 and msg.score > msg.goal then
+         msg.seconds = msg.seconds - 5
+    end
 end
 
 
@@ -67,7 +69,7 @@ end
 function PlayState:update(inputs, msg, dt)
 
     if coroutine.status(self.update_co) ~= 'dead' then
-        self.nerr , self.m = coroutine.resume(self.update_co,msg,1)
+        self.nerr  = coroutine.resume(self.update_co,msg,1)
         assert(self.nerr,'there is an error in update board')
     else
         self.m = 'redflag'
@@ -133,6 +135,4 @@ function PlayState:render(msg)
     love.graphics.printf('Score: ' .. tostring(msg.score), 20, 52, 182, 'center')
     love.graphics.printf('Goal : ' .. tostring(msg.goal), 20, 80, 182, 'center')
     love.graphics.printf('Timer: ' .. tostring(self.seconds), 20, 108, 182, 'center')
-    love.graphics.setFont(gFonts['small'])
-     -- love.graphics.printf(self.m , 20, 128, 182, 'center')for debug only
 end

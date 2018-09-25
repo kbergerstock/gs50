@@ -20,6 +20,7 @@ require 'lib/message'
 
 Class = require 'lib/class'
 push = require 'lib/push'
+require 'lib/Log'
 require 'lib/HID'
 require 'lib/BaseState'
 require 'lib/StateMachine'
