@@ -67,7 +67,7 @@ function Tile:render(x, y, tick)
             -- multiply so drawing white rect makes it brighter
             love.graphics.setBlendMode('add')
             if self.bomb then
-                setColor(255,255,0,96)
+                setColor(200,158 ,148,32)
             else
                 setColor(255, 255, 255, 96)
             end

@@ -38,9 +38,6 @@ function __create_color_table()
     return cc
  end
 
- function scoreMatch(w)
-    return 50 + (w-3) * 100
-end
  -----------------------------------
 
 Board = Class{}
@@ -52,7 +49,7 @@ function Board:init(x, y, level)
     self.colors = {}        -- an arrary of the 6 pieces used in this board
     self.ndx = 0            -- index of current tile hilite
     self.match_found = false
-    self.swaps = ''
+    self.bombs = 0
     -- generate the colors we need for this board
     if level == 1 then
         self.colors = {1,4,7,10,13,16 }
@@ -134,10 +131,12 @@ function Board:toggleTile(col,row)
     end
 end
 
+-- uses zero based indices
 function Board:setBomb(col,row)
     local idx = (row + 1) * 10 + col + 2
     if self.tiles[idx].piece > 0 then
         self.tiles[idx].bomb = true
+        self.bombs = self.bombs + 1
     end
 end
 
@@ -178,22 +177,35 @@ function Board:render(tick)
     end
 end
 
+function Board:bombCheck(idx)
+    local score = 0
+    if self.tiles[idx].bomb then
+        score = 150
+        self.bombs = self.bombs - 1
+    end
+    return score
+end
+
 function Board:calculateMatchWidth(piece,idx,step)
     local j = idx - step
     local k = idx + step
-    local n = 1
+    local score = 0
+    local n = 1                 -- counts number of tiles in match
     self.tiles[idx].matched = -1
+    score = score + self:bombCheck(idx)
     while piece == self.tiles[j].piece do
         self.tiles[j].matched = -1
+        score = score + self:bombCheck(j)
         n = n + 1
         j = j - step
     end
     while piece == self.tiles[k].piece do
         self.tiles[k].matched = -1
+        score = score + self:bombCheck(k)
         n = n + 1
         k = k + step
     end
-    return n
+    return score + 50 +(n-3)*25
 end
 
 -- by adding an empty square around the outside perimeter
@@ -208,19 +220,15 @@ function Board:calculateTileMatches()
             local p3 = self.tiles[i-1].piece
             local p5 = self.tiles[i+10].piece
             local p7 = self.tiles[i-10].piece
-            local n = 0
 
             if p0 == p1 and p0 == p3 then
                 matches = matches + 1
-                n = self:calculateMatchWidth(p0,i,1)
-                score = score + scoreMatch(n)
+                score = score + self:calculateMatchWidth(p0,i,1)
             end
 
             if p0 == p5 and p0 == p7 then
-                n = 0
                 matches = matches + 1
-                n = self:calculateMatchWidth(p0,i,10)
-                score = score + scoreMatch(n)
+                score = score + self:calculateMatchWidth(p0,i,10)
             end
         end
     end

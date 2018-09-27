@@ -16,7 +16,7 @@
     main menu or the score entry menu if they made the top 10.
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState
+-- luacheck: allow_defined, no unused, globals Class setColor love BaseState handle_mouse_input countdown updateBoard
 
 PlayState = Class{__includes = BaseState}
 
@@ -30,7 +30,7 @@ function PlayState:init()
     self.tick = false
     self.alpha = 1.0
     self.seconds = 0
-    self.m = 'not started'
+    self.timer = 0
 
     -- position in the grid which we're highlighting
     self.boardHighlightX = 0
@@ -39,7 +39,7 @@ function PlayState:init()
     self.tileX = 0
     self.TileY = 0
 
-    self.mouse_co = coroutine.create( handle_mouse_input,1)
+    self.mouse_co = coroutine.create(handle_mouse_input, 1)
     self.update_co = coroutine.create(function() end)
 end
 
@@ -53,14 +53,13 @@ function PlayState:enter(msg)
 
     -- score we have to reach to get to the next level
     msg.goal =  msg.level * 1.25 * 1000
-
-    msg.board:setBomb(2,2)
 end
 
 function PlayState:exit(msg)
     self.nerr = coroutine.resume(self.update_co, msg, 99)
     if msg.seconds > 20 and msg.score > msg.goal then
-         msg.seconds = msg.seconds - 5
+        -- shotens the allowed time for the next level
+         msg.seconds = msg.seconds - 2
     end
 end
 
@@ -71,8 +70,6 @@ function PlayState:update(inputs, msg, dt)
     if coroutine.status(self.update_co) ~= 'dead' then
         self.nerr  = coroutine.resume(self.update_co,msg,1)
         assert(self.nerr,'there is an error in update board')
-    else
-        self.m = 'redflag'
     end
 
     -- go back to start if time runs out
@@ -81,8 +78,8 @@ function PlayState:update(inputs, msg, dt)
         msg.nextState('game-over')
     end
 
-    -- go to next level if we surpass score goal
-    if msg.score >= msg.goal then
+
+    if msg.score >= msg.goal and not msg.board.match_found then
         gSounds['next-level']:play()
         msg.level = msg.level + 1
         msg.nextState('begin-game')
@@ -102,14 +99,19 @@ function PlayState:render(msg)
         self.nerr, cx, cy, sx, sy, b1, b2  = coroutine.resume(self.mouse_co,1)
         assert(self.nerr,"there is an error in handle mouse")
         if b1 and not msg.board.match_found then
-            self.m = ''
             msg.board:toggleTile(cx,cy)
         end
     end
     -- execute the countdown timer
     if coroutine.status(self.kd_co) ~= 'dead' then
-        self.nerr,self.done,self.tick,self.seconds = coroutine.resume( self.kd_co,1)
+        self.nerr,self.done,self.tick,self.seconds = coroutine.resume(self.kd_co, 1)
         assert(self.nerr,"there is an error in countdown !!")
+        local rnd = math.random(1000)
+        if self.tick and msg.board.bombs < 3 and rnd > 499 and rnd < 525 then
+            local col = math.random(8)
+            local row = math.random(2)
+            msg.board:setBomb(col-1,8-row)      -- make sure these are zero based indices
+        end
     end
     -- render board of tiles
     msg.board:render(self.tick)
