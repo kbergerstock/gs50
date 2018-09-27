@@ -3,8 +3,7 @@
 -- since we using a love2d engine it;s simmpler to base a timers on the love timer modules
 -- time values are in millisconds
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState o
--- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: allow_defined, no unused, globals Class love  o
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'

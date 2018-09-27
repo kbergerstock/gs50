@@ -24,7 +24,6 @@
 ]]
 
 -- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
 
 StateMachine = Class{}
 -- statemachine constructor

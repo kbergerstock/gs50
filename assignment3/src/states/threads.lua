@@ -3,6 +3,7 @@
 
 -- luacheck: allow_defined, no unused
 -- luacheck: globals love
+-- luacheck: ignore updateBoard fade updateColorBank countdown wrap7 move_label
 
 local EXTRA_TIME = 0
 -- thread
@@ -31,7 +32,7 @@ function updateBoard(msg, action)
         end
     until action == 99
 end
- 
+
 -- thread routine
 function fade(direction)
     -- used to animate our full-screen transition rect
@@ -134,11 +135,10 @@ function countdown(seconds)
             tick = not tick
         until (et - wt) * 1000 > 997
         wt = et
-        allowed_time  = allowed_time - 1 
+        allowed_time  = allowed_time - 1
     until allowed_time < 0
     return true, tick, 0
 end
-
 
 function wrap7(v)
     local r

@@ -12,8 +12,10 @@
 ]]
 
 -- luacheck: allow_defined, no unused
+-- luacheck: ignore Class push
 -- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
 -- luacheck: ignore EXTRA_TIME
+--
 -- libraries
 --
 require 'lib/message'

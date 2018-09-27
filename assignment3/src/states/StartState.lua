@@ -13,7 +13,8 @@
 ]]
 
 -- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals gSounds gFonts gTextures gFrames fade updateColorBank
 
 StartState = Class{__includes = BaseState}
 

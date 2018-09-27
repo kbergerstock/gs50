@@ -2,10 +2,9 @@
 -- create an app Class to implement game
 -- K. R. Bergerstock @ 09/2018
 
--- lovecheck: allow_defined, no unused
--- loveCheck: globals Class
--- luacheck: ignore love push APP app
--- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class push love APP app
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
 
 -- initialize our nearest-neighbor filter
 love.graphics.setDefaultFilter('nearest', 'nearest')

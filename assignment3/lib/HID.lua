@@ -3,7 +3,7 @@
     k.r.bergerstock
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState o
+-- luacheck: allow_defined, no unused, globals Class setColor love  o
 
 
 if not rawget(getmetatable(o) or {},'__Class') then

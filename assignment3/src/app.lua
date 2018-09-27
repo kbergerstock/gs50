@@ -32,8 +32,8 @@
 
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Message StateMachine StartState BeginGameState PlayState GameOverState BaseState
--- luaCheck: globals Class setColor love
--- luacheck: ignore love gFrames gFonts cHID Class VIRTUAL_WIDTH GenerateTileQuads
+-- luacheck: globals Class setColor love GenerateTileQuads cHID VIRTUAL_WIDTH
+-- luacheck: ignore gFonts gFrames
 
 APP = Class{}
 

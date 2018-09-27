@@ -16,7 +16,8 @@
     main menu or the score entry menu if they made the top 10.
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState handle_mouse_input countdown updateBoard
+-- luacheck: allow_defined, no unused, globals Class setColor love BaseState
+-- luacheck: globals gSounds gFonts handle_mouse_input countdown updateBoard
 
 PlayState = Class{__includes = BaseState}
 

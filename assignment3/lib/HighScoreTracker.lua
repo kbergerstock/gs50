@@ -4,7 +4,7 @@
 ]]
 
 -- luacheck: allow_defined, no unused, globals Class setColor love BaseState o
--- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -141,7 +141,7 @@ function HighScoreTracker:render(x, y, font)
 
     -- high score text
     setColor(56, 56, 56, 234)
-    love.graphics.rectangle('fill', x,y, width, heigth, 6, 4) 
+    love.graphics.rectangle('fill', x,y, width, heigth, 6, 4)
     setColor(155, 96, 255, 255)
 
     -- iterate over all high score indices in our high scores table
