@@ -1,8 +1,34 @@
--- app.lua
--- k.r.bergerstock
--- class implementation of  main application
+--[[
+    GD50
+    Match-3 version 2.0.1.1
+    K.R.Bergerstock 09/2018
+    total rewrite of Colton's code main is now just boiler plate
+    along with a shell app class any project can be started, using the same main.lua fle
 
--- encapsulates application in a class amd reduces main to boiler plate
+    credit to : Colton Ogden
+    cogden@cs50.harvard.edu
+
+    Match-3 has taken several forms over the years, with its roots in games
+    like Tetris in the 80s. Bejeweled, in 2001, is probably the most recognized
+    version of this game, as well as Candy Crush from 2012, though all these
+    games owe Shariki, a DOS game from 1994, for their inspiration.
+
+    The goal of the game is to match any three tiles of the same variety by
+    swapping any two adjacent tiles; when three or more tiles match in a line,
+    those tiles add to the player's score and are removed from play, with new
+    tiles coming from the ceiling to replace them.
+
+    As per previous projects, we'll be adopting a retro, NES-quality aesthetic.
+
+    Credit for graphics (amazing work!):
+    https://opengameart.org/users/buch
+
+    Credit for music (awesome track):
+    http://freemusicarchive.org/music/RoccoW/
+
+    Cool texture generator, used for background:
+    http://cpetry.github.io/TextureGenerator-Online/
+]]
 
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Message StateMachine StartState BeginGameState PlayState GameOverState BaseState
@@ -18,7 +44,7 @@ function APP:init()
     self.msg.board = {}
     self.msg.quit = false
     self.msg.seconds = 60              -- allowed time to find matches per board
-   self.msg.clear_level_time = 120
+    self.msg.clear_level_time = 120
 
 
     self.gameStateMachine = StateMachine {
