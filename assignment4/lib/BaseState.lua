@@ -26,6 +26,6 @@ BaseState = Class{}
 function BaseState:init() end
 function BaseState:enter(msg) end
 function BaseState:exit(msg) end
-function BaseState:update(inputs, msg, dt) end
+function BaseState:update(msg, dt) end
 function BaseState:render(msg) end
 function BaseState:handle_input(input, msg) end

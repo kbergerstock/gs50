@@ -14,6 +14,10 @@
     Over screen if at 0 health or the Serve screen otherwise.
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
+
 PlayState = Class{__includes = BaseState}
 
 --[[
@@ -22,7 +26,7 @@ PlayState = Class{__includes = BaseState}
 ]]
 function PlayState:enter(msgs)
     self.paused = false
-    gMusic:stop()
+    gSounds['music']:stop()
     -- give default ball random starting velocity
     msgs.balls:startVelocity()
     msgs.powerUps:setActive(8)
@@ -38,15 +42,17 @@ function PlayState:enter(msgs)
     end
 end
 
-function PlayState:update(keyPressed, msgs, dt)
-    
-    if keyPressed:get('space') then
+function PlayState:handleInput(input, msgs)
+    if input == 'space' then
         self.paused = not self.paused
         gSounds['pause']:play()
     end
+end
+
+function PlayState:update(msgs, dt)
     -- return a nil value !!! if paused
-    if self.paused then 
-        return 
+    if self.paused then
+        return
     end
     -- update positions based on velocity
     msgs.paddle:update(dt)
@@ -60,9 +66,9 @@ function PlayState:update(keyPressed, msgs, dt)
     -- go to our victory screen if there are no more bricks left
     -- detect Brick Collision returns true if all the bricks are gone
     if detect_and_handle_brick_collisions(msgs) then
-        gSounds['victory']:play()                     
-        msgs.next = 'victory'        
-   end 
+        gSounds['victory']:play()
+        msgs.next = 'victory'
+   end
 
     -- if all balls are below bounds, revert to serve state and decrease health
     -- any active returns true if a ball is still in play otherwise false
@@ -84,7 +90,7 @@ function PlayState:update(keyPressed, msgs, dt)
 end
 
 function PlayState:exit()
-    gMusic:play()
+    gSounds['music']:play()
 end
 
 function PlayState:render(msgs)
@@ -100,14 +106,14 @@ function PlayState:render(msgs)
 
     msgs.paddle:render()
     msgs.balls:render()
-    msg.powerUps:render()
-   
+    msgs.powerUps:render()
+
     renderScore(msgs.score)
     renderHealth(msgs.health)
 
     -- pause text, if paused
     if self.paused then
         love.graphics.setFont(gFonts['large'])
-        love.graphics.printf("PAUSED", 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("PAUSED", 0, self.VH / 2 - 16, self.VW, 'center')
     end
 end

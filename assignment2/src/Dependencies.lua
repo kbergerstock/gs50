@@ -11,7 +11,6 @@ push = require 'lib/push'
 --
 -- https://github.com/vrld/hump/blob/master/class.lua
 Class = require 'lib/class'
-require 'lib/Keyboard'
 -- a basic StateMachine class which will allow us to transition to and from
 -- game states smoothly and avoid monolithic code in one file
 require 'lib/StateMachine'
@@ -19,6 +18,7 @@ require 'lib/HighScoreTracker'
 
 -- a few global constants, centralized
 require 'src/constants'
+require 'src/loadResources'
 --  defines a target that interacts with the paddle or gricks (base class for ball and powerups)
 require 'src/Target'
 

@@ -12,13 +12,16 @@
     to the PlayState, where we can finally use player input.
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
--- luacheck: globals Board fade gFonts move_label
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals self.VW self.VH WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals gSounds gTextures gFrames gFonts CON
+-- luacheck: globals Board fade move_label
 
 BeginGameState = Class{__includes = BaseState}
 
 function BeginGameState:init()
+    self:_init_()
     self.ll_co = coroutine.create(function() end)
     coroutine.resume(self.ll_co)
     self.fade_co = coroutine.create( function() end)
@@ -33,7 +36,7 @@ end
 
 function BeginGameState:enter(msg)
     -- spawn a board and place it toward the right
-    msg.board = Board(VIRTUAL_WIDTH - 272, 16, msg.level)
+    msg.board = Board(self.VW - 272, 16, msg.level,self.rcs)
     --
     -- animate our white screen fade-in, then animate a drop-down with
     -- the level text
@@ -55,12 +58,12 @@ function BeginGameState:render(msg)
     if coroutine.status(self.ll_co) ~= 'dead' then
         -- render Level # label and background rect
         setColor(95, 205, 228, 200)
-        love.graphics.rectangle('fill', 0, self.levelLabelY - 8, VIRTUAL_WIDTH, 48)
+        love.graphics.rectangle('fill', 0, self.levelLabelY - 8, self.VW, 48)
 
         setColor(255, 255, 255, 255)
         love.graphics.setFont(gFonts['large'])
         love.graphics.printf('Level ' .. tostring(msg.level),
-            0, self.levelLabelY, VIRTUAL_WIDTH, 'center')
+            0, self.levelLabelY, self.VW, 'center')
 
         self.nerr, self.done, self.levelLabelY = coroutine.resume(self.ll_co)
 
@@ -70,7 +73,7 @@ function BeginGameState:render(msg)
     end
 
     if coroutine.status(self.fade_co) ~= 'dead' then
-        self.nerr, self.done, self.alpha = coroutine.resume(self.fade_co,-1)
+        self.nerr, self.done, self.alpha = coroutine.resume(self.fade_co, -1)
         if self.done then
             self.ll_co = coroutine.create(move_label)
             self.done = false
@@ -78,5 +81,5 @@ function BeginGameState:render(msg)
     end
     -- our transition foreground rectangle
     love.graphics.setColor(1, 1, 1, self.alpha)
-    love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+    love.graphics.rectangle('fill', 0, 0, self.VW, self.VH)
 end

@@ -13,7 +13,7 @@
 
     This version is built to more closely resemble the NES than
     the original Pong machines or the Atari 2600 in terms of
-    resolution, though in widescreen (16:9) so it looks nicer on 
+    resolution, though in widescreen (16:9) so it looks nicer on
     modern systems.
 
     Credit for graphics (amazing work!):
@@ -24,11 +24,15 @@
     http://www.soundcloud.com/empyreanma
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState push
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
+
 require 'src/Dependencies'
 
+
 local gameStateMachine = nil
--- create our keyboard interface
-local keysPressed = Keyboard()  
 
 --[[
     Called just once at the beginning of the game; used to set up
@@ -45,64 +49,22 @@ function love.load()
 
     -- set the application title bar
     love.window.setTitle('Breakout')
+    loadConstants()
+    loadResources()
 
-    -- initialize our nice-looking retro text fonts
-    gFonts = {
-        ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
-        ['medium'] = love.graphics.newFont('fonts/font.ttf', 16),
-        ['large'] = love.graphics.newFont('fonts/font.ttf', 32)
-    }
     love.graphics.setFont(gFonts['small'])
-
-    -- load up the graphics we'll be using throughout our states
-    gTextures = {
-        ['background'] = love.graphics.newImage('graphics/background.png'),
-        ['main'] = love.graphics.newImage('graphics/breakout.png'),
-        ['arrows'] = love.graphics.newImage('graphics/arrows.png'),
-        ['hearts'] = love.graphics.newImage('graphics/hearts.png'),
-        ['particle'] = love.graphics.newImage('graphics/particle.png')
-    }
-
-    -- Quads we will generate for all of our textures; Quads allow us
-    -- to show only part of a texture and not the entire thing
-    gFrames = {
-        ['arrows'] = GenerateQuads(gTextures['arrows'], 24, 24),
-        ['paddles'] = GenerateQuadsPaddles(gTextures['main']),
-        ['balls'] = GenerateQuadsBalls(gTextures['main']),
-        ['bricks'] = GenerateQuadsBricks(gTextures['main']),
-        ['hearts'] = GenerateQuads(gTextures['hearts'], 10, 9)
-    }
-    
     -- initialize our virtual resolution, which will be rendered within our
     -- actual window no matter its dimensions
-    push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
+
+    push:setupScreen(gConst.VIRTUAL_WIDTH, gConst.VIRTUAL_HEIGHT, gConst.WINDOW_WIDTH, gConst.WINDOW_HEIGHT, {
         vsync = true,
         fullscreen = false,
         resizable = true
     })
 
-    -- set up our sound effects; later, we can just index this table and
-    -- call each entry's `play` method
-    gSounds = {
-        ['paddle-hit'] = love.audio.newSource('sounds/paddle_hit.wav','static'),
-        ['score'] = love.audio.newSource('sounds/score.wav','static'),
-        ['wall-hit'] = love.audio.newSource('sounds/wall_hit.wav','static'),
-        ['confirm'] = love.audio.newSource('sounds/confirm.wav','static'),
-        ['select'] = love.audio.newSource('sounds/select.wav','static'),
-        ['no-select'] = love.audio.newSource('sounds/no-select.wav','static'),
-        ['brick-hit-1'] = love.audio.newSource('sounds/brick-hit-1.wav','static'),
-        ['brick-hit-2'] = love.audio.newSource('sounds/brick-hit-2.wav','static'),
-        ['hurt'] = love.audio.newSource('sounds/hurt.wav','static'),
-        ['victory'] = love.audio.newSource('sounds/victory.wav','static'),
-        ['recover'] = love.audio.newSource('sounds/recover.wav','static'),
-        ['high-score'] = love.audio.newSource('sounds/high_score.wav','static'),
-        ['pause'] = love.audio.newSource('sounds/pause.wav','static'),
-    }
-
-    gMusic = love.audio.newSource('sounds/music.wav','stream')
-    gMusic:setLooping(true)
-    gMusic:setVolume(0.3)
-    gMusic:play()
+    gSounds['music']:setLooping(true)
+    gSounds['music']:setVolume(0.3)
+    gSounds['music']:play()
 
 
     -- the state machine we'll be using to transition between various states
@@ -127,7 +89,7 @@ function love.load()
         ['enter_name']  =  EnterHighScoreState(),
         ['paddle_select'] =  PaddleSelectState()
     }
-    
+
     --  start the state machine up
     msgs = init_msg_packet()
     msgs.powerUps:generateQuads(gTextures['main'])
@@ -154,7 +116,7 @@ end
 ]]
 function love.update(dt)
     -- this time, we pass in dt to the state object we're currently using
-    gameStateMachine:update(keysPressed, msgs ,dt)
+    gameStateMachine:update( msgs ,dt)
 end
 
 --[[
@@ -164,16 +126,16 @@ end
     things to happen right away, just once, like when we want to quit.
 ]]
 function love.keypressed(key)
-    -- add to our table of keys pressed this frame    
+    -- add to our table of keys pressed this frame
     if (key == 'f1') then
-        gMusic:stop()  
-    elseif (key == 'f2') then 
-        gMusic:play() 
-    elseif key == 'escape' then    
-        gMusic:stop()
+        gSounds['music']:stop()
+    elseif (key == 'f2') then
+        gSounds['music']:play()
+    elseif key == 'escape' then
+        gSounds['music']:stop()
         love.event.quit()
     else
-        keysPressed:set(key)
+        gameStateMachine:handleInput(key,msgs)
     end
 end
 
@@ -190,20 +152,21 @@ function love.draw()
     local backgroundWidth = gTextures['background']:getWidth()
     local backgroundHeight = gTextures['background']:getHeight()
 
-    love.graphics.draw(gTextures['background'], 
+    love.graphics.draw(gTextures['background'],
         -- draw at coordinates 0, 0
-        0, 0, 
+        0, 0,
         -- no rotation
         0,
         -- scale factors on X and Y axis so it fills the screen
-        VIRTUAL_WIDTH / (backgroundWidth - 1), VIRTUAL_HEIGHT / (backgroundHeight - 1))
-    
+       gConst.VIRTUAL_WIDTH / (backgroundWidth - 1),
+       gConst.VIRTUAL_HEIGHT / (backgroundHeight - 1))
+
     -- use the state machine to defer rendering to the current state we're in
     gameStateMachine:render(msgs)
-    
+
     -- display FPS for debugging; simply comment out to remove
     displayFPS()
-    
+
     push:apply('end')
 end
 
@@ -213,8 +176,8 @@ end
 ]]
 function renderHealth(health)
     -- start of our health rendering
-    local healthX = VIRTUAL_WIDTH - 120
-    local h = 1    
+    local healthX = gConst.VIRTUAL_WIDTH - 120
+    local h = 1
     -- render health left
     for i = 1, 3 do
         if i <= health then h = 1 else h = 2 end
@@ -239,6 +202,6 @@ end
 ]]
 function renderScore(score)
     love.graphics.setFont(gFonts['small'])
-    love.graphics.print('Score:', VIRTUAL_WIDTH - 80, 5)
-    love.graphics.printf(tostring(score), VIRTUAL_WIDTH - 70, 5, 60, 'right')
+    love.graphics.print('Score:', gConst.VIRTUAL_WIDTH - 80, 5)
+    love.graphics.printf(tostring(score), gConst.VIRTUAL_WIDTH - 70, 5, 60, 'right')
 end

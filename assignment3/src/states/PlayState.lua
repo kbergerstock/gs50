@@ -16,8 +16,10 @@
     main menu or the score entry menu if they made the top 10.
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: globals gSounds gFonts handle_mouse_input countdown updateBoard
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals handle_mouse_input countdown updateBoard
 
 PlayState = Class{__includes = BaseState}
 
@@ -64,9 +66,7 @@ function PlayState:exit(msg)
     end
 end
 
-
-
-function PlayState:update(inputs, msg, dt)
+function PlayState:update(msg, dt)
 
     if coroutine.status(self.update_co) ~= 'dead' then
         self.nerr  = coroutine.resume(self.update_co,msg,1)
@@ -78,7 +78,6 @@ function PlayState:update(inputs, msg, dt)
         gSounds['game-over']:play()
         msg.nextState('game-over')
     end
-
 
     if msg.score >= msg.goal and not msg.board.match_found then
         gSounds['next-level']:play()
@@ -107,7 +106,7 @@ function PlayState:render(msg)
     if coroutine.status(self.kd_co) ~= 'dead' then
         self.nerr,self.done,self.tick,self.seconds = coroutine.resume(self.kd_co, 1)
         assert(self.nerr,"there is an error in countdown !!")
-        local rnd = math.random(1000)
+        local rnd = math.random(5000)
         if self.tick and msg.board.bombs < 3 and rnd > 499 and rnd < 525 then
             local col = math.random(8)
             local row = math.random(2)

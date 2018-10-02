@@ -23,9 +23,13 @@ if not rawget(getmetatable(o) or {},'__Class') then
 end
 BaseState = Class{}
 
-function BaseState:init() end
+function BaseState:init() self:_init_() end
 function BaseState:enter(msg) end
 function BaseState:exit(msg) end
 function BaseState:update(inputs, msg, dt) end
 function BaseState:render(msg) end
 function BaseState:handle_input(input, msg) end
+function BaseState:_init_()
+    self.VH = gConst.VIRTUAL_HEIGHT
+    self.VW = gConst.VIRTUAL_WIDTH
+end

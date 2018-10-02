@@ -32,13 +32,13 @@
 
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Message StateMachine StartState BeginGameState PlayState GameOverState BaseState
--- luacheck: globals Class setColor love GenerateTileQuads cHID VIRTUAL_WIDTH
--- luacheck: ignore gFonts gFrames
+-- luacheck: globals Class setColor love GenerateTileQuads cHID VIRTUAL_WIDTH readOnly
+
+require 'lib/readonly'
 
 APP = Class{}
 
 function APP:init()
-    self.inputs = cHID()
     self.msg = Message()
     self.msg.goal = 0
     self.msg.board = {}
@@ -46,6 +46,16 @@ function APP:init()
     self.msg.seconds = 60              -- allowed time to find matches per board
     self.msg.clear_level_time = 120
 
+    -- keep track of scrolling our background on the X axis
+    self.bgX = 0        -- x location of background
+    self.bgS = 80       -- background scroll speed
+    self.bgW = -1024 + gConst.VIRTUAL_WIDTH - 4 + 51
+end
+
+function APP:load()
+    -- window bar title
+    love.window.setTitle('Match 3')
+    assert(gSounds,'the resources are not loaded!')
 
     self.gameStateMachine = StateMachine {
         ['start']       =  StartState(),
@@ -53,16 +63,6 @@ function APP:init()
         ['play']        =  PlayState(),
         ['game-over']   =  GameOverState(),
     }
-
-    -- keep track of scrolling our background on the X axis
-    self.bgX = 0        -- x location of background
-    self.bgS = 80       -- background scroll speed
-    self.bgW = -1024 + VIRTUAL_WIDTH - 4 + 51
-end
-
-function APP:load()
-    -- window bar title
-    love.window.setTitle('Match 3')
 
     -- seed the RNG
     math.randomseed(os.time())
@@ -89,7 +89,7 @@ function APP:update(dt)
         self.bgX = 0
     end
     -- execute the specific instance of the game states
-    self.gameStateMachine:update(self.inputs, self.msg, dt)
+    self.gameStateMachine:update(self.msg, dt)
     if self.msg.quit then
         self:stop()
     end
@@ -103,8 +103,9 @@ function APP:draw()
 end
 
 function APP:loadResources()
+
     -- sounds and music
-    gSounds = {
+    local sounds = {
         ['music'] = love.audio.newSource('sounds/music3.mp3','stream'),
         ['select'] = love.audio.newSource('sounds/select.wav','static'),
         ['error'] = love.audio.newSource('sounds/error.wav','static'),
@@ -114,23 +115,30 @@ function APP:loadResources()
         ['next-level'] = love.audio.newSource('sounds/next-level.wav','static')
     }
 
-    gTextures = {
+    local textures = {
         ['main'] = love.graphics.newImage('graphics/match3.png'),
+        ['bombs'] = love.graphics.newImage('graphics/bombas.png'),
         ['background'] = love.graphics.newImage('graphics/background.png')
     }
 
-    gFrames = {
+    local frames = {
         -- divided into sets for each tile type in this game, instead of one large
         -- table of Quads
-        ['tiles'] = GenerateTileQuads(gTextures['main'])
+        ['tiles'] = GenerateTileQuads( textures['main']),
+        ['bombs'] = generateBombQuads( textures['bombs'])
     }
 
     -- this time, we're keeping our fonts in a global table for readability
-    gFonts = {
+    local fonts = {
         ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
         ['medium'] = love.graphics.newFont('fonts/font.ttf', 16),
         ['large'] = love.graphics.newFont('fonts/font.ttf', 32)
     }
+
+    gSounds = readOnly(sounds)
+    gTextures = readOnly(textures)
+    gFrames = readOnly(frames)
+    gFonts = readOnly(fonts)
 
     -- set music to loop and start
     gSounds['music']:setLooping(true)

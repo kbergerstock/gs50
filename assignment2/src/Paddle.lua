@@ -13,6 +13,10 @@
     which the player gets to choose upon starting the game.
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
+
 Paddle = Class{}
 
 --[[
@@ -21,10 +25,10 @@ Paddle = Class{}
 ]]
 function Paddle:init(skin)
     -- x is placed in the middle
-    self.x = VIRTUAL_WIDTH / 2 - 32
+    self.x = gConst.VIRTUAL_WIDTH / 2 - 32
 
     -- y is placed a little above the bottom edge of the screen
-    self.y = VIRTUAL_HEIGHT - 32
+    self.y = gConst.VIRTUAL_HEIGHT - 32
 
     -- start us off with no velocity
     self.dx = 0
@@ -40,11 +44,11 @@ function Paddle:init(skin)
     -- the variant is which of the four paddle sizes we currently are; 2
     -- is the starting size, as the smallest is too tough to start with
     self.size = 2
-    self.speed = PADDLE_SPEED
+    self.speed = gConst.PADDLE_SPEED
 end
 
 function Paddle:reset()
-    self.speed = PADDLE_SPEED    
+    self.speed = gConst.PADDLE_SPEED
     self:setSize(2)
 end
 
@@ -52,7 +56,7 @@ function Paddle:setSkin(skin)
     self.skin = skin
 end
 
-function Paddle:setSize(size)    
+function Paddle:setSize(size)
     local w = {32,64,96,128}
     self.size = size
     self.width = w[size] or 64
@@ -60,16 +64,16 @@ function Paddle:setSize(size)
 end
 
 function Paddle:incPaddleSpeed()
-    self.speed = PADDLE_SPEED + math.random(0,96)
+    self.speed = gConst.PADDLE_SPEED + math.random(0,96)
 end
 
 function Paddle:resetPaddleSpeed()
-    self.speed = PADDLE_SPEED
+    self.speed = gConst.PADDLE_SPEED
 end
 
 function Paddle:readSpeed()
     return self.speed
-end 
+end
 
 function Paddle:update(dt)
     -- keyboard input
@@ -92,7 +96,7 @@ function Paddle:update(dt)
     -- height (or else it will go partially below, since position is
     -- based on its top left corner)
     else
-        self.x = math.min(VIRTUAL_WIDTH - self.width, self.x + self.dx * dt)
+        self.x = math.min(gConst.VIRTUAL_WIDTH - self.width, self.x + self.dx * dt)
     end
 end
 

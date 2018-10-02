@@ -1,6 +1,9 @@
 -- powerUp class
 -- krbergerstock
 
+-- luacheck: globals love Class o Target, ignore _PowerUp
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
+
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
 end
@@ -14,7 +17,7 @@ function _PowerUp:reset()
     self.x = 0
     self.y = 0
     self.visible = false
-    self.active = false 
+    self.active = false
     self.height = 16
     self.width = 16
     self.dy = 0
@@ -37,16 +40,16 @@ function _PowerUp:update(dt)
         if self.visible then
             self.dy = self.dy + self.gravity * dt
             self.y = self.y + self.dy
-            if self.y > VIRTUAL_HEIGHT then
+            if self.y > gConst.VIRTUAL_HEIGHT then
                 self:handleCollision()
             end
         else
             self.accum = self.accum + dt
             if self.accum > self.drop then
-                self.visible = true 
-                self.x = math.random(32, VIRTUAL_WIDTH - 32)
+                self.visible = true
+                self.x = math.random(32, gConst.VIRTUAL_WIDTH - 32)
                 self.y = 8
-                self.dy = 1      
+                self.dy = 1
                 self.gravity = math.random(0.5,1.5)
             end
         end
@@ -56,9 +59,9 @@ end
 -- returns true if powerup collies with the paddle  otherwise false
 function _PowerUp:collidesWith(paddle)
     if self.active and self.visible then
-        return self:collides(paddle) 
-    end     
-    return false 
+        return self:collides(paddle)
+    end
+    return false
 end
 
 function _PowerUp:render()

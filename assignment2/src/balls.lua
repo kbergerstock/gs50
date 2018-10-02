@@ -1,8 +1,12 @@
 -- implements and controls an array of balls
 -- to meet requirements for adding the feature of handling miltiple balls in play
 -- @ k.r.bergerstock
--- 08/2018 
+-- 08/2018
 -- class G50.cs
+
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState Ball Target
+-- luacheck: globals gSounds gTextures gFrames gFonts
 
 Balls = Class{}
 
@@ -54,10 +58,10 @@ end
 function Balls:anyActive()
     for i , ball in pairs(self.balls) do
         if ball:isActive() then
-            return true 
+            return true
         end
     end
-    return false 
+    return false
 end
 
 function Balls:handleCollisions(paddle)

@@ -9,6 +9,9 @@
 
     Helper functions for writing games.
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
 
 --[[
     Given an "atlas" (a texture with multiple sprites), as well as a
@@ -41,11 +44,11 @@ end
 ]]
 function table.slice(tbl, first, last, step)
     local sliced = {}
-  
+
     for i = first or 1, last or #tbl, step or 1 do
       sliced[#sliced+1] = tbl[i]
     end
-  
+
     return sliced
 end
 
@@ -58,7 +61,7 @@ function GenerateQuadsBricks(atlas)
     local quads = GenerateQuads(atlas, 32, 16)
     local r = table.slice(quads, 1, 21)
     r['key'] = quads[24]
-    return r 
+    return r
 end
 
 --[[
@@ -75,10 +78,10 @@ function GenerateQuadsPaddles(atlas)
     for i = 0, 3 do
         -- smallest
         quads[1 + 4 * i] = love.graphics.newQuad(x, y, 32, 16,
-            atlas:getDimensions())    
+            atlas:getDimensions())
         -- medium
         quads[2 + 4 * i] = love.graphics.newQuad(x + 32, y, 64, 16,
-            atlas:getDimensions())   
+            atlas:getDimensions())
         -- large
         quads[3 + 4 * i] = love.graphics.newQuad(x + 96, y, 96, 16,
             atlas:getDimensions())

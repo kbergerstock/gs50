@@ -1,3 +1,6 @@
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class o love setColor readOnly BaseState _PowerUp
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -20,13 +23,13 @@ end
 
 --[[
     This function is specifically made to piece out the power ups from the
-    sprite sheet.  
+    sprite sheet.
 ]]
 function PowerUps:generateQuads(atlas)
     local x = 0
     local y = 64 + 4 * 2 * 16
     for i = 1, 11 do
-        self.powerUps[i] =  _PowerUp(love.graphics.newQuad(x, y, 16, 16, atlas:getDimensions())) 
+        self.powerUps[i] =  _PowerUp(love.graphics.newQuad(x, y, 16, 16, atlas:getDimensions()))
         x = x + 16
     end
 end
@@ -34,17 +37,17 @@ end
 function PowerUps:update(dt,msgs)
     for i , powerup in pairs(self.powerUps) do
         powerup:update(dt)
-        if powerup:collidesWith(msgs.paddle) then 
+        if powerup:collidesWith(msgs.paddle) then
             powerup:handleCollision()
             self.effects[i](msgs)
         end
-    end 
+    end
 end
 
 function PowerUps:render()
     for i , powerup in pairs(self.powerUps) do
         powerup:render()
-    end   
+    end
 end
 
 function PowerUps:draw(ndx,x,y)
@@ -58,11 +61,11 @@ function PowerUps:reset()
 end
 
 function PowerUps:setActive(ndx)
-    self.powerUps[ndx].active = true 
+    self.powerUps[ndx].active = true
 end
 
 function PowerUps:clrActive(ndx)
-    self.powerUps[ndx].active = false  
+    self.powerUps[ndx].active = false
 end
 
 -- following functions are in a jump table
@@ -101,7 +104,7 @@ function addLife(msgs)
     msgs.health = math.min(msgs.health + 1 , 3)
     msgs.powerUps:clrActive(3)
 end
-  
+
 function multpleBalls(msgs)
     msgs.balls:setMultipleBallsInplay()
     msgs.powerUps:clrActive(7)

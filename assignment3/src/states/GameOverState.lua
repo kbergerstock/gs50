@@ -10,13 +10,16 @@
     State that simply shows us our score when we finally lose.
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
 -- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
--- luacheck: globals gFonts HighScoreTracker
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals HighScoreTracker
 
 GameOverState = Class{__includes = BaseState}
 
 function GameOverState:init()
+    self:_init_()
     self.highScores = HighScoreTracker(10)
     self.highScores:loadHighScores('match3')
 end
@@ -38,7 +41,7 @@ end
 function GameOverState:render(msg)
     local w = 190
     local h = 66
-    local xs = VIRTUAL_WIDTH / 2 - 64
+    local xs = self.VW / 2 - 64
     local ys =16
     love.graphics.setFont(gFonts['large'])
 

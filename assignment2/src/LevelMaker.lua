@@ -14,6 +14,10 @@
     lua 5.3 did not like the goto I fixed the logic and elimninated it KRB
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class o love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts Brick
+
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
 end
@@ -28,7 +32,7 @@ LevelMaker = Class{}
 function LevelMaker.createMap(level)
     local bricks = {}
     local keyBrickFlag = true
-    local k = false 
+    local k = false
     -- randomly choose the number of rows
     local numRows = math.random(1, 5)
     local kbRow =  numRows > 2 and 2 or 1
@@ -37,7 +41,7 @@ function LevelMaker.createMap(level)
     local numCols = math.random(7, 13)
     numCols = numCols % 2 == 0 and (numCols + 1) or numCols
     local kbCol = 1 + math.floor(numCols / 2 )
-        
+
     -- highest possible spawned brick color in this level; ensure we
     -- don't go above 3
     local highestTier = math.min(3, math.floor(level / 5))
@@ -48,29 +52,29 @@ function LevelMaker.createMap(level)
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
         -- whether we want to enable skipping for this row
-        local skipPattern = math.random(1, 2) == 1 
+        local skipPattern = math.random(1, 2) == 1
 
         -- whether we want to enable alternating colors for this row
-        local alternatePattern = math.random(1, 2) == 1 
-        
+        local alternatePattern = math.random(1, 2) == 1
+
         -- choose two colors to alternate between
         local alternateColor1 = math.random(1, highestColor)
         local alternateColor2 = math.random(1, highestColor)
         local alternateTier1 = math.random(0, highestTier)
         local alternateTier2 = math.random(0, highestTier)
-        
+
         -- used only when we want to skip a block, for skip pattern
-        local skipFlag = math.random(2) == 1 
+        local skipFlag = math.random(2) == 1
 
         -- used only when we want to alternate a block, for alternate pattern
-        local alternateFlag = math.random(2) == 1 
+        local alternateFlag = math.random(2) == 1
 
         -- solid color we'll use if we're not skipping or alternating
         local solidColor = math.random(1, highestColor)
         local solidTier = math.random(0, highestTier)
 
         for x = 1, numCols do
-            -- if skipping is turned on 
+            -- if skipping is turned on
             -- flip the skip flag
             -- otherwise set the skp flag to false
             -- so that the next conditional performs it's job
@@ -80,8 +84,8 @@ function LevelMaker.createMap(level)
                 skipFlag = false
             end
 
-            if keyBrickFlag and y == kbRow and x == kbCol then 
-                k = true              
+            if keyBrickFlag and y == kbRow and x == kbCol then
+                k = true
               else
                 k = false
             end
@@ -92,9 +96,9 @@ function LevelMaker.createMap(level)
                     -- x-coordinate
                     (x-1)                   -- decrement x by 1 because tables are 1-indexed, coords are 0
                     * 32                    -- multiply by 32, the brick width
-                    + 8                     -- the screen should have 8 pixels of padding; we can fit 13 cols + 16 pixels total
+                    + 8                     -- the screen should have 8 pixels of padding
+                                            -- we can fit 13 bricks cols @ 16 pixels each
                     + (13 - numCols) * 16,  -- left-side padding for when there are fewer than 13 columns
-                    
                     -- y-coordinate
                     y * 16,                 -- just use y * 16, since we need top padding anyway
                     k                       -- the keybrick flag
@@ -115,12 +119,12 @@ function LevelMaker.createMap(level)
                         b.color = solidColor
                         b.tier = solidTier
                     end
-                end 
+                end
 
                 table.insert(bricks, b)
             end
         end
-    end 
+    end
 
     -- in the event we didn't generate any bricks, try again
     -- return a nil indicating am error to the calling level

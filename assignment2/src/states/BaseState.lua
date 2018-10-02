@@ -14,11 +14,18 @@
     at least empty versions of these methods even if we don't define them
     ourselves in the actual classes.
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class  BaseState gConst
 
 BaseState = Class{}
 
-function BaseState:init() end
+function BaseState:init() self:_init_() end
 function BaseState:enter(msgs) end
 function BaseState:exit() end
-function BaseState:update(keysPressed, msgs, dt) end
+function BaseState:update(msgs, dt) end
+function BaseState:handleInput(input, msgs) end
 function BaseState:render(msgs) end
+function BaseState:_init_()
+    self.VW = gConst.VIRTUAL_WIDTH
+    self.VH = gConst.VIRTUAL_HEIGHT
+end

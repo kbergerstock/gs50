@@ -13,12 +13,13 @@
 ]]
 
 -- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals self.VW self.VW WINDOW_WIDTH WINDOW_HEIGHT
 -- luacheck: globals gSounds gFonts gTextures gFrames fade updateColorBank
 
 StartState = Class{__includes = BaseState}
 
 function StartState:init()
+    self:_init_()
     -- currently selected menu item
     self.currentMenuItem = 1
 
@@ -125,7 +126,7 @@ function StartState:render(msg)
 
     -- keep the background and tiles a little darker than normal
     setColor(0, 0, 0, 128)
-    love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+    love.graphics.rectangle('fill', 0, 0, self.VW, self.VW)
 
     self:drawMatch3Text(-60)
     self:drawOptions(12)
@@ -140,7 +141,7 @@ function StartState:render(msg)
         end
     end
     love.graphics.setColor(1, 1, 1, self.alpha)
-    love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+    love.graphics.rectangle('fill', 0, 0, self.VW, self.VW)
 end
 
 --[[
@@ -154,17 +155,16 @@ function StartState:drawMatch3Text(y)
 
     -- draw semi-transparent rect behind MATCH 3
     setColor(255, 255, 255, 128)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 76, VIRTUAL_HEIGHT / 2 + y - 11, 150, 58, 6)
+    love.graphics.rectangle('fill', self.VW / 2 - 76, self.VH / 2 + y - 11, 150, 58, 6)
 
     -- draw MATCH 3 text shadows
     love.graphics.setFont(gFonts['large'])
-    self:drawTextShadow('MATCH 3', VIRTUAL_HEIGHT / 2 + y)
+    self:drawTextShadow('MATCH 3', self.VH / 2 + y)
 
     -- print MATCH 3 letters in their corresponding current colors
     for i = 1, 6 do
         setColor(self.colors[colorBank + i])
-        love.graphics.printf(self.letterTable[i][1], 0, VIRTUAL_HEIGHT / 2 + y,
-            VIRTUAL_WIDTH + self.letterTable[i][2], 'center')
+        love.graphics.printf(self.letterTable[i][1], 0, self.VH / 2 + y, self.VW + self.letterTable[i][2], 'center')
     end
 end
 
@@ -175,11 +175,11 @@ function StartState:drawOptions(y)
 
     -- draw rect behind start and quit game text
     setColor(255, 255, 255, 128)
-    love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 76, VIRTUAL_HEIGHT / 2 + y, 150, 58, 6)
+    love.graphics.rectangle('fill', self.VW / 2 - 76, self.VH / 2 + y, 150, 58, 6)
 
     -- draw Start text
     love.graphics.setFont(gFonts['medium'])
-    self:drawTextShadow('Start', VIRTUAL_HEIGHT / 2 + y + 8)
+    self:drawTextShadow('Start', self.VH / 2 + y + 8)
 
     if self.currentMenuItem == 1 then
         setColor(99, 155, 255, 255)
@@ -187,11 +187,11 @@ function StartState:drawOptions(y)
         setColor(48, 96, 130, 255)
     end
 
-    love.graphics.printf('Start', 0, VIRTUAL_HEIGHT / 2 + y + 8, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Start', 0, self.VH / 2 + y + 8, self.VW, 'center')
 
     -- draw Quit Game text
     love.graphics.setFont(gFonts['medium'])
-    self:drawTextShadow('Quit Game', VIRTUAL_HEIGHT / 2 + y + 33)
+    self:drawTextShadow('Quit Game', self.VH / 2 + y + 33)
 
     if self.currentMenuItem == 2 then
         setColor(99, 155, 255, 255)
@@ -199,7 +199,7 @@ function StartState:drawOptions(y)
         setColor(48, 96, 130, 255)
     end
 
-    love.graphics.printf('Quit Game', 0, VIRTUAL_HEIGHT / 2 + y + 33, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Quit Game', 0, self.VH / 2 + y + 33, self.VW, 'center')
 end
 
 --[[
@@ -208,8 +208,8 @@ end
 ]]
 function StartState:drawTextShadow(text, y)
     setColor(34, 32, 52, 255)
-    love.graphics.printf(text, 2, y + 1, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf(text, 1, y + 1, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf(text, 0, y + 1, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf(text, 1, y + 2, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf(text, 2, y + 1, self.VW, 'center')
+    love.graphics.printf(text, 1, y + 1, self.VW, 'center')
+    love.graphics.printf(text, 0, y + 1, self.VW, 'center')
+    love.graphics.printf(text, 1, y + 2, self.VW, 'center')
 end

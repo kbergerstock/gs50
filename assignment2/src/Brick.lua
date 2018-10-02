@@ -14,6 +14,10 @@
     layout of bricks.
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts
+
 Brick = Class{}
 
 -- some of the colors in our palette (to be used with particle systems)
@@ -54,7 +58,7 @@ function Brick:init(x, y, keyBrickFlag)
     -- used for coloring and score calculation
     self.tier = 0
     self.color = 1
-    
+
     self.x = x
     self.y = y
     self.width = 32
@@ -75,7 +79,7 @@ function Brick:init(x, y, keyBrickFlag)
     self.psystem:setParticleLifetime(0.5, 1)
 
     -- give it an acceleration of anywhere between X1,Y1 and X2,Y2 (0, 0) and (80, 80) here
-    -- gives generally downward 
+    -- gives generally downward
     self.psystem:setLinearAcceleration(-15, 0, 15, 80)
 
     -- spread of particles; normal looks more natural than uniform
@@ -90,7 +94,7 @@ function Brick:hit()
     -- set the particle system to interpolate between two colors; in this case, we give
     -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
     -- over the particle's lifetime (the second color)
-    local alpha = self.keyBrick and 0.95 or (55*(self.tier +1))/255.0 
+    local alpha = self.keyBrick and 0.95 or (55*(self.tier +1))/255.0
     self.psystem:setColors(
         paletteColors[self.color].r,
         paletteColors[self.color].g,
@@ -139,7 +143,7 @@ end
 function Brick:render()
     if self.inPlay then
         local ndx = self.keyBrick and 'key' or (1 + ((self.color - 1) * 4) + self.tier)
-        love.graphics.draw(gTextures['main'], 
+        love.graphics.draw(gTextures['main'],
             -- multiply color by 4 (-1) to get our color offset, then add tier to that
             -- to draw the correct tier and color brick onto the screen
             gFrames['bricks'][ndx], self.x, self.y)

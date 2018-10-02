@@ -9,29 +9,23 @@
 
     Represents the screen where we can view all high scores previously recorded.
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
 
 HighScoreState = Class{__includes = BaseState}
 
-function HighScoreState:init()
-
-end
-
-function HighScoreState:enter(msgs)
-        
-end
-
-function HighScoreState:update(keysPressed, msgs, dt)
-    assert(not(keysPressed == nil),'illeagl parameter')
+function HighScoreState:handleInput(input, msgs)
     -- return to the start screen if we press escape
-    if keysPressed:getSpace() then
+    if input == 'space' then
         gSounds['wall-hit']:play()
-        msg.next = 'start'
+        msgs.next = 'start'
     end
 end
 
 function HighScoreState:render(msgs)
     love.graphics.setFont(gFonts['large'])
-    love.graphics.printf('High Scores', 0, 20, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('High Scores', 0, 20, self.VW, 'center')
 
     love.graphics.setFont(gFonts['medium'])
 
@@ -40,21 +34,15 @@ function HighScoreState:render(msgs)
     for i = 1, hst.count do
         local name = hst[i].name or '---'
         local score = hst[i].score or '---'
-
+        local y = 60 + i * 13
         -- score number (1-10)
-        love.graphics.printf(tostring(i) .. '.', VIRTUAL_WIDTH / 4, 
-            60 + i * 13, 50, 'left')
-
+        love.graphics.printf(tostring(i) .. '.', self.VW / 4, y, 50, 'left')
         -- score name
-        love.graphics.printf(name, VIRTUAL_WIDTH / 4 + 38, 
-            60 + i * 13, 50, 'right')
-        
+        love.graphics.printf(name, self.VW / 4 + 38, y, 50, 'right')
         -- score itself
-        love.graphics.printf(tostring(score), VIRTUAL_WIDTH / 2,
-            60 + i * 13, 100, 'right')
+        love.graphics.printf(tostring(score), self.VW / 2, y, 100, 'right')
     end
 
     love.graphics.setFont(gFonts['small'])
-    love.graphics.printf("Press Space to return to the main menu!",
-        0, VIRTUAL_HEIGHT - 18, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("Press Space to return to the main menu!", 0, self.VH - 18, self.VW, 'center')
 end

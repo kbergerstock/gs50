@@ -13,20 +13,22 @@
     for visual variety.
 ]]
 
-
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState Target
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
 
 Ball = Class{ __includes = Target}
 
 function Ball:init(skin)
     -- flag to control if an instance is active
-    self.active = false 
-    
+    self.active = false
+
     -- simple positional and dimensional variables
     self.width = 8
     self.height = 8
-    
-    self.x = VIRTUAL_WIDTH / 2 - 2
-    self.y = VIRTUAL_HEIGHT / 2 - 2
+
+    self.x = gConst.VIRTUAL_WIDTH / 2 - 2
+    self.y = gConst.VIRTUAL_HEIGHT / 2 - 2
     -- these variables are for keeping track of our velocity on both the
     -- X and Y axis, since the ball can move in two dimensions
     self.dy = 0
@@ -38,15 +40,15 @@ function Ball:init(skin)
 end
 
 function Ball:setActive()
-    self.active = true 
+    self.active = true
 end
 
 function Ball:clrActive()
-    self.active = false  
+    self.active = false
 end
 
 function Ball:isActive()
-    return self.active  
+    return self.active
 end
 
 function Ball:beep()
@@ -65,7 +67,7 @@ function Ball:handleCollision(paddle)
         -- if we hit the paddle on its left side while moving left...
         if self.x < paddle.x + (paddle.width / 2) and paddle.dx < 0 then
             self.dx = -50 + -(8 * (paddle.x + (paddle.width / 2) - self.x))
-        
+
         -- else if we hit the paddle on its right side while moving right...
         elseif self.x > paddle.x + (paddle.width / 2) and paddle.dx > 0 then
             self.dx = 50 + (8 * math.abs(paddle.x + paddle.width / 2 - self.x))
@@ -75,16 +77,16 @@ end
 
 -- handle out of bounds condition
 function Ball:checkBoundry()
-    if self.y >= VIRTUAL_HEIGHT then
-        self.active = false 
+    if self.y >= gConst.VIRTUAL_HEIGHT then
+        self.active = false
     end
 end
 
 --Places the ball in the middle of the screen, with no movement.
 function Ball:reset(skin)
     if self.active then
-        self.x = VIRTUAL_WIDTH / 2 - 2
-        self.y = VIRTUAL_HEIGHT / 2 - 2
+        self.x = gConst.VIRTUAL_WIDTH / 2 - 2
+        self.y = gConst.VIRTUAL_HEIGHT / 2 - 2
         self.dx = 0
         self.dy = 0
     end
@@ -93,7 +95,7 @@ end
 
 function Ball:update(dt)
     if self.active then
-        local snd = false 
+        local snd = false
         self.x = self.x + self.dx * dt
         self.y = self.y + self.dy * dt
 
@@ -101,11 +103,11 @@ function Ball:update(dt)
         if self.x <= 0 then
             self.x = 0
             self.dx = -self.dx
-            snd = true            
+            snd = true
         end
 
-        if self.x >= VIRTUAL_WIDTH - 8 then
-            self.x = VIRTUAL_WIDTH - 8
+        if self.x >= gConst.VIRTUAL_WIDTH - 8 then
+            self.x = gConst.VIRTUAL_WIDTH - 8
             self.dx = -self.dx
             snd = true
         end
@@ -115,7 +117,7 @@ function Ball:update(dt)
             self.dy = -self.dy
             snd = true
         end
-        if snd then    
+        if snd then
            self:beep()
         end
         self:checkBoundry()
@@ -127,7 +129,7 @@ function Ball:render()
         -- gTexture is our global texture for all blocks
         -- gBallFrames is a table of quads mapping to each individual ball skin in the texture
         love.graphics.draw(gTextures['main'], gFrames['balls'][self.skin], self.x, self.y)
-    end 
+    end
 end
 
 function Ball:setStartVelocity()

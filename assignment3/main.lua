@@ -3,8 +3,7 @@
 -- K. R. Bergerstock @ 09/2018
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class push love APP app
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: globals Class push love gConst APP app 
 
 -- initialize our nearest-neighbor filter
 love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -14,8 +13,9 @@ require 'src/Dependencies'
 require 'src/app'
 
 function love.load()
-        -- initialize our virtual resolution
-        push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
+    loadConstants()
+    -- initialize our virtual resolution
+    push:setupScreen(gConst.VIRTUAL_WIDTH, gConst.VIRTUAL_HEIGHT, gConst.WINDOW_WIDTH, gConst.WINDOW_HEIGHT, {
         vsync = true,
         fullscreen = false,
         resizable = true,

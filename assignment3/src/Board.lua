@@ -49,6 +49,8 @@ function Board:init(x, y, level)
     self.colors = {}        -- an arrary of the 6 pieces used in this board
     self.ndx = 0            -- index of current tile hilite
     self.match_found = false
+    self.explode = false
+    self.explode_list = {}
     self.bombs = 0
     -- generate the colors we need for this board
     if level == 1 then
@@ -180,6 +182,8 @@ end
 function Board:bombCheck(idx)
     local score = 0
     if self.tiles[idx].bomb then
+        self.explode = true
+        self.explode_idx = idx
         score = 150
         self.bombs = self.bombs - 1
     end

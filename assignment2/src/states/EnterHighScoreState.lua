@@ -9,6 +9,9 @@
 
     Screen that allows us to input a new high score in the form of three characters, arcade-style.
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts CONST
 
 EnterHighScoreState = Class{__includes = BaseState}
 
@@ -23,76 +26,62 @@ local chars = {
 local highlightedChar = 1
 local hilite = 103.0 / 255.0
 
-function EnterHighScoreState:init()
-
-end
-
-function EnterHighScoreState:enter(msgs)
-
-end
-
-function EnterHighScoreState:update(keysPressed, msgs, dt)
+function EnterHighScoreState:handleInput(input, msgs)
 
     -- scroll through character slots
-    if keysPressed:get('left') and highlightedChar > 1 then
+    if input == 'left' and highlightedChar > 1 then
         highlightedChar = highlightedChar - 1
         gSounds['select']:play()
-    elseif keysPressed:get('right') and highlightedChar < 3 then
+    elseif input == 'right' and highlightedChar < 3 then
         highlightedChar = highlightedChar + 1
         gSounds['select']:play()
-    end
-
     -- scroll through characters
-    if keysPressed:get('up') then
+    elseif input == 'up' then
         chars[highlightedChar] = chars[highlightedChar] + 1
         if chars[highlightedChar] > 90 then
             chars[highlightedChar] = 65
         end
-    elseif keysPressed:get('down') then
+    elseif input == 'down' then
         chars[highlightedChar] = chars[highlightedChar] - 1
         if chars[highlightedChar] < 65 then
             chars[highlightedChar] = 90
         end
-    end
-
-    if keysPressed:getSpace() then
+    elseif input == 'space' then
         -- update scores table
         local name = string.char(chars[1]) .. string.char(chars[2]) .. string.char(chars[3])
         msgs.hsObj:add(name,msgs.score)
         msgs.hsObj:writeHighScores()
-        msgs.next = 'high_scores' 
+        msgs.next = 'high_scores'
     end
 end
 
 function EnterHighScoreState:render(msgs)
     love.graphics.setFont(gFonts['medium'])
     love.graphics.printf('Your score: ' .. tostring(msgs.score), 0, 30,
-        VIRTUAL_WIDTH, 'center')
+        gConst.VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(gFonts['large'])
-    
     --
     -- render all three characters of the name
     --
     if highlightedChar == 1 then
         love.graphics.setColor(hilite,1,1,1)
     end
-    love.graphics.print(string.char(chars[1]), VIRTUAL_WIDTH / 2 - 28, VIRTUAL_HEIGHT / 2)
+    love.graphics.print(string.char(chars[1]), self.VW/ 2 - 28, self.VH / 2)
     love.graphics.setColor(1,1,1,1)
 
     if highlightedChar == 2 then
         love.graphics.setColor(hilite,1,1,1)
     end
-    love.graphics.print(string.char(chars[2]), VIRTUAL_WIDTH / 2 - 6, VIRTUAL_HEIGHT / 2)
+    love.graphics.print(string.char(chars[2]), self.VW/ 2 - 6, self.VH / 2)
     love.graphics.setColor(1,1,1,1)
 
     if highlightedChar == 3 then
         love.graphics.setColor(hilite,1,1,1)
     end
-    love.graphics.print(string.char(chars[3]), VIRTUAL_WIDTH / 2 + 20, VIRTUAL_HEIGHT / 2)
+    love.graphics.print(string.char(chars[3]), self.VW/ 2 + 20, self.VH / 2)
     love.graphics.setColor(1,1,1,1)
-    
+
     love.graphics.setFont(gFonts['small'])
-    love.graphics.printf('Press Space to confirm!', 0, VIRTUAL_HEIGHT - 18,
-        VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Space to confirm!', 0, self.VH - 18, self.VW, 'center')
 end

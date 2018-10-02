@@ -13,6 +13,6 @@ function init_msg_packet()
     msg.breakout = false
     msg.hsObj     = HighScoreTracker(10)
     msg.powerUps  = PowerUps()
-    
+
     return msg
 end

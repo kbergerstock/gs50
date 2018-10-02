@@ -34,19 +34,19 @@
 	reason not to. i.e. MainMenu creates a state using the MainMenu table. This keeps things
 	straight forward.
 
-	07/15/2018	Keith R. Bergerstock 
-	Software , Test and Quality Engineer for over 30 years currently retired from Marquardt switches 
-	I modified this code to eliminate a circular dependency. The sub classes derived from BaseState were 
+	07/15/2018	Keith R. Bergerstock
+	Software , Test and Quality Engineer for over 30 years currently retired from Marquardt switches
+	I modified this code to eliminate a circular dependency. The sub classes derived from BaseState were
 	using a specific instance of the statemachine class ie gStatemachine a GLOBAL variable a very
 	dangerous practise.
 
 	For instance :
-		Create the instance of gameStateMachine instead of  gStateMachine,(lexagraphically correct 
-		you are creating a variable after all ), or simply declare local  gStateMachine both prefectly 
+		Create the instance of gameStateMachine instead of  gStateMachine,(lexagraphically correct
+		you are creating a variable after all ), or simply declare local  gStateMachine both prefectly
 		reasonable.  Execute and see what happens. Or try running two flappy birds side by side as in
 		a race for competing players. THis dependency would cause a rather spetacular result.
-		Worse imagine what could happen if you tried to use multiple state machines (one for a robot, 
-		one for a vision station. two for ideniticle work stations, one for a label and apply station ) 
+		Worse imagine what could happen if you tried to use multiple state machines (one for a robot,
+		one for a vision station. two for ideniticle work stations, one for a label and apply station )
 		and someone hits the emergancy stop. well something like this https://around.com/ariane.html
 	The modfications now allow the instance to be declared local and its data is encapusulated and hidden.
 	To use create a list of key,value pairs one of which should be ['state'] = 'nextState' and return the list ie
@@ -60,6 +60,8 @@
 				score = self.score
 			}
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class o BaseState
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -83,7 +85,7 @@ end
 	it is passed without modification to the
 	enter function where the state key is
 	simply ignored
-	krb	
+	krb
 ]]
 function StateMachine:_changeState(msgs)
 	self.states[self.current]:exit()
@@ -97,15 +99,16 @@ function StateMachine:run(msgs,state)
 end
 
 -- keysPressed is a reference to an external object found in keyBoard.lua
-function StateMachine:update(keysPressed, msgs, dt)
-	self.states[self.current]:update(keysPressed, msgs, dt)
+function StateMachine:update( msgs, dt)
+	self.states[self.current]:update(msgs, dt)
 	-- pass on return of a nil value
 	if self.current ~= msgs.next then
 		self:_changeState(msgs)
 	end
+end
 
-	-- reset keys pressed
-	keysPressed:reset()
+function StateMachine:handleInput(input,msgs)
+	self.states[self.current]:handleInput(input, msgs)
 end
 
 function StateMachine:render(msgs)

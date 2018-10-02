@@ -10,16 +10,23 @@
     Some global constants for our application.
 ]]
 
--- size of our actual window
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
+require 'lib/readonly'
 
--- size we're trying to emulate with push
-VIRTUAL_WIDTH = 432
-VIRTUAL_HEIGHT = 243
+function loadConstants()
+    local constants = {}
 
--- paddle movement speed
-PADDLE_SPEED = 200
+    -- size of our actual window
+    constants.WINDOW_WIDTH = 1280
+    constants.WINDOW_HEIGHT = 720
 
--- debug flag
-DEBUG = true
+    -- size we're trying to emulate with push
+    constants.VIRTUAL_WIDTH = 432
+    constants.VIRTUAL_HEIGHT = 243
+
+    -- paddle movement speed
+    constants.PADDLE_SPEED = 200
+
+    gConst = readOnly(constants)
+    assert(gConst,"error in creating constants")
+
+end

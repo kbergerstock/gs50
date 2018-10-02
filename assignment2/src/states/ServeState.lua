@@ -13,23 +13,21 @@
     preparation for the serve, including our current health and score, as
     well as the level we're on.
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts
 
 ServeState = Class{__includes = BaseState}
 
-
-function ServeState:init()
-
-end
-
-function ServeState:enter(msgs)    
+function ServeState:enter(msgs)
     self:MakeLevel(msgs)
     msgs.paddle:reset()
     msgs.balls:reset()
-    msg.powerUps:reset()
+    msgs.powerUps:reset()
 end
 
 function ServeState:MakeLevel(msgs)
-    if msgs.makeLevel  then        
+    if msgs.makeLevel  then
         msgs.bricks, msgs.keyBrickFlag  = LevelMaker.createMap(msgs.level)
         msgs.keyCaught = false
         msgs.breakout = false
@@ -37,12 +35,14 @@ function ServeState:MakeLevel(msgs)
     end
 end
 
-function ServeState:update(keysPressed, msgs, dt)
+function ServeState:update(msgs, dt)
     -- have the ball track the player
     msgs.paddle:update(dt)
     msgs.balls:track(msgs.paddle)
+end
 
-    if keysPressed:getSpace() then
+function ServeState:handleInput(input, msgs)
+    if input == 'space' then
         if msgs.makeLevel then
             self:MakeLevel(msgs)
         else
@@ -57,10 +57,9 @@ function ServeState:render(msgs)
     msgs.balls:render()
     msgs.powerUps:render()
 
-    if msgs.makeLevel then 
+    if msgs.makeLevel then
         love.graphics.setFont(gFonts['large'])
-        love.graphics.printf('Level creation error press space again ', 0, VIRTUAL_HEIGHT / 3,
-            VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Level creation error press space again ', 0, self.VH / 3, self.VW, 'center')
     else
         for k, brick in pairs(msgs.bricks) do
             brick:render()
@@ -71,10 +70,8 @@ function ServeState:render(msgs)
     renderHealth(msgs.health)
 
     love.graphics.setFont(gFonts['large'])
-    love.graphics.printf('Level ' .. tostring(msgs.level), 0, VIRTUAL_HEIGHT / 3,
-        VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Level ' .. tostring(msgs.level), 0, self.VH / 3, self.VW, 'center')
 
     love.graphics.setFont(gFonts['medium'])
-    love.graphics.printf('Press Space to serve!', 0, VIRTUAL_HEIGHT / 2,
-        VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Space to serve!', 0, self.VH / 2, self.VW, 'center')
 end

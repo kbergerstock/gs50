@@ -22,8 +22,7 @@ require 'lib/message'
 
 Class = require 'lib/class'
 push = require 'lib/push'
-require 'lib/Log'
-require 'lib/HID'
+require 'lib/readonly'
 require 'lib/BaseState'
 require 'lib/StateMachine'
 require 'lib/handy'
@@ -39,6 +38,7 @@ require 'src/states/handle_mouse'
 -- game pieces
 require 'src/Board'
 require 'src/Tile'
+require 'src/bomb'
 
 -- game states
 require 'src/states/BeginGameState'
@@ -48,13 +48,14 @@ require 'src/states/StartState'
 
 --
 -- constants
---
-EXTRA_TIME = 0
---
--- physical screen dimensions
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
+function loadConstants()
+    p = {}
+    -- physical screen dimensions
+    p.WINDOW_WIDTH = 1280
+    p.WINDOW_HEIGHT = 720
 
--- virtual resolution dimensions
-VIRTUAL_WIDTH = 512
-VIRTUAL_HEIGHT = 288
+    -- virtual resolution dimensions
+    p.VIRTUAL_WIDTH = 512
+    p.VIRTUAL_HEIGHT = 288
+    gConst = readOnly(p)
+end

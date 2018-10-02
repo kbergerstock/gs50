@@ -6,6 +6,7 @@
 -- luacheck: ignore updateBoard fade updateColorBank countdown wrap7 move_label
 
 local EXTRA_TIME = 0
+
 -- thread
 function updateBoard(msg, action)
     local ms = 0        -- matches found
