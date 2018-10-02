@@ -6,14 +6,20 @@
     cogden@cs50.harvard.edu
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Message StateMachine cHID Class setColor love
+-- luacheck: globals gFonts gTextures gFrames gSounds CONST COLLIDABLE_TILES
+
 Tile = Class{}
 
 function Tile:init(x, y, id, topper, tileset, topperset)
     self.x = x
     self.y = y
+    self.sx = (x-1) * CONST.TILE_SIZE
+    self.sy = (y-1) * CONST.TILE_SIZE
 
-    self.width = TILE_SIZE
-    self.height = TILE_SIZE
+    self.width = CONST.TILE_SIZE
+    self.height = CONST.TILE_SIZE
 
     self.id = id
     self.tileset = tileset
@@ -35,12 +41,9 @@ function Tile:collidable(target)
 end
 
 function Tile:render()
-    love.graphics.draw(gTextures['tiles'], gFrames['tilesets'][self.tileset][self.id],
-        (self.x - 1) * TILE_SIZE, (self.y - 1) * TILE_SIZE)
-    
+    love.graphics.draw(gTextures['tiles'], gFrames['tilesets'][self.tileset][self.id],self.sx, self.sy)
     -- tile top layer for graphical variety
     if self.topper then
-        love.graphics.draw(gTextures['toppers'], gFrames['toppersets'][self.topperset][self.id],
-            (self.x - 1) * TILE_SIZE, (self.y - 1) * TILE_SIZE)
+        love.graphics.draw(gTextures['toppers'], gFrames['toppersets'][self.topperset][self.id],self.sx,self.sy)
     end
 end

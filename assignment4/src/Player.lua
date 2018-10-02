@@ -7,6 +7,8 @@
     Author: Colton Ogden
     cogden@cs50.harvard.edu
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Message StateMachine cHID Class setColor love GenerateQuads
 
 Player = Class{__includes = Entity}
 

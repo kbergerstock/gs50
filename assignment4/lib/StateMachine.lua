@@ -15,16 +15,16 @@
 		Worse imagine what could happen if you tried to use multiple state machines (one for a robot,
 		one for a vision station. two for ideniticle work stations, one for a label and apply station )
 		and someone hits the emergancy stop. well something like this https://around.com/ariane.html
+
 	The modfications now allow the instance to be declared local and its data is encapusulated and hidden.
-	To use you design  messahre packet where one key pair element is xxx.next
-	by zsttomg the xxx.state to themrct desired state the core state macine will changge to the nre state
-	ie msg.next = 'playstate' ther message packet can pass anytig youneed to  the imdivbual
-	state.  any think not neeeded by that state is simply ignored. """ all your really doing is passing a
+	To use you design a message packet where one key pair element is xxx.next
+	by settomg the xxx.state to the next desired state the core state macine will change to the new state
+	ie msg.next = 'playstate' the message packet can pass any thing you need to  the indivual states
+	Any thing not neeeded by the currrent  state is simply ignored. """ all your really doing is passing a
 	reference to a structure of references """
 ]]
 
 -- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: ignore VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
 
 StateMachine = Class{}
 -- statemachine constructor

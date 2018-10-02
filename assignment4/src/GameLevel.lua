@@ -7,6 +7,8 @@
     Author: Colton Ogden
     cogden@cs50.harvard.edu
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class
 
 GameLevel = Class{}
 

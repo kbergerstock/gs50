@@ -6,9 +6,17 @@
     cogden@cs50.harvard.edu
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love
+-- luacheck: globals gFonts gTextures gFrames gSounds
+
 GameObject = Class{}
 
 function GameObject:init(def)
+    self:initialize(def)
+end
+
+function GameObject:initialize(def)
     self.x = def.x
     self.y = def.y
     self.texture = def.texture
@@ -34,4 +42,20 @@ end
 
 function GameObject:render()
     love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
+end
+
+GemObject = Class{__includes = GameObject }
+
+function GemObject:init(def)
+    self:initialize(def)
+    self.w = self.y
+    self.timer = dTimer(55)
+end
+
+function GemObject:update(dt)
+    -- every 55 milliseconds move gem up 1
+    -- remember the y axis is inverted , higher numbers are closer to the virtual ground
+    if self.y > self.w and self.timer(dt) then
+        self.y = self.y - 1
+    end
 end

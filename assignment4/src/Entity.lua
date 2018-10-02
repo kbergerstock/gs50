@@ -8,6 +8,9 @@
     cogden@cs50.harvard.edu
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Message StateMachine cHID Class setColor love GenerateQuads
+
 Entity = Class{}
 
 function Entity:init(def)
@@ -48,7 +51,7 @@ function Entity:collides(entity)
                 self.y > entity.y + entity.height or entity.y > self.y + self.height)
 end
 
-function Entity:render()
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
+function Entity:render(rcs)
+    love.graphics.draw(rcs.gTextures[self.texture], rcs.gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
         math.floor(self.x) + 8, math.floor(self.y) + 10, 0, self.direction == 'right' and 1 or -1, 1, 8, 10)
 end

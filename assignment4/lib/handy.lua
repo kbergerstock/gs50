@@ -6,7 +6,7 @@
 -- krb
 -- function converts color calls from love2d 10 -> love2d 11
 
--- luacheck: allow_defined, no unused, globals Class setColor love Basetate
+-- luacheck: ignore setColor, globals love, no unused
 
 function setColor(r,g,b,a)
     local t = type(r)
