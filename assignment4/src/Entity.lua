@@ -9,49 +9,67 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine cHID Class setColor love GenerateQuads
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts gCT
+-- luacheck: ignore Entity
 
-Entity = Class{}
+require 'lib/fpStateMachine'
 
-function Entity:init(def)
-    -- position
-    self.x = def.x
-    self.y = def.y
+function Entity(def)
+    self = fpStateMachine() or {}
+
+    -- coodinates in tiles from bottom left corner
+    self.tx = def.x
+    self.ty = def.y
+    -- home position
+    self.hx = def.x
+    self.hy = def.y
+    -- entity dimensions
+    self.width = def.width
+    self.height = def.height
+    -- offf sets used to adjust screen position
+    self.offset_x = def.offset_x
+    self.offset_y = def.offset_y
+    self.texture = def.texture
+
+     -- 1 is right -1 is left
+    self.direction = math.random(2) == 1 and 1 or -1
+
+    -- this must be started with an interval and a frame list
+    self.animate = Animation()
+
+    self.timer   = loveTimer()
 
     -- velocity
     self.dx = 0
     self.dy = 0
 
-    -- dimensions
-    self.width = def.width
-    self.height = def.height
+    self.Name(def.name)
 
-    self.texture = def.texture
-    self.stateMachine = def.stateMachine
+    local tile_size = gCT.TILE_SIZE
 
-    self.direction = 'left'
+     -- caclulates the top left corner of the animation graphic in screen pixels
+    function self.csx(self,ox)   return ((self.tx - ox) - 1 ) * tile_size + self.offset_x end
+    function self.csy(self)   return ((10 - self.ty) * tile_size ) + self.offset_y end
 
-    -- reference to tile map so we can check collisions
-    self.map = def.map
+    -- returns true is collision is detected otherwise false
+    function self.collides(self, npc)
+        return   self.sx < (npc.sx + npc.width)  and
+                 (self.sx + self.width) > npc.sx and
+                 self.sy < (npc.sy + npc.height) and
+                 (self.sy + self.height) > npc.sy
+    end
 
-    -- reference to level for tests against other entities + objects
-    self.level = def.level
-end
-
-function Entity:changeState(state, params)
-    self.stateMachine:change(state, params)
-end
-
-function Entity:update(dt)
-    self.stateMachine:update(dt)
-end
-
-function Entity:collides(entity)
-    return not (self.x > entity.x + entity.width or entity.x > self.x + self.width or
-                self.y > entity.y + entity.height or entity.y > self.y + self.height)
-end
-
-function Entity:render(rcs)
-    love.graphics.draw(rcs.gTextures[self.texture], rcs.gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
-        math.floor(self.x) + 8, math.floor(self.y) + 10, 0, self.direction == 'right' and 1 or -1, 1, 8, 10)
+    function self.render(self,origin_x)
+        if origin_x < self.tx and self.tx < origin_x + 16 then
+            local current_frame = self.animate:get_current_frame()
+            local sx = self:csx(origin_x)
+            local sy = self:csy()
+            if current_frame > 0 then
+                love.graphics.draw(gTextures[self.texture], gFrames[self.texture][current_frame],sx ,sy)
+            end
+        end
+    end
+    -- end of class defination
+    return self
 end

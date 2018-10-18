@@ -71,13 +71,11 @@ end
 -- inputs is a reference to an external object found in HID.lua
 -- msg is the message packet for this application
 -- dt is the time diferential from the last call to this function
-function StateMachine:update(inputs, msg, dt)
-	self.states[self.current]:update(inputs, msg, dt)
+function StateMachine:update( msg, dt)
+	self.states[self.current]:update(msg, dt)
 	if self.current ~= msg.next() then
 		self:_changeState(msg)
 	end
-	-- reset the hid inputs activated
-	inputs:reset()
 end
 
 function StateMachine:render(msg)

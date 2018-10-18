@@ -1,7 +1,10 @@
 -- message packet
+-- enforces proper state change
+-- and passes object data bewteen state functions
 -- k.r.bergerstock 2018.09.06
 -- Message is a closure based object
 
+-- luacheck: ignore Message
 
  function Message(start)
 
@@ -11,7 +14,7 @@
                         health = 3,
     }
 
-    local next = start
+    local next = 'idle'
 
     function  self.nextState(state)
         next = state

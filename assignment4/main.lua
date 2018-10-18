@@ -4,19 +4,22 @@
 
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Class push love APP app
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: ignore GAME_PADS
 
 require 'src/Dependencies'
 require 'src/app'
 
 function love.load()
+        local gc = loadConstants()
         -- initialize our virtual resolution
-        push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
+        push:setupScreen(gc.VIRTUAL_WIDTH, gc.VIRTUAL_HEIGHT, gc.WINDOW_WIDTH, gc.WINDOW_HEIGHT, {
         vsync = true,
         fullscreen = false,
         resizable = true,
         canvas = true
     })
+    -- create a game pad interface
+    GAME_PADS = love.joystick.getJoysticks()
     -- create and initalize the application
     app = APP()
     -- load up the graphics, sounds and music

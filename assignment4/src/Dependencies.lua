@@ -21,7 +21,6 @@ Class = require 'lib/class'
 push = require 'lib/push'
 require 'lib/BaseState'
 require 'lib/StateMachine'
-require 'lib/HID'           -- human input device
 require 'lib/message'       -- packet messages
 require 'lib/handy'         -- setColor
 require 'lib/dTimer'        -- digital timer input is dt
@@ -43,16 +42,15 @@ require 'src/states/entity/PlayerIdleState'
 require 'src/states/entity/PlayerJumpState'
 require 'src/states/entity/PlayerWalkingState'
 
-require 'src/states/entity/snail/SnailChasingState'
-require 'src/states/entity/snail/SnailIdleState'
-require 'src/states/entity/snail/SnailMovingState'
+require 'src/states/entity/npc_states'
 
 -- general
+require 'src/game_pad'
 require 'src/Animation'
 require 'src/Entity'
 require 'src/GameObject'
-require 'src/GameLevel'
-require 'src/LevelMaker'
+require 'src/generateTileMap'
+require 'src/generateNPCs'
 require 'src/Player'
 require 'src/Snail'
 require 'src/Tile'

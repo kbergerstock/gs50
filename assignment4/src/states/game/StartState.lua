@@ -9,39 +9,45 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine cHID Class setColor love BaseState
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT
--- luacheck: globals gFonts gTextures gFrames gSounds LevelMaker
+-- luacheck: globals Message StateMachine Class setColor love BaseState
+-- luacheck: globals gFonts gTextures gFrames gSounds
 
 StartState = Class{__includes = BaseState}
 
 function StartState:enter(msg)
-    self.map = GenerateLevel(100, 10)
+    self.tile_map = generateTileMap(100,10)
+    self.game_pad = GamePad()
     self.background = math.random(3)
 end
 
-
 function StartState:handle_input(input,msg)
     if input == 'space' then
-        msg:nextState('play')
+        msg.nextState('play')
     end
 end
 
 function StartState:render(msg)
+    local bh = gTextures['backgrounds']:getHeight() / 3 * 2
+    love.graphics.push()
     love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], 0, 0)
-    love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], 0,
-        gTextures['backgrounds']:getHeight() / 3 * 2, 0, 1, -1)
-    self.map:render()
+    love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], 0, bh, 0, 1, -1)
+    self.tile_map:renderTiles()
+    self.tile_map:renderObjects()
+    love.graphics.pop()
 
     love.graphics.setFont(gFonts['title'])
     setColor(0, 0, 0, 255)
-    love.graphics.printf('Super 50 Bros.', 1, 11, VIRTUAL_WIDTH, 'center')
-    setColor(255, 255, 255, 255)
-    love.graphics.printf('Super 50 Bros.', 0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("Otarin's Run", 1, 6, self.VW, 'center')
+    setColor(06, 96, 255, 255)
+    love.graphics.printf("Otarin's Run", 0, 5, self.VW, 'center')
 
     love.graphics.setFont(gFonts['medium'])
     setColor(0, 0, 0, 255)
-    love.graphics.printf('Press Space', 1, 41 , VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Space', 1, 31 , self.VW, 'center')
     setColor(255, 255, 255, 255)
-    love.graphics.printf('Press Space', 0, 40 , VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Space', 0, 30 , self.VW, 'center')
+    local gpr = self.game_pad:input()
+    if gpr and gpr.buttanA then
+        msg.nextState('play')
+    end
 end

@@ -7,19 +7,18 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine cHID Class setColor love
--- luacheck: globals gFonts gTextures gFrames gSounds CONST COLLIDABLE_TILES
+-- luacheck: globals Message StateMachine Class setColor love
+-- luacheck: globals gFonts gTextures gFrames gSounds gCT
 
 Tile = Class{}
 
 function Tile:init(x, y, id, topper, tileset, topperset)
-    self.x = x
-    self.y = y
-    self.sx = (x-1) * CONST.TILE_SIZE
-    self.sy = (y-1) * CONST.TILE_SIZE
+    self.size = gCT.TILE_SIZE
+    self.tx = x
+    self.ty = y
 
-    self.width = CONST.TILE_SIZE
-    self.height = CONST.TILE_SIZE
+    self.width = size
+    self.height = size
 
     self.id = id
     self.tileset = tileset
@@ -27,23 +26,12 @@ function Tile:init(x, y, id, topper, tileset, topperset)
     self.topperset = topperset
 end
 
---[[
-    Checks to see whether this ID is whitelisted as collidable in a global constants table.
-]]
-function Tile:collidable(target)
-    for k, v in pairs(COLLIDABLE_TILES) do
-        if v == self.id then
-            return true
-        end
-    end
-
-    return false
-end
-
-function Tile:render()
-    love.graphics.draw(gTextures['tiles'], gFrames['tilesets'][self.tileset][self.id],self.sx, self.sy)
+function Tile:render(origin_x)
+    local sx = ((self.tx - origin_x) -1) * self.size
+    local sy = (10 - self.ty) * self.size
+    love.graphics.draw(gTextures['tiles'], gFrames['tilesets'][self.tileset][self.id],sx,sy)
     -- tile top layer for graphical variety
     if self.topper then
-        love.graphics.draw(gTextures['toppers'], gFrames['toppersets'][self.topperset][self.id],self.sx,self.sy)
+        love.graphics.draw(gTextures['toppers'], gFrames['toppersets'][self.topperset][self.id],sx,sy)
     end
 end

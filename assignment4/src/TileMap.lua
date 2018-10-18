@@ -7,44 +7,59 @@
 
 require 'lib/mod'
 
--- luacheck: no unused, globals Class CONST mod2
+-- luacheck: no unused, globals Class gCT mod2 love
 -- luacheck: ignore TileMap
 
 TileMap = Class{}
 
-function TileMap:init(width, height, tiles)
-    self.width = width
-    self.height = height
-    self._width = width * CONST.TILE_SIZE
-    self._height = height * CONST.TILE_SIZE
-    self.tile_size  = CONST.TILE_SIZE
-    self.tiles = tiles
+function TileMap:init(def)
+    -- width and height are in number of tiles
+    self.width = def._width
+    self.height = def._height
+    self.tiles = def._tiles
+    self.objects = def._objects
+    assert(self.objects,"no objects to render")
+    -- _width, _height and tile_size are in pixels
+    self.tile_size  = def.tile_size
+    self.display_width = 18
+    self.display_height = 10
+    -- origin of map to be displayed
+    self.origin_x = 0
 end
 
---[[
-    If our tiles were animated, this is potentially where we could iterate over all of them
-    and update either per-tile or per-map animations for appropriately flagged tiles!
-]]
-function TileMap:update(dt)
-
-end
-
---[[
-    Returns the x, y of a tile given an x, y of coordinates in the world space.
-]]
-function TileMap:pointToTile(x, y)
-    if x < 0 or x > self._width  or y < 0 or y > self._height then
-        return nil
-    end
-    -- since these are zero bzsed the ndx formula changes
-    local tx = mod2(x,self.tile_size)
-    local ty = mod2(y,self.tile_size)
-    local ndx = x * self.height + y + 1
+-- retrieve a tile given the col, row coordinates of a tile
+-- this function uses the 1 based index forumla
+function TileMap:getTile(tx, ty)
+    local ndx = (ty - 1) * self.width  + tx
     return self.tiles[ndx]
 end
 
-function TileMap:render()
-    for ndx,tile in pairs(self.tiles) do
-        tile:render()
+function TileMap:renderTiles()
+    for k ,tile in pairs(self.tiles) do
+        if self.origin_x < tile.tx and tile.tx <= self.origin_x + self.display_width then
+            tile:render(self.origin_x)
+        end
     end
+end
+
+function TileMap:renderObjects()
+    assert(self.objects,"no objects to render")
+    for k, object in pairs(self.objects) do
+        if self.origin_x < object.tx and object.tx <= self.origin_x + self.display_width then
+            object:render(self.origin_x)
+        end
+    end
+end
+
+function TileMap:update(direction)
+    self.origin_x = self.origin_x + direction
+    if self.origin_x < 0 then self.origin_x = 0 end
+    if self.origin_x > self.width - self.display_width then
+        self.origin_x = self.width - self.display_width
+    end
+end
+
+function TileMap:renderCanvas(quad)
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.draw(self.canvas,quad)
 end

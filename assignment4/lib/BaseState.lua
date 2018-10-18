@@ -15,7 +15,7 @@
     ourselves in the actual classes.
 ]]
 
--- luacheck: globals BaseState Class o
+-- luacheck: globals BaseState Class o gCT gFonts
 -- luacheck: no unused args , no self
 
 if not rawget(getmetatable(o) or {},'__Class') then
@@ -23,9 +23,15 @@ if not rawget(getmetatable(o) or {},'__Class') then
 end
 BaseState = Class{}
 
-function BaseState:init() end
+function BaseState:init()
+    assert(gCT,'golbal constants arn not initialized !!')
+    assert(gFonts,'Resources are not loaded !!')
+    -- shorcuts
+    self.VH = gCT.VIRTUAL_HEIGHT
+    self.VW = gCT.VIRTUAL_WIDTH
+end
 function BaseState:enter(msg) end
 function BaseState:exit(msg) end
-function BaseState:update(msg, dt) end
+function BaseState:update(inputs, msg, dt) end
 function BaseState:render(msg) end
 function BaseState:handle_input(input, msg) end

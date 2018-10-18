@@ -5,134 +5,139 @@
     -- PlayState Class --
 ]]
 
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals gSounds gTextures gFrames gFonts gCT
+
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init()
+    BaseState:init()
     self.camX = 0
     self.camY = 0
-    self.level = LevelMaker.generate(100, 10)
-    self.tileMap = self.level.tileMap
-    self.background = math.random(3)
+    -- seed the RNG
     self.backgroundX = 0
+    self.zt = 0
+    self.canvas = love.graphics.newCanvas(288,160)
+    self.game_pad = GamePad()
+end
 
-    self.gravityOn = true
-    self.gravityAmount = 6
-
-    self.player = Player({
-        x = 0, y = 0,
-        width = 16, height = 20,
+function PlayState:enter(gameMsg)
+    math.randomseed(os.time())
+    for i = 1, math.random(1000,1500) do
+        math.random(100)
+    end
+    local alien = Player({
+        x = 2,
+        y = 7,
+        width   = 16,
+        height  = 20,
         texture = 'green-alien',
-        stateMachine = StateMachine {
-            ['idle'] = function() return PlayerIdleState(self.player) end,
-            ['walking'] = function() return PlayerWalkingState(self.player) end,
-            ['jump'] = function() return PlayerJumpState(self.player, self.gravityAmount) end,
-            ['falling'] = function() return PlayerFallingState(self.player, self.gravityAmount) end
-        },
-        map = self.tileMap,
-        level = self.level
     })
 
-    self:spawnEnemies()
-
-    self.player:changeState('falling')
-end
-
-function PlayState:update(dt)
-    Timer.update(dt)
-
-    -- remove any nils from pickups, etc.
-    self.level:clear()
-
-    -- update player and level
-    self.player:update(dt)
-    self.level:update(dt)
-
-    -- constrain player X no matter which state
-    if self.player.x <= 0 then
-        self.player.x = 0
-    elseif self.player.x > TILE_SIZE * self.tileMap.width - self.player.width then
-        self.player.x = TILE_SIZE * self.tileMap.width - self.player.width
+    self.tile_map = generateTileMap(100,10)
+    self.player = alien
+    self.entities = generateNPCs()
+    self.fsm = NPC_states({tile_map = self.tile_map,player = self.player})
+    self.pan = 0
+    self.cnt = 0
+    self.pos = 0
+    for k,npc in pairs(self.entities) do
+        self.fsm.start(npc)
     end
 
-    self:updateCamera()
+    self:update_canvas()
+    self.background = math.random(3)
 end
 
-function PlayState:render()
-    love.graphics.push()
-    love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX), 0)
-    love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX),
-        gTextures['backgrounds']:getHeight() / 3 * 2, 0, 1, -1)
-    love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX + 256), 0)
-    love.graphics.draw(gTextures['backgrounds'], gFrames['backgrounds'][self.background], math.floor(-self.backgroundX + 256),
-        gTextures['backgrounds']:getHeight() / 3 * 2, 0, 1, -1)
-    
-    -- translate the entire view of the scene to emulate a camera
-    love.graphics.translate(-math.floor(self.camX), -math.floor(self.camY))
-    
-    self.level:render()
+function PlayState:update_canvas()
+    local origin_x = self.tile_map.origin_x
+    love.graphics.setCanvas(self.canvas)
+    love.graphics.clear(0,0,0,0)
+    self.tile_map:renderTiles()
+    self.tile_map:renderObjects()
+    self.player:render(origin_x)
+    for k, npc in pairs(self.entities) do
+        npc:render(origin_x)
+    end
+    love.graphics.setCanvas()
+end
 
-    self.player:render()
+function PlayState:update(gameMsg,dt)
+    self.zt = self.zt + dt * 1000
+    if self.zt >=25 then
+    local gpr = self.game_pad:input()
+        if gpr then
+            if self.cnt == 0 and gpr.rightx > 0.6 then self.pan = 1; self.cnt = 0; self.pos = 0; end
+            if self.cnt == 0  and gpr.rightx < -0.6 then self.pan = -1; self.cnt = 0; self.pos = 0; end
+        end
+
+        for k, npc in pairs(self.entities) do
+            npc.exec()
+        end
+        self:update_canvas()
+        self.zt = self.zt - 25.0
+    end
+end
+function PlayState:handle_input(input,gameMsg)
+    if input == 'right' and self.cnt == 0 then
+        self.pan = 1; self.cnt = 0; self.pos = 0
+    end
+    if input == 'left' and self.cnt == 0 and self.tile_map.origin_x > 0 then
+        self.pan = -1; self.cnt = 0; self.pos = 0
+    end
+end
+
+function PlayState:render(gameMsg)
+    local bkgnds = 'backgrounds'
+
+    local function gSX(u)
+        return math.floor(-self.backgroundX + u)
+    end
+    local function gSY()
+        return gTextures[bkgnds]:getHeight() / 3 * 2
+    end
+
+    love.graphics.push()
+    love.graphics.draw(gTextures[bkgnds], gFrames[bkgnds][self.background], gSX(0), 0)
+    love.graphics.draw(gTextures[bkgnds], gFrames[bkgnds][self.background], gSX(0), gSY(),0, 1, -1)
+    love.graphics.draw(gTextures[bkgnds], gFrames[bkgnds][self.background], gSX(256), 0)
+    love.graphics.draw(gTextures[bkgnds], gFrames[bkgnds][self.background], gSX(256), gSY(), 0, 1, -1)
+
+    -- translate the entire view of the scene to emulate a camera
+    -- love.graphics.translate(-math.floor(self.camX), -math.floor(self.camY))
+    local quad = love.graphics.newQuad(16 + self.pos, 0, 256,160,288,160)
+    love.graphics.setColor(0,0,0,0)love.graphics.setColor(1,1,1,1)
+    love.graphics.draw(self.canvas,quad)
+    if self.pan ~= 0 then
+        self.cnt = self.cnt + 1
+        self.pos = self.pos + self.pan
+        if self.cnt > 17 then
+            self.tile_map:update(self.pan)
+            self:update_canvas()
+            self.cnt = 0
+            self.pos = 0
+            self.pan = 0
+        end
+    end
+
     love.graphics.pop()
-    
+
     -- render score
     love.graphics.setFont(gFonts['medium'])
     setColor(0, 0, 0, 255)
-    love.graphics.print(tostring(self.player.score), 5, 5)
+    love.graphics.print(tostring(self.player.Score), 5, 5)
     setColor(255, 255, 255, 255)
-    love.graphics.print(tostring(self.player.score), 4, 4)
+    love.graphics.print(tostring(self.player.Score), 4, 4)
 end
 
 function PlayState:updateCamera()
+    local VW = gCT.VIRTUAL_WIDTH
     -- clamp movement of the camera's X between 0 and the map bounds - virtual width,
     -- setting it half the screen to the left of the player so they are in the center
     self.camX = math.max(0,
-        math.min(TILE_SIZE * self.tileMap.width - VIRTUAL_WIDTH,
-        self.player.x - (VIRTUAL_WIDTH / 2 - 8)))
+        math.min(gCT.TILE_SIZE * self.level.tileMap.width - VW, self.player.x - (VW / 2 - 8)))
 
     -- adjust background X to move a third the rate of the camera for parallax
     self.backgroundX = (self.camX / 3) % 256
-end
-
---[[
-    Adds a series of enemies to the level randomly.
-]]
-function PlayState:spawnEnemies()
-    -- spawn snails in the level
-    for x = 1, self.tileMap.width do
-
-        -- flag for whether there's ground on this column of the level
-        local groundFound = false
-
-        for y = 1, self.tileMap.height do
-            if not groundFound then
-                if self.tileMap.tiles[y][x].id == TILE_ID_GROUND then
-                    groundFound = true
-
-                    -- random chance, 1 in 20
-                    if math.random(20) == 1 then
-                        
-                        -- instantiate snail, declaring in advance so we can pass it into state machine
-                        local snail
-                        snail = Snail {
-                            texture = 'creatures',
-                            x = (x - 1) * TILE_SIZE,
-                            y = (y - 2) * TILE_SIZE + 2,
-                            width = 16,
-                            height = 16,
-                            stateMachine = StateMachine {
-                                ['idle'] = function() return SnailIdleState(self.tileMap, self.player, snail) end,
-                                ['moving'] = function() return SnailMovingState(self.tileMap, self.player, snail) end,
-                                ['chasing'] = function() return SnailChasingState(self.tileMap, self.player, snail) end
-                            }
-                        }
-                        snail:changeState('idle', {
-                            wait = math.random(5)
-                        })
-
-                        table.insert(self.level.entities, snail)
-                    end
-                end
-            end
-        end
-    end
 end

@@ -27,33 +27,33 @@
 require 'src/loadResources'
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine cHID Class setColor love
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT
+-- luacheck: globals Message StateMachine BaseState Class setColor love
 -- luacheck: globals gFonts gSounds LoadResources
 -- luacheck: globals StartState PlayState
 
 APP = Class{}
 
 function APP:init()
-    self.inputs = cHID()
     self.msg = Message()
 end
 
 function APP:load()
-    -- assert(self.msg,'The resources are not loaded !')
     -- initialize our nearest-neighbor filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
     -- window bar title
     love.graphics.setFont(gFonts['medium'])
-    love.window.setTitle('Super 50 Bros.')
+    love.window.setTitle("Otarin's Run.")
 
     self.gameStateMachine = StateMachine {
         ['start'] = StartState(),
-        ['play']  = BaseState()  -- PlayState()
+        ['play']  = PlayState()
     }
 
     -- seed the RNG
     math.randomseed(os.time())
+    for i = 1, 100 do
+        math.random(100)
+    end
 
     self.msg.nextState('start')
 end
@@ -70,7 +70,7 @@ end
 
 function APP:update(dt)
 
-    self.gameStateMachine:update(self.inputs, self.msg, dt)
+    self.gameStateMachine:update( self.msg, dt)
 
 end
 
