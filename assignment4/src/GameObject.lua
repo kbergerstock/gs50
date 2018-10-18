@@ -26,14 +26,14 @@ function GameObject:init(def)
     self.onConsume = def.onConsume
     self.hit = def.hit
     self.size = def.tile_size
+    self.sx = (self.tx - 1) * self.size
+    self.sy = (10 - self.ty) * self.size
 end
 
 function GameObject:collides(target) end
 
 function GameObject:update(dt) end
 
-function GameObject:render(origin_x)
-    local sx = ((self.tx - origin_x  )- 1) * self.size
-    local sy = (10 - self.ty) * self.size
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], sx, sy)
+function GameObject:render()
+    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame],self.sx,self.sy)
 end

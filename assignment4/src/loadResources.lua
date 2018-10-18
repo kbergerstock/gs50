@@ -55,7 +55,8 @@ function LoadResources()
         ['backgrounds'] = love.graphics.newImage('graphics/backgrounds.png'),
         ['green-alien'] = love.graphics.newImage('graphics/green_alien.png'),
         ['blue-alien'] = love.graphics.newImage('graphics/blue_alien.png'),
-        ['snails'] = love.graphics.newImage('graphics/snails.png')
+        ['snails'] = love.graphics.newImage('graphics/snails.png'),
+        ['numbers'] = love.graphics.newImage('graphics/numbers.png'),
     }
     gTextures = readOnly(textures)
 
@@ -68,7 +69,8 @@ function LoadResources()
         ['backgrounds'] = GenerateQuads(gTextures['backgrounds'], 256, 128),
         ['green-alien'] = GenerateQuads(gTextures['green-alien'], 16, 20),
         ['blue-alien'] = GenerateQuads(gTextures['blue-alien'], 16, 20),
-        ['snails'] = GenerateQuads(gTextures['snails'], 16, 16)
+        ['snails'] = GenerateQuads(gTextures['snails'], 16, 16),
+        ['numbers'] = GenerateQuads(gTextures['numbers'],8,8),
     }
 
     -- these need to be added after gFrames is initialized because they refer to gFrames from within

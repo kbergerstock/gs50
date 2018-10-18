@@ -18,7 +18,7 @@ function PlayState:init()
     -- seed the RNG
     self.backgroundX = 0
     self.zt = 0
-    self.canvas = love.graphics.newCanvas(288,160)
+    self.canvas = love.graphics.newCanvas(1600,160)
     self.game_pad = GamePad()
 end
 
@@ -40,7 +40,6 @@ function PlayState:enter(gameMsg)
     self.entities = generateNPCs()
     self.fsm = NPC_states({tile_map = self.tile_map,player = self.player})
     self.pan = 0
-    self.cnt = 0
     self.pos = 0
     for k,npc in pairs(self.entities) do
         self.fsm.start(npc)
@@ -51,14 +50,13 @@ function PlayState:enter(gameMsg)
 end
 
 function PlayState:update_canvas()
-    local origin_x = self.tile_map.origin_x
     love.graphics.setCanvas(self.canvas)
     love.graphics.clear(0,0,0,0)
     self.tile_map:renderTiles()
     self.tile_map:renderObjects()
-    self.player:render(origin_x)
+    self.player:render()
     for k, npc in pairs(self.entities) do
-        npc:render(origin_x)
+        npc:render()
     end
     love.graphics.setCanvas()
 end
@@ -68,8 +66,8 @@ function PlayState:update(gameMsg,dt)
     if self.zt >=25 then
     local gpr = self.game_pad:input()
         if gpr then
-            if self.cnt == 0 and gpr.rightx > 0.6 then self.pan = 1; self.cnt = 0; self.pos = 0; end
-            if self.cnt == 0  and gpr.rightx < -0.6 then self.pan = -1; self.cnt = 0; self.pos = 0; end
+            if self.pan == 0 and gpr.rightx > 0.6 then self.pan = 1; end
+            if self.pan == 0 and gpr.rightx < -0.6 then self.pan = -1; end
         end
 
         for k, npc in pairs(self.entities) do
@@ -79,17 +77,34 @@ function PlayState:update(gameMsg,dt)
         self.zt = self.zt - 25.0
     end
 end
+
 function PlayState:handle_input(input,gameMsg)
-    if input == 'right' and self.cnt == 0 then
-        self.pan = 1; self.cnt = 0; self.pos = 0
+    if input == 'right' and self.pan == 0 then
+        self.pan = 1
     end
-    if input == 'left' and self.cnt == 0 and self.tile_map.origin_x > 0 then
-        self.pan = -1; self.cnt = 0; self.pos = 0
+    if input == 'left' and self.pan == 0 then
+        self.pan = -1
     end
 end
 
 function PlayState:render(gameMsg)
     local bkgnds = 'backgrounds'
+
+    -- render score
+    local function renderScore(score)
+        local ssx = 5
+        local ssy = 5
+        local d = 1000000
+        local q = 0
+        local r = score
+        for i = 1, 6 do
+            q, r = mod2 (r, d)
+            d = d / 10
+            love.graphics.draw(gTextures['numbers'],gFrames['numbers'][q+1],ssx,ssy)
+            ssx = ssx + 10
+        end
+        love.graphics.draw(gTextures['numbers'],gFrames['numbers'][r+1],ssx,ssy)
+    end
 
     local function gSX(u)
         return math.floor(-self.backgroundX + u)
@@ -106,29 +121,16 @@ function PlayState:render(gameMsg)
 
     -- translate the entire view of the scene to emulate a camera
     -- love.graphics.translate(-math.floor(self.camX), -math.floor(self.camY))
-    local quad = love.graphics.newQuad(16 + self.pos, 0, 256,160,288,160)
-    love.graphics.setColor(0,0,0,0)love.graphics.setColor(1,1,1,1)
+    local quad = love.graphics.newQuad(16 + self.pos, 0, 256,160,1600,160)
+    love.graphics.setColor(1,1,1,1)
     love.graphics.draw(self.canvas,quad)
-    if self.pan ~= 0 then
-        self.cnt = self.cnt + 1
-        self.pos = self.pos + self.pan
-        if self.cnt > 17 then
-            self.tile_map:update(self.pan)
-            self:update_canvas()
-            self.cnt = 0
-            self.pos = 0
-            self.pan = 0
-        end
-    end
-
     love.graphics.pop()
-
-    -- render score
-    love.graphics.setFont(gFonts['medium'])
-    setColor(0, 0, 0, 255)
-    love.graphics.print(tostring(self.player.Score), 5, 5)
-    setColor(255, 255, 255, 255)
-    love.graphics.print(tostring(self.player.Score), 4, 4)
+    renderScore(self.player.Score)
+    if self.pan ~= 0 then
+        self.pos = self.pos + self.pan
+        if self.pos < 16 then self.pos = 16 end
+        self.pan = 0
+    end
 end
 
 function PlayState:updateCamera()

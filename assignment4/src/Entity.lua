@@ -49,7 +49,7 @@ function Entity(def)
     local tile_size = gCT.TILE_SIZE
 
      -- caclulates the top left corner of the animation graphic in screen pixels
-    function self.csx(self,ox)   return ((self.tx - ox) - 1 ) * tile_size + self.offset_x end
+    function self.csx(self)   return (self.tx - 1 ) * tile_size + self.offset_x end
     function self.csy(self)   return ((10 - self.ty) * tile_size ) + self.offset_y end
 
     -- returns true is collision is detected otherwise false
@@ -60,15 +60,13 @@ function Entity(def)
                  (self.sy + self.height) > npc.sy
     end
 
-    function self.render(self,origin_x)
-        if origin_x < self.tx and self.tx < origin_x + 16 then
+    function self.render(self)
             local current_frame = self.animate:get_current_frame()
-            local sx = self:csx(origin_x)
+            local sx = self:csx()
             local sy = self:csy()
             if current_frame > 0 then
                 love.graphics.draw(gTextures[self.texture], gFrames[self.texture][current_frame],sx ,sy)
             end
-        end
     end
     -- end of class defination
     return self

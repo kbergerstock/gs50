@@ -106,10 +106,9 @@ function loadConstants()
 
     -- game object IDs
     p.BUSH_IDS = readOnly{1, 2, 5, 6, 7}
-    p.COIN_IDS = readOnly{1, 2, 3}
-    p.CRATES = readOnly{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
-    p.GEMS = readOnly{1, 2, 3, 4, 5, 6, 7, 8 }
-
+    p.COIN_FRAMES = 3
+    p.CRATES_FRAMES =  12
+    p.GEMS_FRAMES =  8
     p.JUMP_BLOCKS_FRAMES = 30
 
     gCT = readOnly(p)
