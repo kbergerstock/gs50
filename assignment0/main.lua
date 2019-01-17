@@ -13,12 +13,17 @@
 
     This version is built to more closely resemble the NES than
     the original Pong machines or the Atari 2600 in terms of
-    resolution, though in widescreen (16:9) so it looks nicer on 
+    resolution, though in widescreen (16:9) so it looks nicer on
     modern systems.
 
-    modified by Keith R> bergerstock aug/2018
-    
+    modified by Keith R. Bergerstock aug/2018
+    converted to love engine version 11.1
+    requires push version 0.3
 ]]
+
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love Paddle Ball sign
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT PADDLE_SPEED
 
 -- push is a library that will allow us to draw our game at a virtual
 -- resolution, instead of however large our window is; used to provide
@@ -74,7 +79,7 @@ function love.load()
     largeFont = love.graphics.newFont('font.ttf', 16)
     scoreFont = love.graphics.newFont('font.ttf', 32)
     love.graphics.setFont(smallFont)
-   
+
     -- set up our sound effects; later, we can just index this table and
     -- call each entry's `play` method
     sounds = {
@@ -82,7 +87,7 @@ function love.load()
         ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
         ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static')
     }
-    
+
     -- initialize our virtual resolution, which will be rendered within our
     -- actual window no matter its dimensions
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -90,7 +95,7 @@ function love.load()
         resizable = true,
         vsync = true
     })
-   
+
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
     player1 = Paddle(10, 30, 5, 20)
@@ -136,7 +141,7 @@ function love.update(dt)
         -- detect ball collision with paddles, reversing dx if true and
         -- slightly increasing it, then altering the dy based on the position
         -- at which it collided, then playing a sound effect
-            
+
         if ball:collides(player1) then
             ball:handlePaddleCollision( player1.x + ball.width + 1)
             sounds['paddle_hit']:play()
@@ -146,11 +151,11 @@ function love.update(dt)
             ball:handlePaddleCollision(player2.x - ball.width)
             sounds['paddle_hit']:play()
         end
-        -- handle a possible wall collision    
+        -- handle a possible wall collision
         if ball:handleWallCollision() then
             sounds['wall_hit']:play()
         end
-     
+
         -- if we reach the left edge of the screen, go back to serve
         -- and update the score and serving player
         if ball.x < 0 then
@@ -167,13 +172,13 @@ function love.update(dt)
                 gameState = 'serve'
             end
             -- places the ball in the middle of the screen, no velocity
-            ball:reset()            
+            ball:reset()
         end
 
         -- if we reach the right edge of the screen, go back to serve
         -- and update the score and serving player
         if ball.x > VIRTUAL_WIDTH then
-            player1:incScore()           
+            player1:incScore()
             sounds['score']:play()
 
             -- if we've reached a score of 10, the game is over; set the
@@ -198,19 +203,19 @@ function love.update(dt)
         -- AI move paddle
         player1:track(ball)
     else
-        -- paler move paddle
+        -- player move paddle
         player1:move('w','s')
     end
 
     -- player 2
     if AIplayer2 then
         player2:track(ball)
-    else  
-        player2:move('up','down')      
+    else
+        player2:move('up','down')
     end
 
     -- update our ball based on its DX and DY only if we're in play state;
-    -- scale the velocity by dt so movement is framerate-independent
+    -- scale the velocity by dt so movement is frame rate independent
     if gameState == 'play' then
         ball:update(dt)
     end
@@ -235,11 +240,11 @@ function love.keypressed(key)
     elseif key == 'space' then
         if gameState == 'start' then
             gameState = 'serve'
-        elseif gameState == 'serve' then      
+        elseif gameState == 'serve' then
             winningPlayer = 0
             player1:resetPos()
             player2:resetPos()
-            -- serve the ball 
+            -- serve the ball
             ball:handleServe(servingPlayer)
             gameState = 'play'
         elseif gameState == 'done' then
@@ -258,10 +263,10 @@ function love.keypressed(key)
             player2:resetScore()
         end
     elseif key == '1' then
-        AIplayer1 = not AIplayer1 
+        AIplayer1 = not AIplayer1
         player1:resetPos()
     elseif key == '2' then
-        AIplayer2 = not AIplayer2 
+        AIplayer2 = not AIplayer2
         player2:resetPos()
     end
 end
@@ -269,7 +274,7 @@ end
     Called each frame after update; is responsible simply for
     drawing all of our game objects and more to the screen.
 ]]
-function love.draw()    
+function love.draw()
     -- begin drawing with push, in our virtual resolution
     push:apply('start')
 
@@ -288,7 +293,7 @@ function love.draw()
 
     -- show the score before ball is rendered so it can move over the text
     displayScore()
-    
+
     player1:render()
     player2:render()
     ball:render()
@@ -321,19 +326,19 @@ function displayStart()
     love.graphics.setFont(smallFont)
     love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
     if AIplayer1 then
-        love.graphics.setColor(0, 255, 0, 255)      
+        love.graphics.setColor(0, 255, 0, 255)
     else
-        love.graphics.setColor(255,255, 255, 255)     
+        love.graphics.setColor(255,255, 255, 255)
     end
     love.graphics.printf('Press 1 for compter player one', 0, 20, VIRTUAL_WIDTH, 'center')
     if AIplayer2 then
-        love.graphics.setColor(0, 255, 0, 255)           
+        love.graphics.setColor(0, 255, 0, 255)
     else
-        love.graphics.setColor(255,255, 255, 255)     
-    end        
+        love.graphics.setColor(255,255, 255, 255)
+    end
     love.graphics.printf('Press 2 for compter player two', 0, 30, VIRTUAL_WIDTH, 'center')
-    love.graphics.setColor(255,255, 255, 255)    
-    love.graphics.printf('Press SpaceBar to begin!', 0, 40, VIRTUAL_WIDTH, 'center')    
+    love.graphics.setColor(255,255, 255, 255)
+    love.graphics.printf('Press SpaceBar to begin!', 0, 40, VIRTUAL_WIDTH, 'center')
 end
 -- renders serve message
 function displayServe(player)

@@ -19,10 +19,15 @@
         incScore()
         Won()
         resetPos()
-        track(ball)  : AI addition 
+        track(ball)  : AI addition
         move(up,down): code reductiom
 
 ]]
+
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love Paddle sign
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT PADDLE_SPEED
+
 
 Paddle = Class{}
 
@@ -37,7 +42,7 @@ Paddle = Class{}
     Note that `self` is a reference to *this* object, whichever object is
     instantiated at the time this function is called. Different objects can
     have their own x, y, width, and height values, thus serving as containers
-    for data. In this sense, they're very similar to structs in C.
+    for data. In this sense, they're very similar to structs in C.#ll#
 ]]
 function Paddle:init(x, y, width, height)
     self.x = x
@@ -46,6 +51,7 @@ function Paddle:init(x, y, width, height)
     self.sy = y
     self.width = width
     self.height = height
+    self.h2 = height / 2
     self.dy = 0
     self.score = 0
 end
@@ -69,45 +75,38 @@ end
 function Paddle:resetPos()
     self.x = self.sx
     self.y = self.sy
+    self.dy = 0
 end
 
 function Paddle:update(dt)
-    -- math.max here ensures that we're the greater of 0 or the player's
-    -- current calculated Y position when pressing up so that we don't
-    -- go into the negatives; the movement calculation is simply our
-    -- previously-defined paddle speed scaled by dt
-    if self.dy < 0 then
-        self.y = math.max(0, self.y + self.dy * dt)
-    -- similar to before, this time we use math.min to ensure we don't
-    -- go any farther than the bottom of the screen minus the paddle's
-    -- height (or else it will go partially below, since position is
-    -- based on its top left corner)
-    else
-        self.y = math.min(VIRTUAL_HEIGHT - self.height, self.y + self.dy * dt)
+    self.y = self.y + self.dy * PADDLE_SPEED * dt
+    -- bounds check y position
+    if self.y < 0  then
+        self.y = 0
+    elseif self.y > (VIRTUAL_HEIGHT - self.height) then
+        self.y = VIRTUAL_HEIGHT - self.height
     end
 end
 
 function Paddle:track(ball)
-    -- track the incoming ball and place the paddle in front of it
+    -- track the incoming ball and calculate the next itertation of the controll pid
     -- it uses the Y component of the AABM
-    -- if the paddle is not in front of the ball it sets up paddle.dy to move it there
-    -- all we have to do is set the paddle rate and the normal update routine will move the paddle
     -- krb
-    bh2 = ball.height / 2
-    if self.y > ball.y + ball.height - bh2 or ball.y > self.y + self.height-bh2 then
-        self.dy = sign(ball.y - self.y) * PADDLE_SPEED
-    else 
+    local err = (ball.y + 2) - (self.y + self.h2 )
+    self.dy = sign(err)
+    if self.dy * err < 2 then
         self.dy = 0
     end
 end
+
 --[[ refactored this chunk out of main improves code maintainability, readability,
      and encapsulation all code that can change a class attributes is now owned by the class
      krb ]]
 function Paddle:move(up, down)
     if love.keyboard.isDown(up) then
-        self.dy = -PADDLE_SPEED
+        self.dy = -1
     elseif love.keyboard.isDown(down) then
-        self.dy = PADDLE_SPEED
+        self.dy = 1
     else
         self.dy = 0
     end

@@ -19,6 +19,9 @@
             improving encapsulatoin and readability
         added global function sign(d) needed for A! task
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals Class love Paddle sign
+-- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT PADDLE_SPEED
 
 Ball = Class{}
 
@@ -49,7 +52,7 @@ function Ball:collides(paddle)
     -- edge of the other
     if self.y > paddle.y + paddle.height or paddle.y > self.y + self.height then
         return false
-    end 
+    end
     -- if the above aren't true, they're overlapping
     return true
 end
@@ -58,8 +61,8 @@ end
     Places the ball in the middle of the screen, with no movement.
 ]]
 function Ball:reset()
-    self.x = VIRTUAL_WIDTH / 2 - self.width / 2
-    self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
+    self.x = (VIRTUAL_WIDTH  - self.width) / 2
+    self.y = (VIRTUAL_HEIGHT - self.height) / 2
     self.dx = 0
     self.dy = 0
 end
@@ -82,7 +85,7 @@ function Ball:handlePaddleCollision(offset)
     self.dx = -self.dx * 1.03
     self.x = offset
     -- keep velocity going in the same direction, but randomize it
-    self.dy = sign(self.dy) * math.random(10, 150)
+    self.dy = self.dy * (1 + math.random(-15,25) / 100 )
 end
 
 -- handle the ball serve
@@ -90,9 +93,10 @@ end
 function Ball:handleServe(player)
     -- before switching to play, initialize ball's velocity based
     -- on player who last scored
+    local dd = 0
     self.dy = math.random(-50, 50)
     if player == 1 then dd = 1 else dd = -1 end
-    self.dx = dd * math.random(140, 200)   
+    self.dx = dd * math.random(140, 200)
 end
 
 -- handle a wall collision
@@ -110,16 +114,16 @@ function Ball:handleWallCollision()
         self.dy = -self.dy
         return true
     end
-    return false    
-end    
+    return false
+end
 
 -- returns the sign function of a number
 function sign(d)
     if d < 0 then
         return -1
-    elseif d == 0 then
-        return 0
-    else  
+    elseif d > 0 then
         return 1
-    end    
+    else
+        return 0
+    end
 end
