@@ -20,7 +20,7 @@
         added global function sign(d) needed for A! task
 ]]
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love Paddle sign
+-- luacheck: globals Class love Paddle
 -- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT PADDLE_SPEED
 
 Ball = Class{}
@@ -115,15 +115,4 @@ function Ball:handleWallCollision()
         return true
     end
     return false
-end
-
--- returns the sign function of a number
-function sign(d)
-    if d < 0 then
-        return -1
-    elseif d > 0 then
-        return 1
-    else
-        return 0
-    end
 end

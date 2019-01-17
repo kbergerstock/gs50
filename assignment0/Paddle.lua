@@ -28,6 +28,8 @@
 -- luacheck: globals Class love Paddle sign
 -- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT PADDLE_SPEED
 
+-- paddle movement speed
+PADDLE_SPEED = 200
 
 Paddle = Class{}
 

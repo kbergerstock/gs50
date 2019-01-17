@@ -39,6 +39,8 @@ push = require 'lib/push'
 -- https://github.com/vrld/hump/blob/master/class.lua
 Class = require 'lib/class'
 
+        require 'lib/sign'
+
 -- our Paddle class, which stores position and dimensions for each Paddle
 -- and the logic for rendering them
 require 'Paddle'
@@ -55,8 +57,7 @@ WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
--- paddle movement speed
-PADDLE_SPEED = 200
+
 
 --[[
     Called just once at the beginning of the game; used to set up
