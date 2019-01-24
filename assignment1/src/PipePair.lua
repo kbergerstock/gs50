@@ -7,16 +7,21 @@
     Used to represent a pair of pipes that stick together as they scroll, providing an opening
     for the player to jump through in order to score a point.
 ]]
+-- luacheck: allow_defined,no unused
+-- luacheck: globals love Class Pipe
+-- luacheck: globals WINDOW_WIDTH WINDOW_HEIGHT VIRTUAL_WIDTH VIRTUAL_HEIGHT
+-- luacheck: globals PIPE_SPEED PIPE_WIDTH PIPE_HEIGHT
+-- luacheck: globals BIRD_WIDTH BIRD_HEIGHT COUNTDOWN_TIME
 
 PipePair = Class{}
 
 -- size of the gap between pipes
 local GAP_HEIGHT = 90
--- orientation of the image 
+-- orientation of the image
 local TOP  = -1
 local BOTTOM =  1
 
-function PipePair:init(y)
+function PipePair:init(y, gap)
     -- flag to hold whether this pair has been scored (jumped through)
     self.scored = false
 
@@ -25,7 +30,7 @@ function PipePair:init(y)
 
     -- y value is for the topmost pipe; gap is a vertical shift of the second lower pipe
     self.y = y + PIPE_HEIGHT
-    local yb = self.y + GAP_HEIGHT + math.random(0,GAP_LEVEL)
+    local yb = self.y + GAP_HEIGHT + math.random(0,gap)
     if yb > (PIPE_HEIGHT -15) then yb = PIPE_HEIGHT - 15 end
     -- instantiate two pipes that belong to this pair
     self.pipes = {

@@ -7,6 +7,11 @@
     the bird will flap and go up a little bit, where it will then be affected by gravity. If the bird hits
     the ground or a pipe, the game is over.
 ]]
+-- luacheck: allow_defined,no unused
+-- luacheck: globals love Class
+-- luacheck: globals WINDOW_WIDTH WINDOW_HEIGHT VIRTUAL_WIDTH VIRTUAL_HEIGHT
+-- luacheck: globals PIPE_SPEED PIPE_WIDTH PIPE_HEIGHT
+-- luacheck: globals BIRD_WIDTH BIRD_HEIGHT COUNTDOWN_TIME
 
 Bird = Class{}
 
@@ -18,7 +23,7 @@ function Bird:init()
     self.x = VIRTUAL_WIDTH / 2 - 8
     self.y = VIRTUAL_HEIGHT / 2 - 8
 
-    self.width = self.image:getWidth() 
+    self.width = self.image:getWidth()
     self.height = self.image:getHeight()
 
     self.dy = 0.0
@@ -27,7 +32,7 @@ end
 --  reset the bird's position used when playstate is entered
 function Bird:reset()
     self.x = VIRTUAL_WIDTH / 2 - 8
-    self.y = VIRTUAL_HEIGHT / 2 - 8    
+    self.y = VIRTUAL_HEIGHT / 2 - 8
     self.dy =  0.0
 end
 
@@ -44,24 +49,25 @@ function Bird:collides(pipe)
         if pipe.orientation < 0 then -- top pipe
             if (self.y + 2) < pipe.y then return true end
         else                -- otherwise bottom pipe
-            if (self.y - 2 + self.height ) > pipe.y then return true end      
+            if (self.y - 2 + self.height ) > pipe.y then return true end
         end
     end
     return false
 end
 
-function Bird:update(inputs,msg,dt)
+
+function Bird:update(msg, dt)
     self.dy = self.dy + GRAVITY * dt
 
     -- burst of anti-gravity when space or left mouse are pressed
-    if inputs:isSpace()  or inputs:rightButton() then
+    if msg.user:isSpace()  or msg.user:rightButton() then
         self.dy = ANTIGRAVITY
-        sounds['jump']:play()
+       msg.sounds['jump']:play()
     end
-
+    msg.user:reset()
     self.y = self.y + self.dy
 end
 
 function Bird:render()
- love.graphics.draw(self.image, self.x, self.y)   
+ love.graphics.draw(self.image, self.x, self.y)
 end

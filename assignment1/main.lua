@@ -2,17 +2,20 @@
     GD50 2018
     Flappy Bird Remake
 
-    Author: Colton Ogden
-    cogden@cs50.harvard.edu
-
-    A mobile game by Dong Nguyen that went viral in 2013, utilizing a very simple 
-    but effective gameplay mechanic of avoiding pipes indefinitely by just tapping 
-    the screen, making the player's bird avatar flap its wings and move upwards slightly. 
+    A mobile game by Dong Nguyen that went viral in 2013, utilizing a very simple
+    but effective gameplay mechanic of avoiding pipes indefinitely by just tapping
+    the screen, making the player's bird avatar flap its wings and move upwards slightly.
     A variant of popular games like "Helicopter Game" that floated around the internet
     for years prior. Illustrates some of the most basic procedural generation of game
     levels possible as by having pipes stick out of the ground by varying amounts, acting
     as an infinitely generated obstacle course for the player.
 ]]
+
+-- luacheck: allow_defined,no unused
+-- luacheck: globals love Class BaseState Inputs StateMachine Message
+-- luacheck: globals WINDOW_WIDTH WINDOW_HEIGHT VIRTUAL_WIDTH VIRTUAL_HEIGHT
+-- luacheck: globals PIPE_SPEED PIPE_WIDTH PIPE_HEIGHT
+-- luacheck: globals BIRD_WIDTH BIRD_HEIGHT COUNTDOWN_TIME
 
 -- push is a library that will allow us to draw our game at a virtual
 -- resolution, instead of however large our window is; used to provide
@@ -26,17 +29,17 @@ push = require 'lib/push'
 -- methods
 --
 -- https://github.com/vrld/hump/blob/master/class.lua
-Class = require 'lib/class'
+-- Class = require 'lib/class'
 
 -- a basic StateMachine class which will allow us to transition to and from
 -- game states smoothly and avoid monolithic code in one file
 -- removed dependency on global instane of this class and made it local 07/15/2018 KRB
 require 'lib/StateMachine'
-require 'lib/HID'
+require 'lib/message'
+require 'lib/Inputs'
 require 'src/constants'
 
 -- all states our StateMachine can transition between
-require 'states/BaseState'
 require 'states/CountdownState'
 require 'states/PlayState'
 require 'states/ScoreState'
@@ -45,7 +48,6 @@ require 'states/TitleScreenState'
 require 'src/Bird'
 require 'src/Pipe'
 require 'src/PipePair'
-require 'src/message'
 require 'src/trophies'
 
 local background = love.graphics.newImage('img/background.png')
@@ -59,43 +61,45 @@ local GROUND_SCROLL_SPEED = 60
 
 local BACKGROUND_LOOPING_POINT = 413
 
-local gameStateMachine = nil
--- create our keyboard / mouse interface
-local inputs = cHID{}
-
+local gameStateMachine = StateMachine()
+local msg = Message()
 
 function love.load()
     -- initialize our nearest-neighbor filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
-    
+
     -- seed the RNG
     math.randomseed(os.time())
 
     -- app window title
     love.window.setTitle('Fifty Bird')
+    msg.scrolling = false
+    msg.user = Inputs()
+    -- initialize state machine with all state-classes
+    msg.states['title']       =  TitleScreenState()
+    msg.states['countdown']   =  CountdownState()
+    msg.states['play']        =  PlayState()
+    msg.states['score']       =  ScoreState()
 
     -- initialize our nice-looking retro text fonts
-    smallFont = love.graphics.newFont('fonts/font.ttf', 8)
-    mediumFont = love.graphics.newFont('fonts/flappy.ttf', 14)
-    flappyFont = love.graphics.newFont('fonts/flappy.ttf', 28)
-    hugeFont = love.graphics.newFont('fonts/flappy.ttf', 56)
-    love.graphics.setFont(flappyFont)
+    msg.fonts['small']  = love.graphics.newFont('fonts/font.ttf', 8)
+    msg.fonts['medium'] = love.graphics.newFont('fonts/flappy.ttf', 14)
+    msg.fonts['flappy'] = love.graphics.newFont('fonts/flappy.ttf', 28)
+    msg.fonts['huge']   = love.graphics.newFont('fonts/flappy.ttf', 56)
 
     -- initialize our table of sounds
-    sounds = {
-        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
-        ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
-        ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
-        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
-        ['pause'] = love.audio.newSource('sounds/pause.wav','static'),
+    msg.sounds['jump'] = love.audio.newSource('sounds/jump.wav', 'static')
+    msg.sounds['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static')
+    msg.sounds['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static')
+    msg.sounds['score'] = love.audio.newSource('sounds/score.wav', 'static')
+    msg.sounds['pause'] = love.audio.newSource('sounds/pause.wav','static')
 
-        -- https://freesound.org/people/xsgianni/sounds/388079/
-        ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static')
-    }
+    -- https://freesound.org/people/xsgianni/sounds/388079/
+    msg.sounds['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static')
 
     -- kick off music
-    sounds['music']:setLooping(true)
-    sounds['music']:play()
+    msg.sounds['music']:setLooping(true)
+    msg.sounds['music']:play()
 
     -- initialize our virtual resolution
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -104,15 +108,6 @@ function love.load()
         resizable = true
     })
 
-    -- initialize state machine with all state-classes
-    gameStateMachine = StateMachine {
-        ['title'] =  TitleScreenState(),
-        ['countdown'] =  CountdownState(),
-        ['play'] =  PlayState() ,
-        ['score'] =  ScoreState(),
-        ['idle'] = BaseState(),
-        }
-    msg = init_msg_packet()
     -- start the execution of the state machine
     gameStateMachine:run( msg, 'title')
 end
@@ -128,13 +123,12 @@ end
     things to happen right away, just once, like when we want to quit.
 ]]
 function love.keypressed(key)
-    -- add to our table of keys pressed this frame    
-    if key == 'escape' then    
-        -- quit if the escape was detectd   
-        gMusic:stop()
+    if key == 'escape' then
+        -- quit if the escape was detectd
+        msg.sounds['music']:stop()
         love.event.quit()
     else
-        inputs:set(key)
+        gameStateMachine:handle_input(key, msg)
     end
 end
 
@@ -142,14 +136,16 @@ end
     LÖVE2D callback fired each time a mouse button is pressed; gives us the
     X and Y of the mouse, as well as the button in question.
 ]]
-function love.mousepressed(x, y, button) 
-    -- bug found !! pressing an up event fast enough weill allow the bird to fly above the pipes
-    inputs:set(button)
+-- FIX --
+function love.mousepressed(x, y, button)
+    -- bug found !! pressing an up event fast enough will allow the bird to fly above the pipes
 end
 
 function love.update(dt)
-    gameStateMachine:update(inputs, msg, dt)
-    inputs:reset()
+    if msg.scrolling == true then
+        scrollBackground(dt)
+    end
+    gameStateMachine:update(msg, dt)
 end
 
 function love.draw()
@@ -157,13 +153,18 @@ function love.draw()
 
     love.graphics.draw(background, -backgroundScroll, 0)
     gameStateMachine:render(msg)
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
-  
+
     push:finish()
 end
 
+function checkBoundries(y)
+    return math.max(-PIPE_HEIGHT + 10, math.min( y , VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT) )
+end
+
 function scrollBackground(dt)
-    -- scroll our background and ground, looping back to 0 after a certain amount
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+        -- scroll our background and ground, looping back to 0 after a certain amount
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 end

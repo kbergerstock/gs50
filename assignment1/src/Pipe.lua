@@ -8,6 +8,10 @@
     with one of them, it's game over. Rather than our bird actually moving through the screen horizontally,
     the pipes themselves scroll through the game to give the illusion of player movement.
 ]]
+-- luacheck: allow_defined,no unused
+-- luacheck: globals love Class BaseState
+-- luacheck: globals WINDOW_WIDTH WINDOW_HEIGHT VIRTUAL_WIDTH VIRTUAL_HEIGHT
+-- luacheck: globals PIPE_SPEED PIPE_WIDTH PIPE_HEIGHT
 
 Pipe = Class{}
 
@@ -25,7 +29,6 @@ function Pipe:init(orientation, y)
 end
 
 function Pipe:update(dt)
-    
 end
 
 function Pipe:render()
