@@ -12,7 +12,7 @@
 ]]
 
 -- luacheck: allow_defined,no unused
--- luacheck: globals love Class BaseState Inputs StateMachine Message
+-- luacheck: globals love Class BaseState Inputs StateMachine Message GamePad
 -- luacheck: globals WINDOW_WIDTH WINDOW_HEIGHT VIRTUAL_WIDTH VIRTUAL_HEIGHT
 -- luacheck: globals PIPE_SPEED PIPE_WIDTH PIPE_HEIGHT
 -- luacheck: globals BIRD_WIDTH BIRD_HEIGHT COUNTDOWN_TIME
@@ -37,6 +37,7 @@ push = require 'lib/push'
 require 'lib/StateMachine'
 require 'lib/message'
 require 'lib/Inputs'
+require 'lib/gamePad'
 require 'src/constants'
 
 -- all states our StateMachine can transition between
@@ -63,6 +64,7 @@ local BACKGROUND_LOOPING_POINT = 413
 
 local gameStateMachine = StateMachine()
 local msg = Message()
+local gamePad = GamePad()
 
 function love.load()
     -- initialize our nearest-neighbor filter
@@ -74,7 +76,8 @@ function love.load()
     -- app window title
     love.window.setTitle('Fifty Bird')
     msg.scrolling = false
-    msg.user = Inputs()
+    msg.user = Inputs()         -- create an input
+    msg.mode = '2'              -- default to easy mode
     -- initialize state machine with all state-classes
     msg.states['title']       =  TitleScreenState()
     msg.states['countdown']   =  CountdownState()
@@ -82,7 +85,7 @@ function love.load()
     msg.states['score']       =  ScoreState()
 
     -- initialize our nice-looking retro text fonts
-    msg.fonts['small']  = love.graphics.newFont('fonts/font.ttf', 8)
+    msg.fonts['small']  = love.graphics.newFont('fonts/font.ttf', 12)
     msg.fonts['medium'] = love.graphics.newFont('fonts/flappy.ttf', 14)
     msg.fonts['flappy'] = love.graphics.newFont('fonts/flappy.ttf', 28)
     msg.fonts['huge']   = love.graphics.newFont('fonts/flappy.ttf', 56)
@@ -127,8 +130,10 @@ function love.keypressed(key)
         -- quit if the escape was detectd
         msg.sounds['music']:stop()
         love.event.quit()
+    elseif key == '1' or key == '2' then
+        msg.mode = key
     else
-        gameStateMachine:handle_input(key, msg)
+        gameStateMachine:handle_input(msg, key)
     end
 end
 
@@ -136,26 +141,54 @@ end
     LÖVE2D callback fired each time a mouse button is pressed; gives us the
     X and Y of the mouse, as well as the button in question.
 ]]
--- FIX --
 function love.mousepressed(x, y, button)
     -- bug found !! pressing an up event fast enough will allow the bird to fly above the pipes
+    if button == 1 then
+        gameStateMachine:handle_input(msg, 'up')
+    end
 end
 
 function love.update(dt)
+    gamePad.readAxis()
+    if gamePad.inputs['a'] then
+        gameStateMachine:handle_input(msg,'p')
+    end
+    if gamePad.inputs['b'] then
+        gameStateMachine:handle_input(msg,'space')
+    end
+    if gamePad.inputs['j1up'] then
+        gameStateMachine:handle_input(msg,'up')
+    end
+    if gamePad.inputs['x'] then
+        msg.mode = '2'
+    end
+    if gamePad.inputs['y'] then
+        msg.mode = '1'
+    end
+
     if msg.scrolling == true then
         scrollBackground(dt)
     end
     gameStateMachine:update(msg, dt)
 end
 
+function renderMode()
+    local modeMsg = ''
+    if msg.mode == '2' then
+        modeMsg = 'EASY MODE SELECTED'
+    else
+        modeMsg = 'HARD MODE SELECTED'
+    end
+    love.graphics.setFont(msg.fonts['medium'])
+    love.graphics.printf(modeMsg, 0, 250, VIRTUAL_WIDTH, 'center')
+end
+
 function love.draw()
     push:start()
-
     love.graphics.draw(background, -backgroundScroll, 0)
     gameStateMachine:render(msg)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
-
     push:finish()
 end
 

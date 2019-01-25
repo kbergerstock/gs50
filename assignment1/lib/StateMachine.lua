@@ -53,6 +53,10 @@
 		by setting the xxx.state to the desired state the core state machine will change to the new state
 		ie msg.next = 'playstate'. The message packet can pass any data that is needed to the indivual
 		states.  Any data not neeeded by a particular state is simply ignored.
+
+		NEW CONCEPT - 2019.01.15 -  the statemachine only acts on variables and functions in the message packet.
+		this enables coorperative multitasking of multiple state machines.
+
 ]]
 
 -- luacheck: allow_defined,no unused
@@ -67,36 +71,36 @@ require 'lib/message'
 
 StateMachine = Class{}
 -- statemchine constructor
-function StateMachine:init()
-
-end
+function StateMachine:init() end
 
 --[[
-	populates the3 state list in msg with key , value pairs of
+	populate the state list in msg with key , value pairs of
 	state identifier, state constructor
 	krb
 ]]
 
 -- change from idle to the initial state ie start it up
 function StateMachine:run(msg, state)
-	msg.nextState(state)
+	msg.Change(state)
 end
 
+-- state machine engine
 -- msg is the message packet for this instance
 -- dt is the time diferential from the last call to this function
 function StateMachine:update(msg, dt)
-	msg.states[msg.current()]:update(msg, dt)
-	if msg.current() ~= msg.next() and msg.states[msg.next()] then
-		msg.states[msg.current()]:exit(msg)		-- call the exit function of the old state
+	msg.states[msg.getCurrent()]:update(msg, dt)
+	if msg.getCurrent() ~= msg.getNext() and msg.states[msg.getNext()] then
+		msg.states[msg.getCurrent()]:exit(msg)	--call the exit function of the old state
 		msg.advanceState()						-- change current state to new state
-		msg.states[msg.current()]:enter(msg)	-- call the enter function of the new state
+		msg.states[msg.getCurrent()]:enter(msg)	-- call the enter function of the new state
 	end
 end
 
-function StateMachine:handle_input(input, msg)
-	msg.states[msg.current()]:handleInput(input, msg)
+-- indirect calls
+function StateMachine:handle_input(msg, input)
+	msg.states[msg.getCurrent()]:handleInput(input, msg)
 end
 
 function StateMachine:render(msg)
-	msg.states[msg.current()]:render(msg)
+	msg.states[msg.getCurrent()]:render(msg)
 end

@@ -15,8 +15,9 @@
 
 Bird = Class{}
 
-local GRAVITY = 5.0
-local ANTIGRAVITY = -1.5
+local GRAVITY = {5.0, 3.0}
+local ANTIGRAVITY = {-1.5, -0.75}
+local mode = 0
 
 function Bird:init()
     self.image = love.graphics.newImage('img/bird.png')
@@ -55,19 +56,26 @@ function Bird:collides(pipe)
     return false
 end
 
-
 function Bird:update(msg, dt)
-    self.dy = self.dy + GRAVITY * dt
-
-    -- burst of anti-gravity when space or left mouse are pressed
-    if msg.user:isSpace()  or msg.user:rightButton() then
-        self.dy = ANTIGRAVITY
-       msg.sounds['jump']:play()
+    -- burst of anti-gravity when user sends an 'up' command
+    if msg.user:get('up') then
+        self.dy = ANTIGRAVITY[mode]
+        msg.sounds['jump']:play()
+    else
+        self.dy = self.dy + GRAVITY[mode] * dt
     end
     msg.user:reset()
     self.y = self.y + self.dy
 end
 
 function Bird:render()
- love.graphics.draw(self.image, self.x, self.y)
+    love.graphics.draw(self.image, self.x, self.y)
+end
+
+function Bird:setMode(key)
+    if key == '2' then
+        mode = 2
+    else
+        mode = 1
+    end
 end

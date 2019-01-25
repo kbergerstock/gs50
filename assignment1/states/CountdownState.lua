@@ -45,7 +45,7 @@ function CountdownState:update(msg, dt)
 
         -- when 0 is reached, we should enter the PlayState
         if self.count == 0 then
-            msg.nextState('play')
+            msg.Change('play')
         end
     end
 end
@@ -55,4 +55,5 @@ function CountdownState:render(msg)
     love.graphics.setFont(msg.fonts['huge'])
     love.graphics.setColor(0.8, 0.8, 0.8, 1)
     love.graphics.printf(tostring(self.count), 0, 120, VIRTUAL_WIDTH, 'center')
+    renderMode()
 end

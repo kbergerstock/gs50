@@ -36,6 +36,7 @@ end
 ]]
 function PlayState:enter(msg)
     self.bird:reset()
+    self.bird:setMode(msg.mode)
     msg.score = 0
     self.timer = 0
     -- initialize our last recorded Y value for a gap placement to base other gaps off of
@@ -129,7 +130,7 @@ function PlayState:update(msg, dt)
             if self.bird:collides(pipe) then
                 msg.sounds['explosion']:play()
                 msg.sounds['hurt']:play()
-                msg.nextState('score')
+                msg.Change('score')
             end
         end
     end
@@ -141,7 +142,7 @@ function PlayState:update(msg, dt)
     if self.bird.y > VIRTUAL_HEIGHT - 15 then
         msg.sounds['explosion']:play()
         msg.sounds['hurt']:play()
-        msg.nextState('score')
+        msg.Change('score')
     end
 
 end

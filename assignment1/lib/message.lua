@@ -5,7 +5,7 @@
 -- luacheck: globals Message BaseState
 
  function Message()
-
+    -- predefine variables required by the app and statemachine engine
     local self =   {
                         states = {},
                         fonts = {},
@@ -15,23 +15,25 @@
                         health = 3,
                         scrolling = false,
     }
-
+    -- declaring __current, __next local , limits access
+    -- ensure there is a blank idle state that the engine starts from
     local __current = '__idle'
     local __next = '__idle'
     self.states[__current]  = BaseState()
 
-    function  self.nextState(state)
+    -- set the next state to active
+    function  self.Change(state)
         __next = state
     end
-
-    function self.next()
+    -- get next state
+    function self.getNext()
         return  __next
     end
-
-    function self.current()
+    -- get current state
+    function self.getCurrent()
         return __current
     end
-
+    -- actually make the next state active
     function self.advanceState()
         __current = __next
     end

@@ -34,7 +34,7 @@ function ScoreState:handleInput(input,msg)
             love.event.quit(0)
             -- fix turn off sound
         else
-            msg.nextState('countdown')
+            msg.Change('countdown')
         end
     end
 end
@@ -67,5 +67,5 @@ function ScoreState:render(msg)
     love.graphics.printf(self.usr_msg, 0, 64, VIRTUAL_WIDTH, 'center')
     love.graphics.setFont(msg.fonts['medium'])
     love.graphics.printf('SCORE: ' .. tostring(msg.score), 0, 160, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf('PRESS SPACE TO PLAY AGAIN!', 0, 180, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('PRESS SPACE OR GAMEPAD BUTTON B TO PLAY AGAIN!', 0, 180, VIRTUAL_WIDTH, 'center')
 end
