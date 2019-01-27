@@ -1,9 +1,5 @@
 --[[
-    GD50
-    Breakout Remake
-
-    -- BaseState Class --
-
+    BaseState Class
     Author: Colton Ogden
     cogden@cs50.harvard.edu
 
@@ -15,23 +11,15 @@
     ourselves in the actual classes.
 ]]
 
--- luacheck: globals BaseState Class o gCT gFonts
--- luacheck: no unused args , no self
+-- luacheck: allow_defined,no unused
+-- luacheck: globals love Class BaseState
 
-if not rawget(getmetatable(o) or {},'__Class') then
-	Class = require 'lib/class'
-end
 BaseState = Class{}
 
-function BaseState:init()
-    assert(gCT,'golbal constants arn not initialized !!')
-    assert(gFonts,'Resources are not loaded !!')
-    -- shorcuts
-    self.VH = gCT.VIRTUAL_HEIGHT
-    self.VW = gCT.VIRTUAL_WIDTH
-end
+function BaseState:init() end
 function BaseState:enter(msg) end
 function BaseState:exit(msg) end
-function BaseState:update(inputs, msg, dt) end
+function BaseState:update(msg, dt) end
 function BaseState:render(msg) end
-function BaseState:handle_input(input, msg) end
+function BaseState:handleInput(input, msg) end  -- discrete
+function BaseState:handleInputs(input, msg) end -- continous

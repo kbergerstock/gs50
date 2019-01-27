@@ -24,6 +24,7 @@ require 'lib/StateMachine'
 require 'lib/message'       -- packet messages
 require 'lib/handy'         -- setColor
 require 'lib/dTimer'        -- digital timer input is dt
+require 'lib/Log'
 --
 -- our own code
 --
@@ -37,21 +38,22 @@ require 'src/states/game/PlayState'
 require 'src/states/game/StartState'
 
 -- entity states
-require 'src/states/entity/PlayerFallingState'
-require 'src/states/entity/PlayerIdleState'
-require 'src/states/entity/PlayerJumpState'
-require 'src/states/entity/PlayerWalkingState'
-
+require 'src/states/entity/pc_states'
 require 'src/states/entity/npc_states'
+
+-- game characters
+require 'src/gc/Entity'
+require 'src/gc/npc'
+require 'src/gc/Player'
+require 'src/gc/Snail'
 
 -- general
 require 'src/game_pad'
 require 'src/Animation'
-require 'src/Entity'
+
 require 'src/GameObject'
 require 'src/generateTileMap'
 require 'src/generateNPCs'
-require 'src/Player'
-require 'src/Snail'
+
 require 'src/Tile'
 require 'src/TileMap'

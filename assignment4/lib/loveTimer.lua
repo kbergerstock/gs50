@@ -11,25 +11,17 @@ end
 
 loveTimer = Class{}
 
-function  loveTimer:set(trigger)
-    self._trigger = trigger
-end
-
-function loveTimer:reset()
-    self._st = love.timer.getTime()
-end
-
-function loveTimer:start(trigger)
-    self._st = love.timer.getTime()
-    self._trigger = trigger
+function  loveTimer:init(trigger)
+    self.st = love.timer.getTime()
+    self.trigger = trigger
 end
 
 function loveTimer:elapsed()
     -- convet dt to milliseconds
     local et = love.timer.getTime()
-    local dt = (et - self._st) * 1000
-    if dt >= self._trigger then
-        self._st = et
+    local dt = (et - self.st) * 1000
+    if dt >= self.trigger then
+        self.st = et
         return true
     end
     return false

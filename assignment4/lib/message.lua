@@ -1,27 +1,43 @@
 -- message packet
--- enforces proper state change
--- and passes object data bewteen state functions
--- k.r.bergerstock 2018.09.06
+-- k.r.bergerstock 2018.09.06 / 2019.01.22 new idea to encapsulate the state data
 -- Message is a closure based object
 
--- luacheck: ignore Message
+-- luacheck: globals Message BaseState
 
- function Message(start)
-
+ function Message()
+    -- predefine variables required by the app and statemachine engine
     local self =   {
+                        states = {},
+                        fonts = {},
+                        sounds = {},
+                        textures = {},
+                        frames = {},
                         score = 0,
                         level = 0,
                         health = 3,
+                        scrolling = false,
     }
+    -- declaring __current, __next local , limits access
+    -- ensure there is a blank idle state that the engine starts from
+    local __current = '__idle'
+    local __next = '__idle'
+    self.states[__current]  = BaseState()
 
-    local next = 'idle'
-
-    function  self.nextState(state)
-        next = state
+    -- set the next state to active
+    function  self.Change(state)
+        __next = state
     end
-
-    function self.next()
-        return next
+    -- get next state
+    function self.getNext()
+        return  __next
+    end
+    -- get current state
+    function self.getCurrent()
+        return __current
+    end
+    -- actually make the next state active
+    function self.advanceState()
+        __current = __next
     end
 
     return self

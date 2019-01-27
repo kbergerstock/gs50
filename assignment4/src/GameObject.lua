@@ -13,8 +13,8 @@
 GameObject = Class{}
 
 function GameObject:init(def)
-    self.tx = def.x
-    self.ty = def.y
+    self.tx = def.x - 1
+    self.ty = def.y - 1
     self.width = def.width
     self.height = def.height
     self.texture = def.texture
@@ -22,18 +22,16 @@ function GameObject:init(def)
     self.solid = def.solid
     self.collidable = def.collidable
     self.consumable = def.consumable
-    self.onCollide = def.onCollide
-    self.onConsume = def.onConsume
     self.hit = def.hit
     self.size = def.tile_size
-    self.sx = (self.tx - 1) * self.size
-    self.sy = (10 - self.ty) * self.size
+    self.mx = self.tx * self.size
+    self.my = self.ty * self.size
 end
-
-function GameObject:collides(target) end
 
 function GameObject:update(dt) end
 
 function GameObject:render()
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame],self.sx,self.sy)
+    local sx = self.mx
+    local sy = 146 - self.my
+    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame],sx,sy)
 end

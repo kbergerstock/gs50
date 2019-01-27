@@ -16,20 +16,11 @@ function  dTimer:init(trigger)
     self.trigger = trigger
 end
 
-function dTimer:reset()
-    self.ms = 0
-end
-
-function dTimer:set(t)
-    self.trigger = t
-    self.ms = 0
-end
-
 function dTimer:elapsed(dt)
     -- convet dt to milliseconds and sum
-    self.ms = self.ms + (dt * 1000)
+    self.ms = self.ms + dt * 1000
     if self.ms >= self.trigger then
-        self.ms = self.ms % self.trigger
+        self.ms = 0
         return true
     end
     return false

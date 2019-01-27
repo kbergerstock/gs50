@@ -32,5 +32,8 @@ function fpStateMachine()
             fp_current(self)
         end
     end
+    function self.idle()
+    end
+
     return self
 end
