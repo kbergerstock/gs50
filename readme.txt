@@ -9,9 +9,6 @@ because I am using LOVE2D version 11.1 some necessary changes where needed:
 	the set color commands in the love api require colors to be between 0 and 1
 	(r/255, g/255, b/255) is the proper conversion )
 	
-	lastly I figured out the path.packages location the the love2d engine uses to load
-	packages from. It is (path to eng executable}\lua using this I placed all the package files 
-	in this location:
-	c:\bin\love2d.eng\lua\(push.lua, class.lua) 
+
 	
 
