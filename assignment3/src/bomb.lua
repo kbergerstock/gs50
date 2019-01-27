@@ -2,15 +2,15 @@
 -- bomb sprites
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts gConst
+-- luacheck: globals Class love setColor gRSC
+-- luacheck: ignore renderBomb generateBombQuads
 
 
 function renderBomb(x, y)
     local sx = x + 8
     local sy = y + 8
     setColor(255,255,255,96)
-    love.graphics.draw(gTextures['bombs'], gFrames['bombs'][1],sx, sy)
+    love.graphics.draw(gRSC.textures['bombs'], gRSC.frames['bombs'][1],sx, sy)
 end
 
 --------------------------------------------------------

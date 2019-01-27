@@ -10,6 +10,9 @@
     Helper functions for writing Match-3.
 ]]
 
+-- luacheck: allow_defined, no unused, globals love
+-- luacheck: ignore GenerateTileQuads print_r
+
 --[[
     Given an "atlas" (a texture with multiple sprites), generate all of the
     quads for the different tiles therein, divided into tables for each set

@@ -22,14 +22,15 @@ require 'lib/message'
 
 Class = require 'lib/class'
 push = require 'lib/push'
-require 'lib/readonly'
-require 'lib/BaseState'
 require 'lib/StateMachine'
 require 'lib/handy'
 require 'lib/HighScoreTracker'
+require 'lib/loveTimer'
 
 --
 -- the application code
+require 'src/loadResources'
+require 'src/init_message'
 --
 -- utility
 require 'src/Util'
@@ -38,24 +39,11 @@ require 'src/states/handle_mouse'
 -- game pieces
 require 'src/Board'
 require 'src/Tile'
-require 'src/bomb'
+require 'src/ghost'
 
 -- game states
+require 'src/states/baseAppState'
 require 'src/states/BeginGameState'
 require 'src/states/GameOverState'
 require 'src/states/PlayState'
 require 'src/states/StartState'
-
---
--- constants
-function loadConstants()
-    p = {}
-    -- physical screen dimensions
-    p.WINDOW_WIDTH = 1280
-    p.WINDOW_HEIGHT = 720
-
-    -- virtual resolution dimensions
-    p.VIRTUAL_WIDTH = 512
-    p.VIRTUAL_HEIGHT = 288
-    gConst = readOnly(p)
-end

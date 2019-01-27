@@ -13,12 +13,10 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals self.VW self.VH WINDOW_WIDTH WINDOW_HEIGHT
--- luacheck: globals gSounds gTextures gFrames gFonts CON
+-- luacheck: globals Class love setColor readOnly baseAppState gRSC
 -- luacheck: globals Board fade move_label
 
-BeginGameState = Class{__includes = BaseState}
+BeginGameState = Class{__includes = baseAppState}
 
 function BeginGameState:init()
     self:_init_()
@@ -61,14 +59,14 @@ function BeginGameState:render(msg)
         love.graphics.rectangle('fill', 0, self.levelLabelY - 8, self.VW, 48)
 
         setColor(255, 255, 255, 255)
-        love.graphics.setFont(gFonts['large'])
+        love.graphics.setFont(gRSC.fonts['large'])
         love.graphics.printf('Level ' .. tostring(msg.level),
             0, self.levelLabelY, self.VW, 'center')
 
         self.nerr, self.done, self.levelLabelY = coroutine.resume(self.ll_co)
 
         if self.done then
-            msg.nextState('play')
+            msg.Change('play')
         end
     end
 

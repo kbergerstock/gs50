@@ -11,7 +11,8 @@
     color and a variety, with the varietes adding extra points to the matches.
 ]]
 
--- luacheck: allow_defined, globals Class setColor love gFrames gTextures
+-- luacheck: allow_defined, globals Class setColor love gRSC
+-- luacheck: ignore loveTimer renderGhost
 
 Tile = Class{}
 
@@ -37,6 +38,8 @@ function Tile:init(col, row, color, variety)
     self.piece = color * 10 + variety
     self.matched = self.piece
     self.bomb = false                   -- bomb mode == true
+    self.frame = 1                      -- frame to display
+    self.timer = loveTimer(55)
     self.hilite  = false                -- true if hilite
 end
 
@@ -45,14 +48,20 @@ function Tile:render(x, y, tick)
         -- draw shadow
         love.graphics.setLineWidth(1)
         setColor(34, 32, 52, 255)
-        love.graphics.draw(gTextures['main'],gFrames['tiles'][self.color][self.variety],
+        love.graphics.draw(gRSC.textures['main'],gRSC.frames['tiles'][self.color][self.variety],
             self.x + x + 2, self.y + y + 2)
 
         -- draw tile itself
         setColor(255, 255, 255, 255)
-        love.graphics.draw(gTextures['main'],gFrames['tiles'][self.color][self.variety],self.x + x, self.y + y)
+        love.graphics.draw(gRSC.textures['main'],gRSC.frames['tiles'][self.color][self.variety],self.x + x, self.y + y)
         if self.bomb then
-            renderBomb(self.x + x,self.y + y )
+            renderGhost(self.x + x,self.y + y, self.frame )
+            if self.timer:elapsed() then
+                self.frame = self.frame + 1
+                if self.frame > 4 then
+                    self.frame = 1
+                end
+            end
         end
         if (self.hilite ) and tick then
             -- multiply so drawing white rect makes it brighter

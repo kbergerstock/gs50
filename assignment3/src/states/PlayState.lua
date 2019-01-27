@@ -17,11 +17,10 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly baseAppState gRSC
 -- luacheck: globals handle_mouse_input countdown updateBoard
 
-PlayState = Class{__includes = BaseState}
+PlayState = Class{__includes = baseAppState}
 
 function PlayState:init()
     self.kd_co = coroutine.create(function() end)
@@ -75,14 +74,14 @@ function PlayState:update(msg, dt)
 
     -- go back to start if time runs out
     if self.seconds == 0 then
-        gSounds['game-over']:play()
-        msg.nextState('game-over')
+        gRSC.sounds['game-over']:play()
+        msg.Change('game-over')
     end
 
     if msg.score >= msg.goal and not msg.board.match_found then
-        gSounds['next-level']:play()
+        gRSC.sounds['next-level']:play()
         msg.level = msg.level + 1
-        msg.nextState('begin-game')
+        msg.Change('begin-game')
     end
 end
 
@@ -132,7 +131,7 @@ function PlayState:render(msg)
     love.graphics.rectangle('fill', 16, 16, 186, 186, 6, 4) -- org 116
 
     setColor(99, 155, 255, 255)
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gRSC.fonts['medium'])
     love.graphics.printf('Level: ' .. tostring(msg.level), 20, 24, 182, 'center')
     love.graphics.printf('Score: ' .. tostring(msg.score), 20, 52, 182, 'center')
     love.graphics.printf('Goal : ' .. tostring(msg.goal), 20, 80, 182, 'center')

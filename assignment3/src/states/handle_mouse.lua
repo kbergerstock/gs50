@@ -2,8 +2,7 @@
 -- k.r.bergerstock
 -- sept 2018
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
+-- luacheck: allow_defined, no unused, globals Class setColor love
 -- luacheck: ignore handle_mouse_input
 
 -- thread routine

@@ -11,12 +11,12 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
+-- luacheck: globals Class love setColor readOnly baseAppState
 -- luacheck: globals VIRTUAL_WIDTH VIRTUAL_HEIGHT WINDOW_WIDTH WINDOW_HEIGHT
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals gRSC.sounds gRSC.textures gRSC.frames gRSC.fonts CONST
 -- luacheck: globals HighScoreTracker
 
-GameOverState = Class{__includes = BaseState}
+GameOverState = Class{__includes = baseAppState}
 
 function GameOverState:init()
     self:_init_()
@@ -31,10 +31,10 @@ function GameOverState:enter(msg)
     end
 end
 
-function GameOverState:handle_input(input, msg)
+function GameOverState:handleInput(input, msg)
     -- switch to another state via one of the menu options
     if input == 'space' then
-        msg.nextState('start')
+        msg.Change('start')
     end
 end
 
@@ -43,15 +43,15 @@ function GameOverState:render(msg)
     local h = 66
     local xs = self.VW / 2 - 64
     local ys =16
-    love.graphics.setFont(gFonts['large'])
+    love.graphics.setFont(gRSC.fonts['large'])
 
     setColor(56, 56, 56, 234)
     love.graphics.rectangle('fill',xs , ys, w, h, 4)
 
     setColor(99, 155, 255, 255)
     love.graphics.printf('GAME OVER', xs, ys + 4, w, 'center')
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gRSC.fonts['medium'])
     love.graphics.printf('Your Score: ' .. tostring(msg.score), xs , ys +30 , w, 'center')
     love.graphics.printf('Press Space Bar', xs, ys + 46 , w, 'center')
-    self.highScores:render(xs,ys + h + 2, gFonts['medium'])
+    self.highScores:render(xs,ys + h + 2, gRSC.fonts['medium'])
 end

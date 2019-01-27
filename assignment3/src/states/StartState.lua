@@ -12,11 +12,10 @@
     Enter to begin.
 ]]
 
--- luacheck: allow_defined, no unused, globals Class setColor love BaseState
--- luacheck: globals self.VW self.VW WINDOW_WIDTH WINDOW_HEIGHT
--- luacheck: globals gSounds gFonts gTextures gFrames fade updateColorBank
+-- luacheck: allow_defined, no unused, globals Class setColor love baseAppState
+-- luacheck: globals gRSC fade updateColorBank
 
-StartState = Class{__includes = BaseState}
+StartState = Class{__includes = baseAppState}
 
 function StartState:init()
     self:_init_()
@@ -64,7 +63,7 @@ function StartState:generateTable()
     local positions = {}
     -- generate full table of tiles just for display
     for i = 1, 64 do
-        table.insert(positions, gFrames['tiles'][math.random(18)][math.random(6)])
+        table.insert(positions, gRSC.frames['tiles'][math.random(18)][math.random(6)])
     end
     return positions
 end
@@ -82,7 +81,7 @@ function StartState:enter(msg)
     self.positions = self:generateTable()
 end
 
-function StartState:handle_input(input, msg)
+function StartState:handleInput(input, msg)
 
     local status = coroutine.status(self.fade_co)
     if status == 'dead' then
@@ -90,7 +89,7 @@ function StartState:handle_input(input, msg)
         -- change menu selection
         if input == 'up' or input == 'down' then
             self.currentMenuItem = self.currentMenuItem == 1 and 2 or 1
-            gSounds['select']:play()
+            gRSC.sounds['select']:play()
         end
 
         -- switch to another state via one of the menu options
@@ -100,7 +99,7 @@ function StartState:handle_input(input, msg)
                 self.fade_co = coroutine.create(fade,1)
                 self.next = 'begin-game'
             else
-                msg.nextState('idle')
+                msg.Change('idle')
                 msg.quit = true
             end
         end
@@ -114,12 +113,12 @@ function StartState:render(msg)
 
             -- render shadow first
             setColor(0, 0, 0, 255)
-            love.graphics.draw(gTextures['main'], self.positions[(y - 1) * x + x],
+            love.graphics.draw(gRSC.textures['main'], self.positions[(y - 1) * x + x],
                 (x - 1) * 32 + 128 + 3, (y - 1) * 32 + 16 + 3)
 
             -- render tile
             setColor(255, 255, 255, 255)
-            love.graphics.draw(gTextures['main'], self.positions[(y - 1) * x + x],
+            love.graphics.draw(gRSC.textures['main'], self.positions[(y - 1) * x + x],
                 (x - 1) * 32 + 128, (y - 1) * 32 + 16)
         end
     end
@@ -137,7 +136,7 @@ function StartState:render(msg)
         self.error, self.done, self.alpha = coroutine.resume(self.fade_co,1)
             -- if the fade is complete advance state
         if self.done then
-            msg.nextState(self.next)
+            msg.Change(self.next)
         end
     end
     love.graphics.setColor(1, 1, 1, self.alpha)
@@ -158,7 +157,7 @@ function StartState:drawMatch3Text(y)
     love.graphics.rectangle('fill', self.VW / 2 - 76, self.VH / 2 + y - 11, 150, 58, 6)
 
     -- draw MATCH 3 text shadows
-    love.graphics.setFont(gFonts['large'])
+    love.graphics.setFont(gRSC.fonts['large'])
     self:drawTextShadow('MATCH 3', self.VH / 2 + y)
 
     -- print MATCH 3 letters in their corresponding current colors
@@ -178,7 +177,7 @@ function StartState:drawOptions(y)
     love.graphics.rectangle('fill', self.VW / 2 - 76, self.VH / 2 + y, 150, 58, 6)
 
     -- draw Start text
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gRSC.fonts['medium'])
     self:drawTextShadow('Start', self.VH / 2 + y + 8)
 
     if self.currentMenuItem == 1 then
@@ -190,7 +189,7 @@ function StartState:drawOptions(y)
     love.graphics.printf('Start', 0, self.VH / 2 + y + 8, self.VW, 'center')
 
     -- draw Quit Game text
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gRSC.fonts['medium'])
     self:drawTextShadow('Quit Game', self.VH / 2 + y + 33)
 
     if self.currentMenuItem == 2 then
