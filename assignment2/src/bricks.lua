@@ -1,7 +1,7 @@
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts
+-- luacheck: globals Class love setColor readOnly BaseState gRSC
+-- luacheck: ignore detect_and_handle_brick_collisions
 
 -- functions to iterate over the array of bricks
 function checkVictory(bricks)
@@ -54,63 +54,63 @@ function handle_brick_collision(ball,brick)
     end
 end
 
-function update_score(msgs,brick)
+function update_score(msg,brick)
     -- add to score
     -- ts == tier scale
     -- bs == brick color scale
     local s = 0
     if brick.keyBrick then
-        s = math.max(1000,msgs.level * 125)
-        msgs.breakout = true
+        s = math.max(1000,msg.level * 125)
+        msg.breakout = true
     else
         s =  (brick.tier * 100 + brick.color * 5)
     end
 
-    msgs.score = msgs.score + s
+    msg.score = msg.score + s
 
     -- trigger the brick's hit function, which removes it from play
     brick:hit()
 
     -- if we have enough points, recover a point of health
-    if msgs.score > msgs.recoverPoints then
+    if msg.score > msg.recoverPoints then
         -- can't go above 3 health
-        msgs.health = math.min(3, msgs.health + 1)
+        msg.health = math.min(3, msg.health + 1)
 
         -- multiply recover points by 2
-        msgs.recoverPoints = math.min(msg.recoverPoints + 10000, msgs.recoverPoints * 2)
+        msg.recoverPoints = math.min(msg.recoverPoints + 10000, msg.recoverPoints * 2)
 
         -- play recover sound effect
-        gSounds['recover']:play()
+        gRSC.sounds['recover']:play()
     end
 end
 
 -- update scoring using different parameters if it is the keybrick
-function handle_scoring(msgs, brick)
+function handle_scoring(msg, brick)
     if brick.keyBrick then
-        if msgs.keyCaught then
-            update_score(msgs, brick)
+        if msg.keyCaught then
+            update_score(msg, brick)
         end
     else
-        update_score(msgs, brick)
+        update_score(msg, brick)
     end
 end
 
-function score_bonas(msgs)
-    msgs.score = msgs.score + msgs.level  * 500
+function score_bonas(msg)
+    msg.score = msg.score + msg.level  * 500
 end
 
-function detect_and_handle_brick_collisions(msgs)
+function detect_and_handle_brick_collisions(msg)
     -- process all active balls
-    for i , ball in pairs(msgs.balls:getList()) do
+    for i , ball in pairs(msg.balls:getList()) do
          if ball:isActive()  then
             -- detect collision across all bricks with the ball
-            for k, brick in pairs(msgs.bricks) do
+            for k, brick in pairs(msg.bricks) do
                 if brick.inPlay then
                     if ball:collides(brick) then
                         -- change the ball movement vectors
                         handle_brick_collision(ball, brick)
                         -- update scoring
-                        handle_scoring(msgs,brick)
+                        handle_scoring(msg,brick)
                         -- only allow colliding with one brick, for corners
                         -- break the loop on first collision detected
                        break
@@ -120,8 +120,8 @@ function detect_and_handle_brick_collisions(msgs)
         end
     end
     -- return true if the board is cleared
-    if checkVictory(msgs.bricks) then
-        score_bonas(msgs)
+    if checkVictory(msg.bricks) then
+        score_bonas(msg)
     end
-    return msgs.breakout
+    return msg.breakout
 end

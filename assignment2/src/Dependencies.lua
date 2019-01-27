@@ -9,21 +9,18 @@ push = require 'lib/push'
 -- our game as code, rather than keeping track of many disparate variables and
 -- methods
 --
--- https://github.com/vrld/hump/blob/master/class.lua
-Class = require 'lib/class'
 -- a basic StateMachine class which will allow us to transition to and from
 -- game states smoothly and avoid monolithic code in one file
+require 'lib/Inputs'
 require 'lib/StateMachine'
 require 'lib/HighScoreTracker'
+require 'lib/gamePad'
 
+require 'src/init_message_packet'
 -- a few global constants, centralized
-require 'src/constants'
 require 'src/loadResources'
 --  defines a target that interacts with the paddle or gricks (base class for ball and powerups)
 require 'src/Target'
-
--- the messages passed between states
-require 'src/init_message_packet'
 
 -- the ball that travels around, breaking bricks and triggering lives lost
 require 'src/Ball'
@@ -50,7 +47,7 @@ require 'src/Util'
 -- each of the individual states our game can be in at once; each state has
 -- its own update and render methods that can be called by our state machine
 -- each frame, to avoid bulky code in main.lua
-require 'src/states/BaseState'
+require 'src/states/baseAppState'
 require 'src/states/EnterHighScoreState'
 require 'src/states/GameOverState'
 require 'src/states/HighScoreState'

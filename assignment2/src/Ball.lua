@@ -14,8 +14,7 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState Target
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly BaseState Target gRSC
 
 Ball = Class{ __includes = Target}
 
@@ -27,8 +26,8 @@ function Ball:init(skin)
     self.width = 8
     self.height = 8
 
-    self.x = gConst.VIRTUAL_WIDTH / 2 - 2
-    self.y = gConst.VIRTUAL_HEIGHT / 2 - 2
+    self.x = gRSC.W.VIRTUAL_WIDTH / 2 - 2
+    self.y = gRSC.W.VIRTUAL_HEIGHT / 2 - 2
     -- these variables are for keeping track of our velocity on both the
     -- X and Y axis, since the ball can move in two dimensions
     self.dy = 0
@@ -52,7 +51,7 @@ function Ball:isActive()
 end
 
 function Ball:beep()
-    gSounds['wall-hit']:play()
+    gRSC.sounds['wall-hit']:play()
 end
 
 
@@ -77,7 +76,7 @@ end
 
 -- handle out of bounds condition
 function Ball:checkBoundry()
-    if self.y >= gConst.VIRTUAL_HEIGHT then
+    if self.y >= gRSC.W.VIRTUAL_HEIGHT then
         self.active = false
     end
 end
@@ -85,8 +84,8 @@ end
 --Places the ball in the middle of the screen, with no movement.
 function Ball:reset(skin)
     if self.active then
-        self.x = gConst.VIRTUAL_WIDTH / 2 - 2
-        self.y = gConst.VIRTUAL_HEIGHT / 2 - 2
+        self.x = gRSC.W.VIRTUAL_WIDTH / 2 - 2
+        self.y = gRSC.W.VIRTUAL_HEIGHT / 2 - 2
         self.dx = 0
         self.dy = 0
     end
@@ -106,8 +105,8 @@ function Ball:update(dt)
             snd = true
         end
 
-        if self.x >= gConst.VIRTUAL_WIDTH - 8 then
-            self.x = gConst.VIRTUAL_WIDTH - 8
+        if self.x >= gRSC.W.VIRTUAL_WIDTH - 8 then
+            self.x = gRSC.W.VIRTUAL_WIDTH - 8
             self.dx = -self.dx
             snd = true
         end
@@ -128,13 +127,13 @@ function Ball:render()
     if self.active then
         -- gTexture is our global texture for all blocks
         -- gBallFrames is a table of quads mapping to each individual ball skin in the texture
-        love.graphics.draw(gTextures['main'], gFrames['balls'][self.skin], self.x, self.y)
+        love.graphics.draw(gRSC.textures['main'], gRSC.frames['balls'][self.skin], self.x, self.y)
     end
 end
 
 function Ball:setStartVelocity()
     self.dx = math.random(-200, 200)
-    self.dy = math.random(-50, -60)
+    self.dy = math.random(-80, -60)
 end
 
 function Ball:startBall()

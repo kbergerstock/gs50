@@ -1,9 +1,5 @@
 --[[
-    GD50
-    Breakout Remake
-
-    -- BaseState Class --
-
+    BaseState Class
     Author: Colton Ogden
     cogden@cs50.harvard.edu
 
@@ -14,18 +10,16 @@
     at least empty versions of these methods even if we don't define them
     ourselves in the actual classes.
 ]]
--- luacheck: allow_defined, no unused
--- luacheck: globals Class  BaseState gConst
+
+-- luacheck: allow_defined,no unused
+-- luacheck: globals love Class BaseState
 
 BaseState = Class{}
 
-function BaseState:init() self:_init_() end
-function BaseState:enter(msgs) end
-function BaseState:exit() end
-function BaseState:update(msgs, dt) end
-function BaseState:handleInput(input, msgs) end
-function BaseState:render(msgs) end
-function BaseState:_init_()
-    self.VW = gConst.VIRTUAL_WIDTH
-    self.VH = gConst.VIRTUAL_HEIGHT
-end
+function BaseState:init() end
+function BaseState:enter(msg) end
+function BaseState:exit(msg) end
+function BaseState:update(msg, dt) end
+function BaseState:render(msg) end
+function BaseState:handleInput(input, msg) end  -- discrete
+function BaseState:handleInputs(input, msg) end -- continous

@@ -1,12 +1,11 @@
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class o love setColor readOnly BaseState _PowerUp
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class o love setColor readOnly BaseState _PowerUp gRSC
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
 end
 
---[[     class PowerUps   an array of powerups                                        ]]--
+--[[     class PowerUps   an array of powerups    ]]--
 PowerUps = Class()
 
 function PowerUps:init()
@@ -34,12 +33,12 @@ function PowerUps:generateQuads(atlas)
     end
 end
 
-function PowerUps:update(dt,msgs)
+function PowerUps:update(dt,msg)
     for i , powerup in pairs(self.powerUps) do
         powerup:update(dt)
-        if powerup:collidesWith(msgs.paddle) then
+        if powerup:collidesWith(msg.paddle) then
             powerup:handleCollision()
-            self.effects[i](msgs)
+            self.effects[i](msg)
         end
     end
 end
@@ -72,45 +71,45 @@ end
 -- use the corsponding i value to call the correct jump value
 -- as retured by the pairs syntax in an itteritive for loop
 --
-function setPaddleSize(msgs)
-    if msgs.paddle.size == 2 then
-        msgs.paddle:setSize(3)
-        msgs.powerUps:setActive(1)
-        msgs.powerUps:clrActive(8)
+function setPaddleSize(msg)
+    if msg.paddle.size == 2 then
+        msg.paddle:setSize(3)
+        msg.powerUps:setActive(1)
+        msg.powerUps:clrActive(8)
     end
 end
 
-function resetPaddleSize(msgs)
-    if msgs.paddle.size == 3 then
-        msgs.paddle:setSize(2)
-        msgs.powerUps:setActive(8)
-        msgs.powerUps:clrActive(1)
+function resetPaddleSize(msg)
+    if msg.paddle.size == 3 then
+        msg.paddle:setSize(2)
+        msg.powerUps:setActive(8)
+        msg.powerUps:clrActive(1)
     end
 end
 
-function incPaddleSpeed(msgs)
-    msgs.paddle:incPaddleSpeed()
-    msgs.powerUps:setActive(2)
-    msgs.powerUps:clrActive(9)
+function incPaddleSpeed(msg)
+    msg.paddle:incPaddleSpeed()
+    msg.powerUps:setActive(2)
+    msg.powerUps:clrActive(9)
 end
 
-function resetPaddleSpeed(msgs)
-    msgs.paddle:resetPaddleSpeed()
-    msgs.powerUps:setActive(9)
-    msgs.powerUps:clrActive(2)
+function resetPaddleSpeed(msg)
+    msg.paddle:resetPaddleSpeed()
+    msg.powerUps:setActive(9)
+    msg.powerUps:clrActive(2)
 end
 
-function addLife(msgs)
-    msgs.health = math.min(msgs.health + 1 , 3)
-    msgs.powerUps:clrActive(3)
+function addLife(msg)
+    msg.health = math.min(msg.health + 1 , 3)
+    msg.powerUps:clrActive(3)
 end
 
-function multpleBalls(msgs)
-    msgs.balls:setMultipleBallsInplay()
-    msgs.powerUps:clrActive(7)
+function multpleBalls(msg)
+    msg.balls:setMultipleBallsInplay()
+    msg.powerUps:clrActive(7)
 end
 
-function setKeyCaught(msgs)
-    msgs.keyCaught = true
-    msgs.powerUps:clrActive(10)
+function setKeyCaught(msg)
+    msg.keyCaught = true
+    msg.powerUps:clrActive(10)
 end

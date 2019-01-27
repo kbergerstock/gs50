@@ -13,10 +13,10 @@
     Enter to begin.
 ]]
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly baseAppState
+-- luacheck: globals gRSC.sounds gRSC.textures gRSC.frames gRSC.fonts CONST
 
-PaddleSelectState = Class{__includes = BaseState}
+PaddleSelectState = Class{__includes = baseAppState}
 
 function PaddleSelectState:init()
     self:_init_()
@@ -27,46 +27,46 @@ function PaddleSelectState:init()
     self.width = 64
 end
 
-function PaddleSelectState:enter(msgs)
+function PaddleSelectState:enter(msg)
     self.currentPaddle = 1
 end
 
-function PaddleSelectState:handleInput(input, msgs)
+function PaddleSelectState:handleInput(input, msg)
     if input == 'left' then
         if self.currentPaddle == 1 then
-            gSounds['no-select']:play()
+            gRSC.sounds['no-select']:play()
         else
-            gSounds['select']:play()
+            gRSC.sounds['select']:play()
             self.currentPaddle = self.currentPaddle - 1
         end
     elseif input == 'right' then
         if self.currentPaddle == 4 then
-            gSounds['no-select']:play()
+            gRSC.sounds['no-select']:play()
         else
-            gSounds['select']:play()
+            gRSC.sounds['select']:play()
             self.currentPaddle = self.currentPaddle + 1
         end
     elseif input == '2' then
-        self.size , self.width = msgs.paddle:setSize(2)
+        self.size , self.width = msg.paddle:setSize(2)
     elseif input == '3' then
-        self.size, self.width = msgs.paddle:setSize(3)
+        self.size, self.width = msg.paddle:setSize(3)
     -- select paddle and move on to the serve state, passing in the selection
     elseif input == 'space' then
-        gSounds['confirm']:play()
+        gRSC.sounds['confirm']:play()
         -- update the message packet
-        msgs.paddle:setSkin(self.currentPaddle)
-        msgs.recoverPoints = 5000
-        msgs.next = 'serve'
+        msg.paddle:setSkin(self.currentPaddle)
+        msg.recoverPoints = 5000
+        msg.Change('serve')
     end
 end
 
 function PaddleSelectState:render()
     -- instructions
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gRSC.fonts['medium'])
     love.graphics.printf("Select your paddle with left and right!", 0, self.VH / 4,
         self.VW, 'center')
-    love.graphics.setFont(gFonts['small'])
-    love.graphics.printf("(Press SPACE to continue!)", 0, self.VH / 3,
+    love.graphics.setFont(gRSC.fonts['small'])
+    love.graphics.printf("(Press SPACE or button 'b' to continue!)", 0, self.VH / 3,
         self.VW, 'center')
 
         local r = 40.0 / 255.0
@@ -81,7 +81,7 @@ function PaddleSelectState:render()
         love.graphics.setColor(r,g,b,a)
     end
 
-    love.graphics.draw(gTextures['arrows'], gFrames['arrows'][1], self.VW / 4 - 24, self.VH - self.VH / 3)
+    love.graphics.draw(gRSC.textures['arrows'], gRSC.frames['arrows'][1], self.VW / 4 - 24, self.VH - self.VH / 3)
 
     -- reset drawing color to full white for proper rendering
     love.graphics.setColor(1,1,1,1)
@@ -93,12 +93,12 @@ function PaddleSelectState:render()
         love.graphics.setColor(r,g,b,a)
     end
 
-    love.graphics.draw(gTextures['arrows'], gFrames['arrows'][2], self.VW - self.VW / 4, self.VH - self.VH / 3)
+    love.graphics.draw(gRSC.textures['arrows'], gRSC.frames['arrows'][2], self.VW - self.VW / 4, self.VH - self.VH / 3)
 
     -- reset drawing color to full white for proper rendering
     love.graphics.setColor(1,1,1,1)
 
     -- draw the paddle itself, based on which we have selected
-    love.graphics.draw(gTextures['main'], gFrames['paddles'][self.size + 4 * (self.currentPaddle - 1)],
+    love.graphics.draw(gRSC.textures['main'], gRSC.frames['paddles'][self.size + 4 * (self.currentPaddle - 1)],
         (self.VW - self.width )/2 , self.VH - self.VH / 3)
 end

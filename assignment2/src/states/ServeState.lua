@@ -14,64 +14,65 @@
     well as the level we're on.
 ]]
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts
+-- luacheck: globals Class love setColor readOnly baseAppState
+-- luacheck: globals renderScore renderHealth gRSC LevelMaker Inputs
 
-ServeState = Class{__includes = BaseState}
+ServeState = Class{__includes = baseAppState}
 
-function ServeState:enter(msgs)
-    self:MakeLevel(msgs)
-    msgs.paddle:reset()
-    msgs.balls:reset()
-    msgs.powerUps:reset()
+function ServeState:enter(msg)
+    self.inputs:reset()
+    self:MakeLevel(msg)
+    msg.paddle:reset()
+    msg.balls:reset()
+    msg.powerUps:reset()
 end
 
-function ServeState:MakeLevel(msgs)
-    if msgs.makeLevel  then
-        msgs.bricks, msgs.keyBrickFlag  = LevelMaker.createMap(msgs.level)
-        msgs.keyCaught = false
-        msgs.breakout = false
-        msgs.makeLevel = (msgs.bricks == nil )
+function ServeState:MakeLevel(msg)
+    if msg.makeLevel  then
+        msg.bricks, msg.keyBrickFlag  = LevelMaker.createMap(msg.level)
+        msg.keyCaught = false
+        msg.breakout = false
+        msg.makeLevel = (msg.bricks == nil )
     end
 end
 
-function ServeState:update(msgs, dt)
+function ServeState:update(msg, dt)
     -- have the ball track the player
-    msgs.paddle:update(dt)
-    msgs.balls:track(msgs.paddle)
+    msg.paddle:update(self.inputs,dt)
+    msg.balls:track(msg.paddle)
 end
 
-function ServeState:handleInput(input, msgs)
+function ServeState:handleInput(input, msg)
     if input == 'space' then
-        if msgs.makeLevel then
-            self:MakeLevel(msgs)
+        if msg.makeLevel then
+            self:MakeLevel(msg)
         else
             -- pass in all important state info to the PlayState
-            msgs.next = 'play'
+            msg.Change('play')
         end
      end
 end
 
-function ServeState:render(msgs)
-    msgs.paddle:render()
-    msgs.balls:render()
-    msgs.powerUps:render()
+function ServeState:render(msg)
+    msg.paddle:render()
+    msg.balls:render()
+    msg.powerUps:render()
 
-    if msgs.makeLevel then
-        love.graphics.setFont(gFonts['large'])
+    if msg.makeLevel then
+        love.graphics.setFont(gRSC.fonts['large'])
         love.graphics.printf('Level creation error press space again ', 0, self.VH / 3, self.VW, 'center')
     else
-        for k, brick in pairs(msgs.bricks) do
+        for k, brick in pairs(msg.bricks) do
             brick:render()
         end
     end
 
-    renderScore(msgs.score)
-    renderHealth(msgs.health)
+    renderScore(msg.score)
+    renderHealth(msg.health)
 
-    love.graphics.setFont(gFonts['large'])
-    love.graphics.printf('Level ' .. tostring(msgs.level), 0, self.VH / 3, self.VW, 'center')
+    love.graphics.setFont(gRSC.fonts['large'])
+    love.graphics.printf('Level ' .. tostring(msg.level), 0, self.VH / 3, self.VW, 'center')
 
-    love.graphics.setFont(gFonts['medium'])
-    love.graphics.printf('Press Space to serve!', 0, self.VH / 2, self.VW, 'center')
+    love.graphics.setFont(gRSC.fonts['medium'])
+    love.graphics.printf("Press Space ot button 'b' to serve!", 0, self.VH / 2, self.VW, 'center')
 end

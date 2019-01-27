@@ -10,8 +10,8 @@
     Helper functions for writing games.
 ]]
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love
+-- luacheck: ignore GenerateQuadsBricks GenerateQuadsPaddles GenerateQuadsBalls
 
 --[[
     Given an "atlas" (a texture with multiple sprites), as well as a
@@ -42,7 +42,7 @@ end
 
     https://stackoverflow.com/questions/24821045/does-lua-have-something-like-pythons-slice
 ]]
-function table.slice(tbl, first, last, step)
+function table_slice(tbl, first, last, step)
     local sliced = {}
 
     for i = first or 1, last or #tbl, step or 1 do
@@ -59,7 +59,7 @@ end
 ]]
 function GenerateQuadsBricks(atlas)
     local quads = GenerateQuads(atlas, 32, 16)
-    local r = table.slice(quads, 1, 21)
+    local r = table_slice(quads, 1, 21)
     r['key'] = quads[24]
     return r
 end

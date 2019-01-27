@@ -48,69 +48,64 @@
 		Worse imagine what could happen if you tried to use multiple state machines (one for a robot,
 		one for a vision station. two for ideniticle work stations, one for a label and apply station )
 		and someone hits the emergancy stop. well something like this https://around.com/ariane.html
-	The modfications now allow the instance to be declared local and its data is encapusulated and hidden.
-	To use create a list of key,value pairs one of which should be ['state'] = 'nextState' and return the list ie
-		local r = {}
-			r['state'] = 'countdown'
-			r['score'] = self.score
-			return r
-		or simply
-			return {
-				state = 'countdown',
-				score = self.score
-			}
+		The modfications now allow the instance to be declared local and its data is encapusulated and hidden.
+		To use you design a  message packet where one key pair element is xxx.next
+		by setting the xxx.state to the desired state the core state machine will change to the new state
+		ie msg.change( 'playstate'. The message packet can pass any data that is needed to the indivual
+		states.  Any data not neeeded by a particular state is simply ignored.
+
+		NEW CONCEPT - 2019.01.15 -  the statemachine only acts on variables and functions in the message packet.
+		this enables coorperative multitasking of multiple state machines.
+
 ]]
--- luacheck: allow_defined, no unused
--- luacheck: globals Class o BaseState
+
+-- luacheck: allow_defined,no unused
+-- luacheck: globals o Class BaseState
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
 end
 
+require 'lib/BaseState'
+require 'lib/message'
+
 StateMachine = Class{}
 -- statemchine constructor
--- input a key , value pair list
--- where :
--- key == state name or index value
--- value = state class constructor
-function StateMachine:init(states)
-	self.states = states or {} -- [name] -> [a state constructor]
-	self.current = 'idle'
-end
+function StateMachine:init() end
 
 --[[
-	private function
-	input a key,value paired list of parameters
-	one of which must be state = 'nextState'
-	it is passed without modification to the
-	enter function where the state key is
-	simply ignored
+	populate the state list in msg with key , value pairs of
+	state identifier, state constructor
 	krb
 ]]
-function StateMachine:_changeState(msgs)
-	self.states[self.current]:exit()
-	self.current = msgs.next
-	self.states[self.current]:enter(msgs)
+
+-- change from idle to the initial state ie start it up
+function StateMachine:run(msg, state)
+	msg.Change(state)
 end
 
--- public function
-function StateMachine:run(msgs,state)
-	msgs.next = state
-end
-
--- keysPressed is a reference to an external object found in keyBoard.lua
-function StateMachine:update( msgs, dt)
-	self.states[self.current]:update(msgs, dt)
-	-- pass on return of a nil value
-	if self.current ~= msgs.next then
-		self:_changeState(msgs)
+-- state machine engine
+-- msg is the message packet for this instance
+-- dt is the time diferential from the last call to this function
+function StateMachine:update(msg, dt)
+	msg.states[msg.getCurrent()]:update(msg, dt)
+	if msg.getCurrent() ~= msg.getNext() and msg.states[msg.getNext()] then
+		msg.states[msg.getCurrent()]:exit(msg)	--call the exit function of the old state
+		msg.advanceState()						-- change current state to new state
+		msg.states[msg.getCurrent()]:enter(msg)	-- call the enter function of the new state
 	end
 end
 
-function StateMachine:handleInput(input,msgs)
-	self.states[self.current]:handleInput(input, msgs)
+-- indirect calls
+-- input is discrete
+function StateMachine:handle_input(msg, input)
+	msg.states[msg.getCurrent()]:handleInput(input, msg)
+end
+-- input is continous
+function StateMachine:handle_inputs(msg, input)
+	msg.states[msg.getCurrent()]:handleInputs(input, msg)
 end
 
-function StateMachine:render(msgs)
-	self.states[self.current]:render(msgs)
+function StateMachine:render(msg)
+	msg.states[msg.getCurrent()]:render(msg)
 end

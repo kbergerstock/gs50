@@ -12,27 +12,26 @@
     to the StartState.
 ]]
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly baseAppState gRSC
 
-GameOverState = Class{__includes = BaseState}
+GameOverState = Class{__includes = baseAppState}
 
-function GameOverState:handleInput(input, msgs)
+function GameOverState:handleInput(input, msg)
     if input == 'space' then
         -- see if score is higher than any in the high scores table
-        if msgs.hsObj:checkScore(msgs.score) then
-            gSounds['high-score']:play()
-            msgs.next = 'enter_name'
+        if msg.hsObj:checkScore(msg.score) then
+            gRSC.sounds['high-score']:play()
+            msg.Change('enter_name')
         else
-            msgs.next = 'start'
+            msg.Change('start')
         end
     end
 end
 
-function GameOverState:render(msgs)
-    love.graphics.setFont(gFonts['large'])
+function GameOverState:render(msg)
+    love.graphics.setFont(gRSC.fonts['large'])
     love.graphics.printf('GAME OVER', 0, self.VH / 3, self.VW, 'center')
-    love.graphics.setFont(gFonts['medium'])
-    love.graphics.printf('Final Score: ' .. tostring(msgs.score), 0, self.VH / 2, self.VW, 'center')
-    love.graphics.printf('Press Space!', 0, self.VH - self.VH / 4, self.VW, 'center')
+    love.graphics.setFont(gRSC.fonts['medium'])
+    love.graphics.printf('Final Score: ' .. tostring(msg.score), 0, self.VH / 2, self.VW, 'center')
+    love.graphics.printf("'Press bitton 'b' or Space!", 0, self.VH - self.VH / 4, self.VW, 'center')
 end

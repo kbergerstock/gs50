@@ -15,8 +15,7 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class o love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts Brick
+-- luacheck: globals Class o Brick
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'

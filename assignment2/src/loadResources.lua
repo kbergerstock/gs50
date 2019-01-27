@@ -1,12 +1,29 @@
 -- loadResourses
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Class love setColor readOnly
--- luacheck: globals gSounds gTextures gFrames gFonts
--- luacheck: globals GenerateQuads
+-- luacheck: globals GenerateQuadsBalls GenerateQuadsPaddles GenerateQuadsBricks GenerateQuads
+-- luacheck: ignore loadResources
 
 require 'lib/readonly'
 
 function loadResources()
+    gRSC ={}
+    -- initialize constants
+    local constants = {}
+
+    -- size of our actual window
+    constants.WINDOW_WIDTH = 1280
+    constants.WINDOW_HEIGHT = 720
+
+    -- size we're trying to emulate with push
+    constants.VIRTUAL_WIDTH = 432
+    constants.VIRTUAL_HEIGHT = 243
+
+    -- paddle movement speed
+    constants.PADDLE_SPEED = 250
+
+    gRSC.W = readOnly(constants)
+    assert(gRSC.W,"error in creating constants")
 
     -- initialize our nice-looking retro text fonts
     local fonts = {
@@ -53,8 +70,8 @@ function loadResources()
         ['pause'] = love.audio.newSource('sounds/pause.wav','static'),
     }
 
-    gSounds = readOnly(sounds)
-    gTextures = readOnly(textures)
-    gFrames = readOnly(frames)
-    gFonts = readOnly(fonts)
+    gRSC.sounds = readOnly(sounds)
+    gRSC.textures = readOnly(textures)
+    gRSC.frames = readOnly(frames)
+    gRSC.fonts  = readOnly(fonts)
 end

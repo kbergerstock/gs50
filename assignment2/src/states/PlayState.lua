@@ -15,105 +15,106 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly baseAppState gRSC
+-- luacheck: globals renderHealth renderScore detect_and_handle_brick_collisions
 
-PlayState = Class{__includes = BaseState}
+PlayState = Class{__includes = baseAppState}
 
 --[[
     We initialize what's in our PlayState via a state table that we pass between
     states as we go from playing to serving.
 ]]
-function PlayState:enter(msgs)
+function PlayState:enter(msg)
+    self.inputs:reset()
     self.paused = false
-    gSounds['music']:stop()
+    gRSC.sounds['music']:stop()
     -- give default ball random starting velocity
-    msgs.balls:startVelocity()
-    msgs.powerUps:setActive(8)
-    msgs.powerUps:setActive(9)
-    if msgs.level > 5 then
-        msgs.powerUps:setActive(7)
+    msg.balls:startVelocity()
+    msg.powerUps:setActive(8)
+    msg.powerUps:setActive(9)
+    if msg.level > 5 then
+        msg.powerUps:setActive(7)
     end
-    if msgs.health < 2  then
-        msgs.powerUps:setActive(3)
+    if msg.health < 2  then
+        msg.powerUps:setActive(3)
     end
-    if msgs.keyBrickFlag and not msgs.keyCaught then
-        msgs.powerUps:setActive(10)
+    if msg.keyBrickFlag and not msg.keyCaught then
+        msg.powerUps:setActive(10)
     end
 end
 
-function PlayState:handleInput(input, msgs)
-    if input == 'space' then
+function PlayState:handleInput(input, msg)
+    if input == 'p' or input == 'P' then
         self.paused = not self.paused
-        gSounds['pause']:play()
+        gRSC.sounds['pause']:play()
     end
 end
 
-function PlayState:update(msgs, dt)
+function PlayState:update(msg, dt)
     -- return a nil value !!! if paused
     if self.paused then
         return
     end
     -- update positions based on velocity
-    msgs.paddle:update(dt)
-    msgs.balls:update(dt)
-    msgs.powerUps:update(dt,msgs)
+    msg.paddle:update(self.inputs, dt)
+    msg.balls:update(dt)
+    msg.powerUps:update(dt,msg)
 
     -- detect and handle ball collisions with the paddle
-    msgs.balls:handleCollisions(msgs.paddle)
+    msg.balls:handleCollisions(msg.paddle)
 
     -- detect collision across all bricks with the ball
     -- go to our victory screen if there are no more bricks left
     -- detect Brick Collision returns true if all the bricks are gone
-    if detect_and_handle_brick_collisions(msgs) then
-        gSounds['victory']:play()
-        msgs.next = 'victory'
+    if detect_and_handle_brick_collisions(msg) then
+        gRSC.sounds['victory']:play()
+        msg.Change('victory')
    end
 
     -- if all balls are below bounds, revert to serve state and decrease health
     -- any active returns true if a ball is still in play otherwise false
-    if  not msgs.balls:anyActive() then
-        msgs.health = msgs.health - 1
-        gSounds['hurt']:play()
+    if  not msg.balls:anyActive() then
+        msg.health = msg.health - 1
+        gRSC.sounds['hurt']:play()
 
-        if msgs.health > 0 then
-            msgs.next = 'serve'
+        if msg.health > 0 then
+            msg.Change('serve')
         else
-            msgs.next = 'game_over'
+            msg.Change('game_over')
         end
     end
 
     -- for rendering particle systems
-    for k, brick in pairs(msgs.bricks) do
+    for k, brick in pairs(msg.bricks) do
         brick:update(dt)
     end
 end
 
 function PlayState:exit()
-    gSounds['music']:play()
+    gRSC.sounds['music']:play()
 end
 
-function PlayState:render(msgs)
+function PlayState:render(msg)
     -- render bricks
-    for k, brick in pairs(msgs.bricks) do
+    for k, brick in pairs(msg.bricks) do
         brick:render()
     end
 
     -- render all particle systems
-    for k, brick in pairs(msgs.bricks) do
+    for k, brick in pairs(msg.bricks) do
         brick:renderParticles()
     end
 
-    msgs.paddle:render()
-    msgs.balls:render()
-    msgs.powerUps:render()
+    msg.paddle:render()
+    msg.balls:render()
+    msg.powerUps:render()
 
-    renderScore(msgs.score)
-    renderHealth(msgs.health)
+    renderScore(msg.score)
+    renderHealth(msg.health)
 
     -- pause text, if paused
     if self.paused then
-        love.graphics.setFont(gFonts['large'])
+        love.graphics.setFont(gRSC.fonts['large'])
         love.graphics.printf("PAUSED", 0, self.VH / 2 - 16, self.VW, 'center')
     end
 end

@@ -14,8 +14,7 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly BaseState Inputs gRSC
 
 Paddle = Class{}
 
@@ -25,10 +24,10 @@ Paddle = Class{}
 ]]
 function Paddle:init(skin)
     -- x is placed in the middle
-    self.x = gConst.VIRTUAL_WIDTH / 2 - 32
+    self.x = gRSC.W.VIRTUAL_WIDTH / 2 - 32
 
     -- y is placed a little above the bottom edge of the screen
-    self.y = gConst.VIRTUAL_HEIGHT - 32
+    self.y = gRSC.W.VIRTUAL_HEIGHT - 32
 
     -- start us off with no velocity
     self.dx = 0
@@ -44,11 +43,11 @@ function Paddle:init(skin)
     -- the variant is which of the four paddle sizes we currently are; 2
     -- is the starting size, as the smallest is too tough to start with
     self.size = 2
-    self.speed = gConst.PADDLE_SPEED
+    self.speed = gRSC.W.PADDLE_SPEED
 end
 
 function Paddle:reset()
-    self.speed = gConst.PADDLE_SPEED
+    self.speed = gRSC.W.PADDLE_SPEED
     self:setSize(2)
 end
 
@@ -64,26 +63,27 @@ function Paddle:setSize(size)
 end
 
 function Paddle:incPaddleSpeed()
-    self.speed = gConst.PADDLE_SPEED + math.random(0,96)
+    self.speed = gRSC.W.PADDLE_SPEED + math.random(0,96)
 end
 
 function Paddle:resetPaddleSpeed()
-    self.speed = gConst.PADDLE_SPEED
+    self.speed = gRSC.W.PADDLE_SPEED
 end
 
 function Paddle:readSpeed()
     return self.speed
 end
 
-function Paddle:update(dt)
-    -- keyboard input
-    if love.keyboard.isDown('left') then
+function Paddle:update(inputs, dt)
+    -- handle input from user
+    if inputs:get('left') then
         self.dx = -self.speed
-    elseif love.keyboard.isDown('right') then
+    elseif inputs:get('right') then
         self.dx = self.speed
     else
         self.dx = 0
     end
+    inputs:reset()
 
     -- math.max here ensures that we're the greater of 0 or the player's
     -- current calculated Y position when pressing up so that we don't
@@ -96,7 +96,7 @@ function Paddle:update(dt)
     -- height (or else it will go partially below, since position is
     -- based on its top left corner)
     else
-        self.x = math.min(gConst.VIRTUAL_WIDTH - self.width, self.x + self.dx * dt)
+        self.x = math.min(gRSC.W.VIRTUAL_WIDTH - self.width, self.x + self.dx * dt)
     end
 end
 
@@ -105,6 +105,6 @@ end
     that corresponds to the proper skin and size.
 ]]
 function Paddle:render()
-    love.graphics.draw(gTextures['main'], gFrames['paddles'][self.size + 4 * (self.skin - 1)],
+    love.graphics.draw(gRSC.textures['main'], gRSC.frames['paddles'][self.size + 4 * (self.skin - 1)],
         self.x, self.y)
 end

@@ -1,8 +1,7 @@
 -- powerUp class
 -- krbergerstock
 
--- luacheck: globals love Class o Target, ignore _PowerUp
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals love Class o Target gRSC, ignore _PowerUp
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -40,14 +39,14 @@ function _PowerUp:update(dt)
         if self.visible then
             self.dy = self.dy + self.gravity * dt
             self.y = self.y + self.dy
-            if self.y > gConst.VIRTUAL_HEIGHT then
+            if self.y > gRSC.W.VIRTUAL_HEIGHT then
                 self:handleCollision()
             end
         else
             self.accum = self.accum + dt
             if self.accum > self.drop then
                 self.visible = true
-                self.x = math.random(32, gConst.VIRTUAL_WIDTH - 32)
+                self.x = math.random(32, gRSC.W.VIRTUAL_WIDTH - 32)
                 self.y = 8
                 self.dy = 1
                 self.gravity = math.random(0.5,1.5)
@@ -66,10 +65,10 @@ end
 
 function _PowerUp:render()
     if self.active and self.visible then
-        love.graphics.draw(gTextures['main'],self.quad,self.x,self.y)
+        love.graphics.draw(gRSC.textures['main'],self.quad,self.x,self.y)
     end
 end
 
 function _PowerUp:draw(x,y)
-    love.graphics.draw(gTextures['main'],self.quad,x,y)
+    love.graphics.draw(gRSC.textures['main'],self.quad,x,y)
 end

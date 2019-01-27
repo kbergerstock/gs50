@@ -5,8 +5,7 @@
 -- class G50.cs
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState Ball Target
--- luacheck: globals gSounds gTextures gFrames gFonts
+-- luacheck: globals Class love setColor readOnly BaseState Ball Target gRSC
 
 Balls = Class{}
 
@@ -68,7 +67,7 @@ function Balls:handleCollisions(paddle)
     for i , ball in pairs(self.balls) do
         if ball:collides(paddle) then
             ball:handleCollision(paddle)
-            gSounds['paddle-hit']:play()
+            gRSC.sounds['paddle-hit']:play()
         end
     end
 end

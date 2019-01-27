@@ -10,26 +10,25 @@
     Represents the screen where we can view all high scores previously recorded.
 ]]
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts CONST
+-- luacheck: globals Class love setColor readOnly baseAppState gRSC
 
-HighScoreState = Class{__includes = BaseState}
+HighScoreState = Class{__includes = baseAppState}
 
-function HighScoreState:handleInput(input, msgs)
+function HighScoreState:handleInput(input, msg)
     -- return to the start screen if we press escape
     if input == 'space' then
-        gSounds['wall-hit']:play()
-        msgs.next = 'start'
+        gRSC.sounds['wall-hit']:play()
+        msg.Change('start')
     end
 end
 
-function HighScoreState:render(msgs)
-    love.graphics.setFont(gFonts['large'])
+function HighScoreState:render(msg)
+    love.graphics.setFont(gRSC.fonts['large'])
     love.graphics.printf('High Scores', 0, 20, self.VW, 'center')
 
-    love.graphics.setFont(gFonts['medium'])
+    love.graphics.setFont(gRSC.fonts['medium'])
 
-    local hst = msgs.hsObj:get()
+    local hst = msg.hsObj:get()
     -- iterate over all high score indices in our high scores table
     for i = 1, hst.count do
         local name = hst[i].name or '---'
@@ -43,6 +42,6 @@ function HighScoreState:render(msgs)
         love.graphics.printf(tostring(score), self.VW / 2, y, 100, 'right')
     end
 
-    love.graphics.setFont(gFonts['small'])
-    love.graphics.printf("Press Space to return to the main menu!", 0, self.VH - 18, self.VW, 'center')
+    love.graphics.setFont(gRSC.fonts['small'])
+    love.graphics.printf("Press Space or button 'b' to return to the main menu!", 0, self.VH - 18, self.VW, 'center')
 end

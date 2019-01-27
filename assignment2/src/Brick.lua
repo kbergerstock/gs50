@@ -15,8 +15,7 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState
--- luacheck: globals gSounds gTextures gFrames gFonts
+-- luacheck: globals Class love setColor readOnly BaseState gRSC
 
 Brick = Class{}
 
@@ -70,7 +69,7 @@ function Brick:init(x, y, keyBrickFlag)
     self.inPlay = true
 
     -- particle system belonging to the brick, emitted on hit
-    self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
+    self.psystem = love.graphics.newParticleSystem(gRSC.textures['particle'], 64)
 
     -- various behavior-determining functions for the particle system
     -- https://love2d.org/wiki/ParticleSystem
@@ -108,8 +107,8 @@ function Brick:hit()
     self.psystem:emit(64)
 
     -- sound on hit
-    gSounds['brick-hit-2']:stop()
-    gSounds['brick-hit-2']:play()
+    gRSC.sounds['brick-hit-2']:stop()
+    gRSC.sounds['brick-hit-2']:play()
 
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color
@@ -131,8 +130,8 @@ function Brick:hit()
 
     -- play a second layer sound if the brick is destroyed
     if not self.inPlay then
-        gSounds['brick-hit-1']:stop()
-        gSounds['brick-hit-1']:play()
+        gRSC.sounds['brick-hit-1']:stop()
+        gRSC.sounds['brick-hit-1']:play()
     end
 end
 
@@ -143,10 +142,10 @@ end
 function Brick:render()
     if self.inPlay then
         local ndx = self.keyBrick and 'key' or (1 + ((self.color - 1) * 4) + self.tier)
-        love.graphics.draw(gTextures['main'],
+        love.graphics.draw(gRSC.textures['main'],
             -- multiply color by 4 (-1) to get our color offset, then add tier to that
             -- to draw the correct tier and color brick onto the screen
-            gFrames['bricks'][ndx], self.x, self.y)
+            gRSC.frames['bricks'][ndx], self.x, self.y)
     end
 end
 

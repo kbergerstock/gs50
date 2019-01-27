@@ -2,6 +2,8 @@
     high score tracking class
     k.r.bergerstock
 ]]
+-- luacheck: allow_defined, no unused
+-- luacheck: globals o love HighScoreTracker Class
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -41,7 +43,7 @@ function HighScoreTracker:loadHighScores(gName)
         self.highScores = self:sort(self.highScores)
         return self:writeScores()
     else
-        return self:readHighScores()        
+        return self:readHighScores()
     end
 end
 
@@ -51,7 +53,7 @@ function HighScoreTracker:sort(hs)
     for i = 1 ,l - 1 ,1 do
         for j = l , i+1, -1 do
             if hs[j].score > hs[i].score then
-                hs[i], hs[j] = hs[j], hs[i] 
+                hs[i], hs[j] = hs[j], hs[i]
             end
         end
     end
@@ -67,8 +69,8 @@ function HighScoreTracker:add(cName,cScore)
     self.highScores = self:sort(self.highScores)
     if self.highScores.count > self.mx then
         table.remove(self.highScores)
-        self.highScores.count = self.highScores.count - 1     
-    end    
+        self.highScores.count = self.highScores.count - 1
+    end
 end
 
 -- retrieve the latest rendition of the list
@@ -80,17 +82,17 @@ end
 -- given that the list is sorted we only need to check the score 
 -- afainst the bottom of the list
 function  HighScoreTracker:checkScore(score)
-    ndx = self.highScores.count
-    item = self.highScores[ndx]
+    local ndx = self.highScores.count
+    local item = self.highScores[ndx]
     return score > item.score
 end
 
 -- write scores to file
 function HighScoreTracker:writeHighScores()
     local n = self.highScores.count
-    lines = 'count = ' .. tostring(n) .. '\n'
+    local lines = 'count = ' .. tostring(n) .. '\n'
     for i = 1, n , 1 do
-        item = self.highScores[i]
+        local item = self.highScores[i]
         lines = lines .. 'name = ' .. item.name ..', score = ' .. tostring(item.score) .. '\n'
     end
     local s
@@ -126,8 +128,8 @@ function HighScoreTracker:readHighScores()
             -- we scan though the file getting all elements
             k1, k2, cName = string.find(lines, w, k2)
             k1, k2, cScore = string.find(lines, s, k2 + 1)
-            table.insert(self.highScores,{name = cName, score = tonumber(cScore)})    
+            table.insert(self.highScores,{name = cName, score = tonumber(cScore)})
         end
         return 'success'
-    end        
+    end
 end
