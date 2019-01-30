@@ -11,10 +11,11 @@
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init()
+    self.inputs = Inputs()
+    self.pos = 0
     self.camX = 0
     self.camY = 0
     self.backgroundX = 0
-    self.zt = 0
     self.fgCanvas = love.graphics.newCanvas(1600,160)
     self.bgCanvas = love.graphics.newCanvas(512,160)
 end
@@ -28,7 +29,7 @@ function PlayState:enter(msg)
     self.tile_map =  generateTileMap(100,10)
 
     self:updateFGcanvas()
-    self.updateBGcanvas()
+    self:updateBGcanvas()
 end
 
 function PlayState:updateFGcanvas()
@@ -39,18 +40,43 @@ function PlayState:updateFGcanvas()
 end
 
 function PlayState:updateBGcanvas()
-    local background = math.random(3)
+    local bkgnd = math.random(3)
+    local bkgnds = 'backgrounds'
+    local sy = gRC.textures[bkgnds]:getHeight() / 3 * 2
     love.graphics.setCanvas(self.bgCanvas)
     love.graphics.clear(0,0,0,0)
-    
+    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][bkgnd], 0, 0)
+    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][bkgnd], 0, sy,0, 1, -1)
+    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][bkgnd], 256, 0)
+    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][bkgnd], 256, sy, 0, 1, -1)
     love.graphics.setCanvas()
 end
 
+function PlayState:handleInputs(input, msg)
+   self.inputs:set(input)
+end
+
+function PlayState:updatePos()
+    if self.inputs:get('left') or self.inputs:get('GPleft') then
+    self.pos = self.pos - 1
+    elseif self.inputs:get('right') or self.inputs:get('GPright') then
+        self.pos = self.pos + 1
+    end
+    if self.pos < 0 then
+        self.pos = 0
+    end
+    if self.pos > (1600 - 256) then
+        self.pos = 1600 - 256
+    end
+    self.inputs:reset()
+end
+
 function PlayState:update(msg, dt)
+    self:updatePos()
     self:updateFGcanvas()
 end
 
-function PlayState:render(gameMsg)
+function PlayState:render(msg)
     local bkgnds = 'backgrounds'
 
     -- render score
@@ -76,14 +102,13 @@ function PlayState:render(gameMsg)
         return gRC.textures[bkgnds]:getHeight() / 3 * 2
     end
 
+    local q, r = mod2(16 + self.pos, 256)
     love.graphics.push()
-    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][self.background], gSX(0), 0)
-    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][self.background], gSX(0), gSY(),0, 1, -1)
-    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][self.background], gSX(256), 0)
-    love.graphics.draw(gRC.textures[bkgnds], gRC.frames[bkgnds][self.background], gSX(256), gSY(), 0, 1, -1)
-
-    local quad = love.graphics.newQuad(16 + self.pos, 0, 256,160,1600,160)
+    local bgQuad = love.graphics.newQuad(r, 0, 256, 160, 512, 160)
+    local fgQuad = love.graphics.newQuad(16 + self.pos, 0, 256,160,1600,160)
     love.graphics.setColor(1,1,1,1)
-    love.graphics.draw(self.canvas,quad)
+    love.graphics.draw(self.bgCanvas, bgQuad)
+    love.graphics.draw(self.fgCanvas, fgQuad)
+    renderScore(msg.score)
     love.graphics.pop()
 end

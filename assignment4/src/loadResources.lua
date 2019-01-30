@@ -25,14 +25,15 @@
 ]]
 
 require 'lib/readonly'
+require 'src/loadConstants'
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals love readOnly GenerateQuads GenerateTileSets gCT
--- luacheck: ignore LoadResources gSounds gTextures gFrames gFonts
+-- luacheck: globals love readOnly GenerateQuads GenerateTileSets
+-- luacheck: ignore LoadResources loadConstants
 
 function LoadResources()
     -- the resources are loaded into read only tables
-    p = gCT
+    local p = loadConstants()
     -- sounds and music
     local sounds = {
         ['jump'] = love.audio.newSource('sounds/jump.wav','static'),
@@ -44,7 +45,7 @@ function LoadResources()
         ['kill'] = love.audio.newSource('sounds/kill.wav','static'),
         ['kill2'] = love.audio.newSource('sounds/kill2.wav','static')
     }
-    gSounds = readOnly(sounds)
+    p.sounds = readOnly(sounds)
 
     local textures = {
         ['tiles'] = love.graphics.newImage('graphics/tiles.png'),
@@ -58,29 +59,29 @@ function LoadResources()
         ['snails'] = love.graphics.newImage('graphics/snails.png'),
         ['numbers'] = love.graphics.newImage('graphics/numbers.png'),
     }
-    gTextures = readOnly(textures)
+    p.textures = readOnly(textures)
 
     local frames = {
-        ['tiles'] = GenerateQuads(gTextures['tiles'], p.TILE_SIZE, p.TILE_SIZE),
-        ['toppers'] = GenerateQuads(gTextures['toppers'], p.TILE_SIZE, p.TILE_SIZE),
-        ['bushes'] = GenerateQuads(gTextures['bushes'], 16, 16),
-        ['jump-blocks'] = GenerateQuads(gTextures['jump-blocks'], 16, 16),
-        ['gems'] = GenerateQuads(gTextures['gems'], 16, 16),
-        ['backgrounds'] = GenerateQuads(gTextures['backgrounds'], 256, 128),
-        ['green-alien'] = GenerateQuads(gTextures['green-alien'], 16, 20),
-        ['blue-alien'] = GenerateQuads(gTextures['blue-alien'], 16, 20),
-        ['snails'] = GenerateQuads(gTextures['snails'], 16, 16),
-        ['numbers'] = GenerateQuads(gTextures['numbers'],8,8),
+        ['tiles'] = GenerateQuads(textures['tiles'], p.TILE_SIZE, p.TILE_SIZE),
+        ['toppers'] = GenerateQuads(textures['toppers'], p.TILE_SIZE, p.TILE_SIZE),
+        ['bushes'] = GenerateQuads(textures['bushes'], 16, 16),
+        ['jump-blocks'] = GenerateQuads(textures['jump-blocks'], 16, 16),
+        ['gems'] = GenerateQuads(textures['gems'], 16, 16),
+        ['backgrounds'] = GenerateQuads(textures['backgrounds'], 256, 128),
+        ['green-alien'] = GenerateQuads(textures['green-alien'], 16, 20),
+        ['blue-alien'] = GenerateQuads(textures['blue-alien'], 16, 20),
+        ['snails'] = GenerateQuads(textures['snails'], 16, 16),
+        ['numbers'] = GenerateQuads(textures['numbers'],8,8),
     }
 
-    -- these need to be added after gFrames is initialized because they refer to gFrames from within
+    -- these need to be added after frames is initialized because they refer to frames from within
     frames['tilesets'] = GenerateTileSets(frames['tiles'],
         p.TILE_SETS_WIDE, p.TILE_SETS_TALL, p.TILE_SET_WIDTH, p.TILE_SET_HEIGHT)
 
     frames['toppersets'] = GenerateTileSets(frames['toppers'],
         p.TOPPER_SETS_WIDE, p.TOPPER_SETS_TALL, p.TILE_SET_WIDTH, p.TILE_SET_HEIGHT)
 
-    gFrames = readOnly(frames)
+    p.frames = readOnly(frames)
 
     local fonts = {
         ['small'] = love.graphics.newFont('fonts/font.ttf', 8),
@@ -88,5 +89,6 @@ function LoadResources()
         ['large'] = love.graphics.newFont('fonts/font.ttf', 32),
         ['title'] = love.graphics.newFont('fonts/ArcadeAlternate.ttf', 32)
    }
-   gFonts = readOnly(fonts)
+   p.fonts = readOnly(fonts)
+   return readOnly(p)
 end

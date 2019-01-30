@@ -7,8 +7,7 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love
--- luacheck: globals gFonts gTextures gFrames gSounds gCT
+-- luacheck: globals Class love gRC
 
 GameObject = Class{}
 
@@ -33,5 +32,5 @@ function GameObject:update(dt) end
 function GameObject:render()
     local sx = self.mx
     local sy = 146 - self.my
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame],sx,sy)
+    love.graphics.draw(gRC.textures[self.texture], gRC.frames[self.texture][self.frame],sx,sy)
 end

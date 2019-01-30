@@ -24,71 +24,138 @@
 
 ]]
 
-require 'src/loadResources'
-
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine BaseState Class setColor love
--- luacheck: globals gFonts gSounds LoadResources
--- luacheck: globals StartState PlayState
+-- luacheck: globals push Message StateMachine  Class setColor love
+-- luacheck: globals GamePad LoadResources StartState PlayState
+
+push = require 'lib/push'
+require 'src/loadResources'
 
 APP = Class{}
 
 function APP:init()
-    self.msg = Message()
+    -- create a game pad interface
+    self.gamePad = GamePad()
+    -- fetrch  and store all resourses use in the application (sprits, tiles, sounds, frames and constants )
+    gRC = LoadResources()
 end
 
-function APP:load()
+function APP:Run()
+    -- display the virtual window
+    self:start()
+
+    local msg = self:init_message_packet()
+    local gameStateMachine = StateMachine()
+    gameStateMachine:run(msg, 'start')
+
+    -- define love callbacks in this fuction body so they have access to local's
+    function love.resize(w, h)
+        push:resize(w, h)
+    end
+
+    -- stop the muisic and issue the exit cmd to the love system
+    local function stop()
+        gRC.sounds['music']:stop()
+        love.event.quit()
+    end
+
+    function love.keypressed(key)
+        if key == 'escape' then
+            stop()
+        else
+            gameStateMachine:handle_input(msg, key)
+        end
+    end
+
+    function love.update(dt)
+        -- pass the inputs to be processed
+        local button = ''
+        local hInput = ''
+        local vInput = ''
+        button,  hInput, vInput = self:readGamePad()
+        gameStateMachine:handle_input(msg,button)
+        gameStateMachine:handle_inputs(msg, hInput)
+        gameStateMachine:handle_inputs(msg, vInput)
+        -- execute the state machine and process inputs
+        gameStateMachine:update(msg, dt)
+    end
+
+    function love.draw()
+        push:start()
+        -- render the current state
+        gameStateMachine:render(msg)
+        push:finish()
+    end
+
+end
+-- ------------------------------------------------------------------
+function APP:start()
     -- initialize our nearest-neighbor filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
-    -- window bar title
-    love.graphics.setFont(gFonts['medium'])
+    -- set window bar title
+    love.graphics.setFont(gRC.fonts['medium'])
     love.window.setTitle("Otarin's Run.")
 
-    self.gameStateMachine = StateMachine {
-        ['start'] = StartState(),
-        ['play']  = PlayState()
-    }
+    -- initialize our virtual resolution
+    push:setupScreen(gRC.VIRTUAL_WIDTH, gRC.VIRTUAL_HEIGHT, gRC.WINDOW_WIDTH, gRC.WINDOW_HEIGHT, {
+            vsync = true,
+            fullscreen = false,
+            resizable = true,
+            canvas = true
+        })
+
+    -- set music to loop and start
+    gRC.sounds['music']:setLooping(true)
+    gRC.sounds['music']:setVolume(0.5)
+    gRC.sounds['music']:play()
 
     -- seed the RNG
     math.randomseed(os.time())
-    for i = 1, 100 do
-        math.random(100)
+    for i = 1, 100 do math.random(100) end
+end
+
+function APP:readGamePad()
+    local button = ''
+    self.gamePad:readJoysticks()
+    if  self.gamePad.inputs['f1lt'] then
+        button = 'left'
+    elseif  self.gamePad.inputs['f1rt'] then
+        button = 'right'
+    elseif  self.gamePad.inputs['f1up'] then
+        button = 'up'
+    elseif  self.gamePad.inputs['f1dn'] then
+        button = 'down'
+    elseif self.gamePad.inputs['b'] then    -- is true on detected false otherwise
+        button = 'GPb'                        -- assign to return value
+        self.gamePad.inputs['b'] = false    -- debounce the button
+    elseif self.gamePad.inputs['a'] then
+        button = 'GPa'
+        self.gamePad.inputs['a'] = false
+    elseif self.gamePad.inputs['x'] then
+        button = 'GPx'
+        self.gamePad.inputs['x'] = false
+    elseif self.gamePad.inputs['y'] then
+        button = 'GPy'
+        self.gamePad.inputs['y'] = false
     end
-
-    self.msg.nextState('start')
-end
-
-function APP:handle_input(input, x, y)
-    -- add to our table of keys pressed this frame
-    if input == 'escape' then
-        -- quit if the escape was detectd
-        self:stop()
-      else
-        self.gameStateMachine:handle_input(input, self.msg)
+    local hInput = ''
+    if  self.gamePad.inputs['j1lt'] or love.keyboard.isDown('left') then
+        hInput = 'GPleft'
+    elseif  self.gamePad.inputs['j1rt'] or love.keyboard.isDown('right')  then
+        hInput = 'GPright'
     end
+    vInput = ''
+    if  self.gamePad.inputs['j1up'] or love.keyboard.isDown('up') then
+        vInput = 'GPup'
+    elseif  self.gamePad.inputs['j1dn'] or love.keyboard.isDown('down')  then
+        vInput = 'GPdown'
+    end
+    return button, hInput, vInput
 end
 
-function APP:update(dt)
-
-    self.gameStateMachine:update( self.msg, dt)
-
-end
-
-function APP:draw()
-        -- render the current state
-        self.gameStateMachine:render(self.msg)
-end
-
-function APP:loadResources()
-    -- the resources and constants are stored in read only tables
-    LoadResources()
-    -- set music to loop and start
-    gSounds['music']:setLooping(true)
-    gSounds['music']:setVolume(0.5)
-    gSounds['music']:play()
-end
-
-function APP:stop()
-    gSounds['music']:stop()
-    love.event.quit()
+function APP:init_message_packet()
+    local msg = Message()
+    msg.states['start'] = StartState()
+    msg.states['play']  = PlayState()
+    return msg
 end

@@ -7,20 +7,20 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine Class setColor love
--- luacheck: globals gFonts gTextures gFrames gSounds gCT
+-- luacheck: globals Message StateMachine Class setColor love gRC
+
 
 Tile = Class{}
 
 function Tile:init(x, y, id, topper, tileset, topperset)
-    self.size = gCT.TILE_SIZE
-    self.tx = x
-    self.ty = y
-    self.sx = (self.tx - 1) * self.size
-    self.sy = (10 - self.ty) * self.size
+    self.size =  gRC.TILE_SIZE
+    self.tx = x - 1
+    self.ty = y - 1
+    self.mx = self.tx  * self.size
+    self.my = self.ty  * self.size
 
-    self.width = size
-    self.height = size
+    self.width = self.size
+    self.height = self.size
 
     self.id = id
     self.tileset = tileset
@@ -29,9 +29,11 @@ function Tile:init(x, y, id, topper, tileset, topperset)
 end
 
 function Tile:render()
-    love.graphics.draw(gTextures['tiles'], gFrames['tilesets'][self.tileset][self.id],self.sx,self.sy)
+    local sx = self.mx
+    local sy = 146 - self.my
+    love.graphics.draw(gRC.textures['tiles'], gRC.frames['tilesets'][self.tileset][self.id],sx,sy)
     -- tile top layer for graphical variety
     if self.topper then
-        love.graphics.draw(gTextures['toppers'], gFrames['toppersets'][self.topperset][self.id],self.sx,self.sy)
+        love.graphics.draw(gRC.textures['toppers'], gRC.frames['toppersets'][self.topperset][self.id],sx,sy)
     end
 end

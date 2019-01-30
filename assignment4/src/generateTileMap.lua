@@ -1,14 +1,13 @@
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor Tile TileMap
--- luacheck: globals gSounds gTextures gFrames gFonts gCT
--- luacheck: ignore generateTileMap
+-- luacheck: globals Class love setColor Tile TileMap gRC
+-- luacheck: ignore generateTileMap GameObject
 
 --units for  width amd height is in tile size
 function generateTileMap(width, height)
     -- converting from a two dimensional array to a single dimension
     -- this will improve rendering amd processing speed
     -- to access a tile should be (x-1) * height + y
-    local tile_size = gCT.TILE_SIZE
+    local tile_size =  gRC.TILE_SIZE
     local tiles = {}
     local objects = {}
     local tile_id = 0
@@ -19,8 +18,7 @@ function generateTileMap(width, height)
     local topperset = math.random(20)
     ----------------------------------------------------
     local function set(tile)
-
-        local ndx = (tile.ty - 1) * width + tile.tx
+        local ndx = tile.ty * width + tile.tx + 1
         tiles[ndx]=tile
     end
     ----------------------------------------------------
@@ -35,7 +33,7 @@ function generateTileMap(width, height)
                     height = tile_size,
                     tile_size = tile_size,
                     -- select random frame from bush_ids whitelist, then random row for variance
-                    frame = gCT.BUSH_IDS[math.random(#gCT.BUSH_IDS)] + (math.random(4)-1) * 7
+                    frame =  gRC.BUSH_IDS[math.random(# gRC.BUSH_IDS)] + (math.random(4)-1) * 7
                 }
             )
         end
@@ -51,7 +49,7 @@ function generateTileMap(width, height)
                 height = tile_size,
                 tile_size = tile_size,
                 -- make it a random variant
-                frame = math.random(gCT.JUMP_BLOCKS_FRAMES),
+                frame = math.random( gRC.JUMP_BLOCKS_FRAMES),
                 collidable = true,
                 hit = false,
                 solid = true,
@@ -62,8 +60,8 @@ function generateTileMap(width, height)
     end
     ----------------------------------------------------
     local function make_tiles()
-        local empty = gCT.TILE_ID_EMPTY
-        local ground = gCT.TILE_ID_GROUND
+        local empty =  gRC.TILE_ID_EMPTY
+        local ground =  gRC.TILE_ID_GROUND
         for tx = 1,100 do
             local col = 10
             if tx > 20 then
@@ -90,8 +88,10 @@ function generateTileMap(width, height)
             if col < 10 then
                 col = col + 1
                 set(Tile(tx, col, tile_id, topper, tileset, topperset))
-                if math.random(8) == 1 then create_bush(tx,col) end
-                if math.random(10) == 1 then create_jump_block(tx,col) end
+                if tx > 16 then
+                    if math.random(8) == 1 then create_bush(tx,col) end
+                    if math.random(10) == 1 then create_jump_block(tx,col) end
+                end
                 tile_id = empty
                 col = col + 1
                 for ty = col , 10 do

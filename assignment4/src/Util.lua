@@ -15,6 +15,9 @@
     width and a height for the tiles therein, split the texture into
     all of the quads by simply dividing it evenly.
 ]]
+-- luacheck: globals love
+--luacheck: ignore GenerateQuads GenerateTileSets print_r
+
 function GenerateQuads(atlas, tilewidth, tileheight)
     local sheetWidth = atlas:getWidth() / tilewidth
     local sheetHeight = atlas:getHeight() / tileheight
