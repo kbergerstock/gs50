@@ -1,49 +1,47 @@
--- common start up code for a love2d engine
+-- simple start up code for a love2d engine
 -- create an app Class to implement game
 -- K. R. Bergerstock @ 09/2018
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class push love APP app
--- luacheck: ignore GAME_PADS
+-- luacheck: globals lclass push love APP LoadResources gRC
 
-require 'src/Dependencies'
+
+-- libraries
+require 'lib/StateMachine'
+require 'lib/handy'         -- setColor
+require 'lib/dTimer'        -- digital timer input is dt
+require 'lib/Log'
+require 'lib/GamePad'
+require 'lib/inputs'
+
+-- utility
+require 'src/Util'
+
+-- game states
+require 'src/states/game/PlayState'
+require 'src/states/game/StartState'
+
+-- entity states
+-- require 'src/states/entity/pc_states'
+-- require 'src/states/entity/npc_states'
+
+-- game characters
+-- require 'src/gc/Entity'
+-- require 'src/gc/npc'
+-- require 'src/gc/Player'
+-- require 'src/gc/Snail'
+
+-- general
+-- require 'src/Animation'
+
+require 'src/GameObject'
+require 'src/generateTileMap'
+-- require 'src/generateNPCs'
+require 'src/TileMap'
+
 require 'src/app'
 
 function love.load()
-        local gc = loadConstants()
-        -- initialize our virtual resolution
-        push:setupScreen(gc.VIRTUAL_WIDTH, gc.VIRTUAL_HEIGHT, gc.WINDOW_WIDTH, gc.WINDOW_HEIGHT, {
-        vsync = true,
-        fullscreen = false,
-        resizable = true,
-        canvas = true
-    })
-    -- create a game pad interface
-    GAME_PADS = love.joystick.getJoysticks()
-    -- create and initalize the application
     app = APP()
-    -- load up the graphics, sounds and music
-    app:loadResources()
-    -- load everything else and start the state machine
-    app:load()
-end
-
-function love.resize(w, h)
-    push:resize(w, h)
-end
-
-function love.keypressed(key)
-    app:handle_input(key)
-end
-
-function love.update(dt)
-    -- execute the state machine
-    app:update(dt)
-end
-
-function love.draw()
-    push:start()
-    -- render the current state
-    app:draw()
-    push:finish()
+    app:Run()
 end

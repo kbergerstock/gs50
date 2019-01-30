@@ -6,16 +6,14 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Class love setColor readOnly BaseState gRC
+-- luacheck: globals Class love setColor BaseState gRC Inputs mod2
+-- luacheck: globals generateTileMap
 
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init()
     self.inputs = Inputs()
     self.pos = 0
-    self.camX = 0
-    self.camY = 0
-    self.backgroundX = 0
     self.fgCanvas = love.graphics.newCanvas(1600,160)
     self.bgCanvas = love.graphics.newCanvas(512,160)
 end
@@ -53,27 +51,28 @@ function PlayState:updateBGcanvas()
 end
 
 function PlayState:handleInputs(input, msg)
-   self.inputs:set(input)
+    if input == 'left' or input == 'GPleft' then
+            self.pos = self.pos - 1
+        elseif input == 'right' or input == 'GPright' then
+            self.pos = self.pos + 1
+        else
+            self.inputs:set(input)
+        end
 end
 
 function PlayState:updatePos()
-    if self.inputs:get('left') or self.inputs:get('GPleft') then
-    self.pos = self.pos - 1
-    elseif self.inputs:get('right') or self.inputs:get('GPright') then
-        self.pos = self.pos + 1
-    end
     if self.pos < 0 then
         self.pos = 0
     end
     if self.pos > (1600 - 256) then
         self.pos = 1600 - 256
     end
-    self.inputs:reset()
 end
 
 function PlayState:update(msg, dt)
     self:updatePos()
     self:updateFGcanvas()
+    self.inputs:reset()
 end
 
 function PlayState:render(msg)
@@ -112,3 +111,4 @@ function PlayState:render(msg)
     renderScore(msg.score)
     love.graphics.pop()
 end
+
