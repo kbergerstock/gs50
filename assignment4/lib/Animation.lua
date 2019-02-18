@@ -5,7 +5,7 @@
 -- luacheck: ignore Animation
 
 function Animation()
-    self = {}
+    local self = {}
     self.playFrames = {}
     self.ndx = 0
     self.divisor = 1

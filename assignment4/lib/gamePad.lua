@@ -3,11 +3,11 @@
 
 -- handles gamepads
 -- luacheck: allow_defined, no unused
--- luacheck: globals  love
+-- luacheck: ignore GamePad globals love
 
 function GamePad()
     -- create the virtual register
-    self =  {
+    local self =  {
                 io_states = {},
                 rx = 0,
                 ry = 0,

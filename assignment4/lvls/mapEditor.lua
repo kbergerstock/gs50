@@ -60,12 +60,12 @@ function APP:run()
     def.height = 20
     def.offset = 160
     def.texture = gRC.textures['blue-alien']
-    def.frames  = gRC.frames['blue-_alien']
-    def.interval = 30
+    def.frames  = gRC.frames['blue-alien']
+    def.interval = 250
     def.playFrames = {8,9,10,11}
-    def.sx = 16
+    def.sx = 4.5 * 16
     def.sy = 8 * 16
-    -- sprites[1] = Sprite(def)
+    sprites[1] = Sprite(def)
 
     canvas:updateBG(gRC.textures, gRC.frames)
     canvas:updateFG(sprites)
@@ -89,10 +89,10 @@ function APP:run()
     function love.update(dt)
         -- pass the inputs to be processed
         button,  hInput, vInput = readGamePad(self.gamePad)
-        -- for n, sprite in pairs(sprites) do
-        --     sprite:update(dt)
-        --     sprite:move(hInput,vInput)
-        -- end
+        for i, sprite in pairs(sprites) do
+            sprite:update(dt)
+            sprite:move(hInput,vInput)
+        end
         canvas:updatePos(hInput)
         canvas:updateFG(sprites)
     end

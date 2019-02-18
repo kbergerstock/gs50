@@ -31,6 +31,7 @@ function Canvas:updateFG(sprites)
     self.map:renderTiles()
     if sprites then
         for i, sprite in pairs(sprites) do
+            assert(sprite,'sprite is nil in update fg')
             sprite:render()
         end
     end

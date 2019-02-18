@@ -11,7 +11,7 @@
 require 'lib/Animation'
 
 function Sprite(def)
-    self = Animation()
+     self = Animation()
     -- coodinates in tiles from bottom left corner (zero based)
     self.sx = def.sx
     self.sy = def.sy
@@ -24,17 +24,17 @@ function Sprite(def)
     self.Start(self,def.interval,def.playFrames)
 
     function self.update(self, dt)
-        self.sdx = self.animate(self, dt)
+        self.sdx = self.Animate(self, dt)
     end
 
-    function self.move(dx, dy)
+    function self.move(self, dx, dy)
         self.sx = self.sx + dx
         self.sy = self.sy + dy
     end
 
     function self.render(self)
         local mx = self.sx
-        local my = self.offset - self.sx - self.height
+        local my = self.offset - self.sy - self.height
         if self.sdx > 0 then
             love.graphics.draw(self.texture,self.frames[self.sdx],mx,my)
         end
