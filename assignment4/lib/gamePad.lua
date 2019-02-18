@@ -8,24 +8,24 @@
 function GamePad()
     -- create the virtual register
     self =  {
-                inputs = {},
+                io_states = {},
                 rx = 0,
                 ry = 0,
                 lx = 0,
                 ly = 0,
             }
-            self.inputs['a'] = false
-            self.inputs['b'] = false
-            self.inputs['x'] = false
-            self.inputs['y'] = false
-            self.inputs['j1up'] = false
-            self.inputs['j1dn'] = false
-            self.inputs['j1lt'] = false
-            self.inputs['j1rt'] = false
-            self.inputs['f1up'] = false
-            self.inputs['f1dn'] = false
-            self.inputs['f1lt'] = false
-            self.inputs['f1rt'] = false
+            self.io_states['a'] = false
+            self.io_states['b'] = false
+            self.io_states['x'] = false
+            self.io_states['y'] = false
+            self.io_states['j1up'] = false
+            self.io_states['j1dn'] = false
+            self.io_states['j1lt'] = false
+            self.io_states['j1rt'] = false
+            self.io_states['f1up'] = false
+            self.io_states['f1dn'] = false
+            self.io_states['f1lt'] = false
+            self.io_states['f1rt'] = false
 
     local game_pad = nil
 
@@ -43,13 +43,13 @@ function GamePad()
 
     function love.gamepadpressed(joystick , button )
         if game_pad == joystick then
-            self.inputs[button] = true
+            self.io_states[button] = true
         end
     end
 
     function love.gamepadreleased(joystick ,  button )
         if game_pad == joystick then
-            self.inputs[button] = false
+            self.io_states[button] = false
         end
     end
 
@@ -66,16 +66,17 @@ function GamePad()
             local down  = (self.ry > 0.6)
             local up    =  (self.ry < -0.6)
             -- oneshot:determine if this reading is first high detected after a low
-            self.inputs['f1rt'] = right and not(right == self.inputs['j1rt'])
-            self.inputs['f1lt'] = left  and not(left  == self.inputs['j1lt'])
-            self.inputs['f1dn'] = down  and not(down  == self.inputs['j1dn'])
-            self.inputs['f1up'] = up    and not(up    == self.inputs['j1up'])
+            self.io_states['f1rt'] = right and not(right == self.io_states['j1rt'])
+            self.io_states['f1lt'] = left  and not(left  == self.io_states['j1lt'])
+            self.io_states['f1dn'] = down  and not(down  == self.io_states['j1dn'])
+            self.io_states['f1up'] = up    and not(up    == self.io_states['j1up'])
             -- store digital state for joy 1
-            self.inputs['j1rt'] = right
-            self.inputs['j1lt'] = left
-            self.inputs['j1dn'] = down
-            self.inputs['j1up'] = up
+            self.io_states['j1rt'] = right
+            self.io_states['j1lt'] = left
+            self.io_states['j1dn'] = down
+            self.io_states['j1up'] = up
         end
+        return self.io_states
     end
     return self
 end

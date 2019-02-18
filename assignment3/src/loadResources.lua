@@ -31,7 +31,7 @@ function loadResources()
     local textures = {
         ['main'] = love.graphics.newImage('graphics/match3.png'),
         ['ghost'] = love.graphics.newImage('graphics/Spooksel_n.png'),
-        ['background'] = love.graphics.newImage('graphics/background.png')
+        ['background'] = love.graphics.newImage('graphics/background.png'),
     }
 
     local frames = {

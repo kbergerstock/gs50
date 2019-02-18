@@ -11,15 +11,15 @@ require 'lib/StateMachine'
 require 'lib/handy'         -- setColor
 require 'lib/dTimer'        -- digital timer input is dt
 require 'lib/Log'
-require 'lib/GamePad'
-require 'lib/inputs'
+require 'lib/mod'
+require 'lib/push'
 
 -- utility
 require 'src/Util'
 
 -- game states
-require 'src/states/game/PlayState'
-require 'src/states/game/StartState'
+-- require 'src/states/game/PlayState'
+-- require 'src/states/game/StartState'
 
 -- entity states
 -- require 'src/states/entity/pc_states'
@@ -34,14 +34,17 @@ require 'src/states/game/StartState'
 -- general
 -- require 'src/Animation'
 
-require 'src/GameObject'
-require 'src/generateTileMap'
--- require 'src/generateNPCs'
-require 'src/TileMap'
+-- require 'src/TileMap'
+-- require 'src/GameObject'
 
-require 'src/app'
+-- require 'src/generateTileMap'
+-- require 'src/generateNPCs'
+
+
+-- require 'src/app'
+require 'lvls/mapEditor'
 
 function love.load()
     app = APP()
-    app:Run()
+    app:run()
 end
