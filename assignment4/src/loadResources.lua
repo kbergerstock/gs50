@@ -48,38 +48,33 @@ function LoadResources()
     p.sounds = readOnly(sounds)
 
     local textures = {
-        ['tiles'] = love.graphics.newImage('graphics/tiles.png'),
-        ['toppers'] = love.graphics.newImage('graphics/tile_tops.png'),
-        ['bushes'] = love.graphics.newImage('graphics/bushes_and_cacti.png'),
+        ['tiles']       = love.graphics.newImage('graphics/tiles.png'),
+        ['toppers']     = love.graphics.newImage('graphics/tile_tops.png'),
+        ['bushes']      = love.graphics.newImage('graphics/bushes_and_cacti.png'),
         ['jump-blocks'] = love.graphics.newImage('graphics/jump_blocks.png'),
-        ['gems'] = love.graphics.newImage('graphics/gems.png'),
+        ['gems']        = love.graphics.newImage('graphics/gems.png'),
         ['backgrounds'] = love.graphics.newImage('graphics/backgrounds.png'),
         ['green-alien'] = love.graphics.newImage('graphics/green_alien.png'),
-        ['blue-alien'] = love.graphics.newImage('graphics/blue_alien.png'),
-        ['snails'] = love.graphics.newImage('graphics/snails.png'),
-        ['numbers'] = love.graphics.newImage('graphics/numbers.png'),
+        ['blue-alien']  = love.graphics.newImage('graphics/blue_alien.png'),
+        ['snails']      = love.graphics.newImage('graphics/snails.png'),
+        ['numbers']     = love.graphics.newImage('graphics/numbers.png'),
+        ['water']       = love.graphics.newImage('graphics/water.png'),
     }
     p.textures = readOnly(textures)
 
     local frames = {
-        ['tiles'] = GenerateQuads(textures['tiles'], p.TILE_SIZE, p.TILE_SIZE),
-        ['toppers'] = GenerateQuads(textures['toppers'], p.TILE_SIZE, p.TILE_SIZE),
-        ['bushes'] = GenerateQuads(textures['bushes'], 16, 16),
+        ['tiles']       = GenerateQuads(textures['tiles'], p.TILE_SIZE, p.TILE_SIZE),
+        ['toppers']     = GenerateQuads(textures['toppers'], p.TILE_SIZE, p.TILE_SIZE),
+        ['bushes']      = GenerateQuads(textures['bushes'], 16, 16),
         ['jump-blocks'] = GenerateQuads(textures['jump-blocks'], 16, 16),
-        ['gems'] = GenerateQuads(textures['gems'], 16, 16),
+        ['gems']        = GenerateQuads(textures['gems'], 16, 16),
         ['backgrounds'] = GenerateQuads(textures['backgrounds'], 256, 128),
         ['green-alien'] = GenerateQuads(textures['green-alien'], 16, 20),
-        ['blue-alien'] = GenerateQuads(textures['blue-alien'], 16, 20),
-        ['snails'] = GenerateQuads(textures['snails'], 16, 16),
-        ['numbers'] = GenerateQuads(textures['numbers'],8,8),
+        ['blue-alien']  = GenerateQuads(textures['blue-alien'], 16, 20),
+        ['snails']      = GenerateQuads(textures['snails'], 16, 16),
+        ['numbers']     = GenerateQuads(textures['numbers'],8,8),
+        ['water']       = GenerateQuads(textures['water'],16,16),
     }
-
-    -- these need to be added after frames is initialized because they refer to frames from within
-    frames['tilesets'] = GenerateTileSets(frames['tiles'],
-        p.TILE_SETS_WIDE, p.TILE_SETS_TALL, p.TILE_SET_WIDTH, p.TILE_SET_HEIGHT)
-
-    frames['toppersets'] = GenerateTileSets(frames['toppers'],
-        p.TOPPER_SETS_WIDE, p.TOPPER_SETS_TALL, p.TILE_SET_WIDTH, p.TILE_SET_HEIGHT)
 
     p.frames = readOnly(frames)
 

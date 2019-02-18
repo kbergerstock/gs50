@@ -38,9 +38,7 @@ function loadConstants()
         TOPPER_SETS_WIDE = 6,
         TOPPER_SETS_TALL = 18,
 
-        -- tile IDs
-        TILE_ID_EMPTY = 5,
-        TILE_ID_GROUND = 3,
+
 
         -- player walking speed
         PLAYER_WALK_SPEED = 60,

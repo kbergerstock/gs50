@@ -9,31 +9,76 @@
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Message StateMachine Class setColor love gRC
 
+baseTile = Class{}
+function baseTile:init() end
 
-Tile = Class{}
+function baseTile:__init(def)
+    -- tx and ty are zero based indices
+    self.v  = def
+    self.id = def.id
+    self.tx = def.tx
+    self.ty = def.ty
+    self.mx = def.tx * def.tile_size
+    self.my = 144 - (def.ty * def.tile_size)
+end
 
-function Tile:init(x, y, id, topper, tileset, topperset)
-    self.size =  gRC.TILE_SIZE
-    self.tx = x - 1
-    self.ty = y - 1
-    self.mx = self.tx  * self.size
-    self.my = self.ty  * self.size
+function baseTile:render() assert(false,'oops') end
+-- --------------------------------------------------------------------
+Tile = Class{__include = baseTile}
 
-    self.width = self.size
-    self.height = self.size
-
-    self.id = id
-    self.tileset = tileset
-    self.topper = topper
-    self.topperset = topperset
+function Tile:init(def)
+    baseTile.__init(self,def)
+    self.texture = gRC.textures['tiles']
+    assert(self.texture, 'missing ground texture -> id '..tostring(def.id) )
+    local x, y
+    y, x = mod2(def.tile_set - 1, def.tile_sets_wide)
+    self.tdx = y * def.tile_set_height * def.tile_sets_wide * def.tile_set_width + x * def.tile_set_width
+    y, x  = mod2(def.sdx - 1, def.tile_set_width)
+    self.tdx = self.tdx + y * def.tile_sets_wide * def.tile_set_width + x + 1
+    self.frame = gRC.frames['tiles'][self.tdx]
+    assert(self.frame, 'missing ground quad -> id '..tostring(def.id) )
+    if def.id == ID.TOPPER then
+        local w, h
+        self.topper_texture = gRC.textures['toppers']
+        w, h = self.topper_texture:getDimensions()
+        y, x = mod2(def.topper_set - 1, def.tile_sets_wide)
+        y = y * 64
+        x = x * 80
+        self.topper_frame = love.graphics.newQuad(x , y , def.tile_size, def.tile_size, w, h)
+    end
 end
 
 function Tile:render()
-    local sx = self.mx
-    local sy = 146 - self.my
-    love.graphics.draw(gRC.textures['tiles'], gRC.frames['tilesets'][self.tileset][self.id],sx,sy)
+    love.graphics.draw(self.texture,self.frame, self.mx, self.my)
     -- tile top layer for graphical variety
-    if self.topper then
-        love.graphics.draw(gRC.textures['toppers'], gRC.frames['toppersets'][self.topperset][self.id],sx,sy)
+    if self.id == ID.TOPPER then
+         love.graphics.draw(self.topper_texture, self.topper_frame, self.mx, self.my)
     end
+end
+-- --------------------------------------------------------------------
+Wave = Class{__include = baseTile}
+
+function Wave:init(def)
+    baseTile.__init(self,def)
+    self.texture = gRC.textures['water']
+    assert(self.texture,'missing water image -> id = '..tostring(def.id) )
+    local tdx = def.sdx + def.wave_set - 1
+    self.frame = gRC.frames['water'][tdx]
+    assert(self.frame,'missing water quad -> id = '..tostring(def.id) )
+end
+
+function Wave:render()
+    love.graphics.draw(self.texture, self.frame, self.mx, self.my)
+end
+
+-- --------------------------------------------------------------------
+Bush = Class{__include = baseTile}
+function Bush:init(def)
+    baseTile.__init(self,def)
+    self.texture = gRC.textures['bushes']
+    local tdx = (def.bush_set - 1) * 7 + def.sdx
+    self.frame = gRC.frames['bushes'][tdx]
+end
+function Bush:render()
+    love.graphics.draw(self.texture, self.frame, self.mx, self.my)
 end

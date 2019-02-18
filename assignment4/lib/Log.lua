@@ -11,21 +11,21 @@ end
 LOG = Class{}
 
 function LOG:init(iden)
-    self.fileName_ = ''
-    self.Name = ''
+    self.fileName = ''
     self.iden = iden
 end
 
 function LOG:initialize(fp)
-    self.Name = fp or 'lualog'
-    self.fileName_ = self.Name .. '.log'
-    local line = self.Name .. '\n'
+    local name = (fp and true) or 'lualog'
+    self.fileName = name .. '.log'
+    local line = 'LOG: ' .. name .. '\n'
     love.filesystem.setIdentity(self.iden)
-    love.filesystem.write(self.fileName_, line , #line )
+    love.filesystem.write(self.fileName, line , #line )
 
 end
 
-function LOG:log(string)
-    local line = string .. '\n'
-    love.filesystem.append(self.fileName_, line, #line )
+function LOG:wrt(line)
+    assert(line,'grr this cannot be')
+    line = line .. '\n'
+    love.filesystem.append(self.fileName, line, #line )
 end
