@@ -7,6 +7,7 @@
 push = require 'lib/push'
 require 'lib/GamePad'
 require 'lib/sprite'
+require 'lib/displayFPS'
 require 'src/loadResources'
 require 'src/canvas'
 require 'src/readGamePad'
@@ -94,7 +95,7 @@ function APP:run()
             sprite:move(hInput,vInput)
         end
         canvas:updatePos(hInput)
-        canvas:updateFG(sprites)
+        canvas:updateFG()
     end
 
     function love.draw()
@@ -102,6 +103,13 @@ function APP:run()
         -- render the current map
         love.graphics.push()
         canvas:render()
+        if sprites then
+            for i, sprite in pairs(sprites) do
+                assert(sprite,'sprite is nil')
+                sprite:render()
+            end
+        end
+        displayFPS(gRC.fonts['small'])
         love.graphics.pop()
 
         push:finish()

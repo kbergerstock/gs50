@@ -25,16 +25,10 @@ function Canvas:updateBG(textures,frames)
     love.graphics.setCanvas()
 end
 
-function Canvas:updateFG(sprites)
+function Canvas:updateFG()
     love.graphics.setCanvas(self.fgCanvas)
     love.graphics.clear(0,0,0,0)
     self.map:renderTiles()
-    if sprites then
-        for i, sprite in pairs(sprites) do
-            assert(sprite,'sprite is nil in update fg')
-            sprite:render()
-        end
-    end
     love.graphics.setCanvas()
 end
 
@@ -49,8 +43,9 @@ function Canvas:updatePos(dir)
 end
 
 function Canvas:render()
-    local q, r = mod2(16 + self.pos, 256)
+    local q, r = mod2(16 + self.pos/2, 256)
     local bgQuad = love.graphics.newQuad(r, 0, 256, self.h, 512, self.h )
+    q, r = mod2(16 + self.pos, 256)
     local fgQuad = love.graphics.newQuad(self.pos, 0, 256,self.h, self.w, self.h)
     love.graphics.setColor(1,1,1,1)
     love.graphics.draw(self.bgCanvas, bgQuad)
