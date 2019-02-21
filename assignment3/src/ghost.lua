@@ -19,3 +19,12 @@ function generateGhostQuads(atlas)
     end
     return quads
 end
+
+function generateGemQuads(atlas,tile_size)
+    local quads = {}
+    local w = 5 * tile_size
+    for x = 0, w, tile_size do
+        quads[1+#quads] = love.graphics.newQuad(x, 0, tile_size, tile_size, atlas:getDimensions())
+    end
+    return quads
+end
