@@ -31,6 +31,13 @@ function Level:init()
                 GND7     = 6,
                 GND8     = 7,
                 GND9     = 8,
+                JUMP_BLOCK = 9,
+                LADDER = 10,
+                LADDER_TOP = 11,
+                SPRING = 12,
+                SWITCH = 13,
+                SIGN = 14,
+                CRATE = 15,
     }
     ID = readOnly(ids)
 end
@@ -71,9 +78,6 @@ end
 function Level:load(fileName)
     local lines
     local size
-    local tile_mapping = {}
-    local bushes = {}
-    local ids  = {}
     local def_gnd = {}
     local def = {}
     -- verify file esists
@@ -91,19 +95,6 @@ function Level:load(fileName)
         def_gnd.tile_set = read_number(lines,'tile_set:=')
         def_gnd.topper_set = read_number(lines,'topper_set:=')
         def.wave_set = read_number(lines,'wave_set:=')
-        def.bush_set = read_number(lines,'bush_set:=')
-
-        -- read the tile mappings in
-        -- tile mpppings are a look up table of indices that represent the tile  we want to display
-        -- so instead of looking up tile_set[tile_id] we look up tile_set[tile_mapping[tile_id]]
-        -- this way we can use different tile sets without changing the map
-        tile_mapping =  read_array(lines,'tile_mappings:={','}end')
-
-        -- read the bush mappings in
-        bushes = read_array(lines,'bushes:={','}end')
-        local b = 1
-        -- read in the tile id's for the map
-        ids = read_array(lines,'map:begin','map:end')
 
         -- --------------------------------------------------
         local function set(tile)
@@ -112,6 +103,34 @@ function Level:load(fileName)
             self.tiles[idx] = tile
         end
         -- --------------------------------------------------
+        function list_iter (t)
+            local i = 0
+            local n = #t
+            return function ()
+                     i = i + 1
+                     if i <= n then return t[i] else return 1 end
+                   end
+          end
+        -- --------------------------------------------------
+        -- read the tile mappings in
+        -- tile mpppings are a look up table of indices that represent the tile  we want to display
+        -- so instead of looking up tile_set[tile_id] we look up tile_set[tile_mapping[tile_id]]
+        -- this way we can use different tile sets without changing the map
+        local tile_mapping =  read_array(lines,'tile_mappings:={','}end')
+
+        -- read the bush mappings in
+        local bush_set = read_number(lines,'bush_set:=')
+        local bushes = list_iter(read_array(lines,'bushes:={','}end') )
+        -- read the jump_blocks mappings in
+        local jump_blocks = list_iter(read_array(lines,'jump_blocks:={','}end') )
+        -- read the crate mappings in
+        local crates = list_iter(read_array(lines,'crates:={','}end') )
+        -- reads the ladder  set in
+        local ladder =  read_number(lines,'ladder:=')
+        local ladder_top = read_number(lines,'ladder_top:=')
+
+        -- read in the tile id's for the map
+        local ids  = read_array(lines,'map:begin','map:end')
 
         def.tile_size = self.tile_size
         def_gnd.tile_size = self.tile_size
@@ -123,23 +142,32 @@ function Level:load(fileName)
         local tx = 0
         local ty = 0
         for n,id in pairs(ids) do
+            def.id = id
+            def.tx = tx
+            def.ty = ty
             if (id == ID.WATER) or (id == ID.WAVE) then
-                def.id = id
                 def.sdx = tile_mapping[id + 1]
-                def.tx = tx
-                def.ty = ty
                 set(Wave(def))
             elseif id == ID.BUSH then
-                def.id = id
-                if b <= #bushes then
-                    def.sdx = bushes[b]
-                    b = b + 1
-                else
-                    def.sdx = 1
-                end
-                def.tx = tx
-                def.ty = ty
-                set(Bush(def))
+                def.tile_set = 'bushes'
+                def.sdx = (bush_set - 1) * 7 + bushes()
+                set(aTile(def))
+            elseif id == ID.JUMP_BLOCK  then
+                def.tile_set = 'jump-blocks'
+                def.sdx = jump_blocks()
+                set(aTile(def))
+            elseif id == ID.CRATE then
+                def.tile_set = 'crates'
+                def.sdx = crates()
+                set(aTile(def))
+            elseif id == ID.LADDER then
+                def.tile_set = 'ladders'
+                def.sdx = ladder
+                set(aTile(def))
+            elseif id == ID.LADDER_TOP then
+                def.tile_set = 'ladders'
+                def.sdx = ladder_top
+                set(aTile(def))
             else
                 def_gnd.id = id
                 def_gnd.sdx = tile_mapping[id + 1]

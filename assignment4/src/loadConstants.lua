@@ -60,12 +60,5 @@ function loadConstants()
     -- table of tiles that should trigger a collision
     p.COLLIDABLE_TILES = readOnly{ p.TILE_ID_GROUND }
 
-    -- game object IDs
-    p.BUSH_IDS = readOnly{1, 2, 5, 6, 7}
-    p.COIN_FRAMES = 3
-    p.CRATES_FRAMES =  12
-    p.GEMS_FRAMES =  8
-    p.JUMP_BLOCKS_FRAMES = 30
-
     return p
 end

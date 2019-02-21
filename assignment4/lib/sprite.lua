@@ -32,6 +32,11 @@ function Sprite(def)
         self.sy = self.sy + dy
     end
 
+    function self.constrain(self, left, right, up, down)
+        if self.sx < left then self.sx = left elseif self.sx > right then self.sx = right end
+        if self.sy > up then self.sy = up elseif self.sy < down then self.sy = down end
+    end
+
     function self.render(self)
         local mx = self.sx
         local my = self.offset - self.sy - self.height

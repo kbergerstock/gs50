@@ -70,15 +70,15 @@ end
 function Wave:render()
     love.graphics.draw(self.texture, self.frame, self.mx, self.my)
 end
-
 -- --------------------------------------------------------------------
-Bush = Class{__include = baseTile}
-function Bush:init(def)
+aTile = Class{__include = baseTile}
+function aTile:init(def)
     baseTile.__init(self,def)
-    self.texture = gRC.textures['bushes']
-    local tdx = (def.bush_set - 1) * 7 + def.sdx
-    self.frame = gRC.frames['bushes'][tdx]
+    self.texture = gRC.textures[def.tile_set]
+    self.frame = gRC.frames[def.tile_set][def.sdx]
+    assert(self.frame,'tile set  '..def.tile_set..'  sdx  '.. tostring(def.sdx) )
 end
-function Bush:render()
+
+function aTile:render()
     love.graphics.draw(self.texture, self.frame, self.mx, self.my)
 end

@@ -59,6 +59,9 @@ function LoadResources()
         ['snails']      = love.graphics.newImage('graphics/snails.png'),
         ['numbers']     = love.graphics.newImage('graphics/numbers.png'),
         ['water']       = love.graphics.newImage('graphics/water.png'),
+        ['ladders']     = love.graphics.newImage('graphics/ladders_and_signs.png'),
+        ['mushrooms']   = love.graphics.newImage('graphics/mushrooms.png'),
+        ['crates']      = love.graphics.newImage('graphics/crates_and_blocks.png'),
     }
     p.textures = readOnly(textures)
 
@@ -74,6 +77,9 @@ function LoadResources()
         ['snails']      = GenerateQuads(textures['snails'], 16, 16),
         ['numbers']     = GenerateQuads(textures['numbers'],8,8),
         ['water']       = GenerateQuads(textures['water'],16,16),
+        ['ladders']     = GenerateQuads(textures['ladders'],16,16),
+        ['mushrooms']   = GenerateQuads(textures['mushrooms'],16,16),
+        ['crates']      = GenerateQuads(textures['crates'],16,16)
     }
 
     p.frames = readOnly(frames)

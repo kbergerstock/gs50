@@ -92,10 +92,12 @@ function APP:run()
         button,  hInput, vInput = readGamePad(self.gamePad)
         for i, sprite in pairs(sprites) do
             sprite:update(dt)
-            sprite:move(hInput,vInput)
+            sprite:move(hInput + hInput * dt * 60,vInput)
+            sprite:constrain(canvas.pos, canvas.pos + 120,146,0)
         end
-        canvas:updatePos(hInput)
+        canvas:updateRLpos(hInput)
         canvas:updateFG()
+        canvas:updateSprites(sprites)
     end
 
     function love.draw()
@@ -103,12 +105,6 @@ function APP:run()
         -- render the current map
         love.graphics.push()
         canvas:render()
-        if sprites then
-            for i, sprite in pairs(sprites) do
-                assert(sprite,'sprite is nil')
-                sprite:render()
-            end
-        end
         displayFPS(gRC.fonts['small'])
         love.graphics.pop()
 
