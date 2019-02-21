@@ -1,6 +1,5 @@
 -- luacheck: allow_defined, no unused
 -- luacheck: globals Class love setColor
--- luacheck: globals gSounds gTextures gFrames gFonts
 
 function generateNPCs(c)
     local entities = {}
@@ -18,7 +17,7 @@ function generateNPCs(c)
         table.insert(entities, snail)
     end
 
-    createSnail(8,4)
+    createSnail(9,4)
     createSnail(13,4)
     return entities
 end

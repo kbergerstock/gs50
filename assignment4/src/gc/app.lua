@@ -114,44 +114,7 @@ function APP:start()
     for i = 1, 100 do math.random(100) end
 end
 
-function APP:readGamePad()
-    local button = ''
-    self.gamePad:readJoysticks()
-    if  self.gamePad.inputs['f1lt'] then
-        button = 'left'
-    elseif  self.gamePad.inputs['f1rt'] then
-        button = 'right'
-    elseif  self.gamePad.inputs['f1up'] then
-        button = 'up'
-    elseif  self.gamePad.inputs['f1dn'] then
-        button = 'down'
-    elseif self.gamePad.inputs['b'] then    -- is true on detected false otherwise
-        button = 'GPb'                        -- assign to return value
-        self.gamePad.inputs['b'] = false    -- debounce the button
-    elseif self.gamePad.inputs['a'] then
-        button = 'GPa'
-        self.gamePad.inputs['a'] = false
-    elseif self.gamePad.inputs['x'] then
-        button = 'GPx'
-        self.gamePad.inputs['x'] = false
-    elseif self.gamePad.inputs['y'] then
-        button = 'GPy'
-        self.gamePad.inputs['y'] = false
-    end
-    local hInput = ''
-    if  self.gamePad.inputs['j1lt'] or love.keyboard.isDown('left') then
-        hInput = 'GPleft'
-    elseif  self.gamePad.inputs['j1rt'] or love.keyboard.isDown('right')  then
-        hInput = 'GPright'
-    end
-    vInput = ''
-    if  self.gamePad.inputs['j1up'] or love.keyboard.isDown('up') then
-        vInput = 'GPup'
-    elseif  self.gamePad.inputs['j1dn'] or love.keyboard.isDown('down')  then
-        vInput = 'GPdown'
-    end
-    return button, hInput, vInput
-end
+
 
 function APP:init_message_packet()
     local msg = Message()

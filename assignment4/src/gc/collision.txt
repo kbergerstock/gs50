@@ -1,0 +1,10 @@
+    function self.collides(self, npc)
+        local sx = self:csx()
+        local sy = self:csy()
+        local nx = npc:csx()
+        local ny = npc:csy()
+        return   sx < (nx + npc.width)  and
+                 (sx + self.width) > nx and
+                 sy < (ny + npc.height) and
+                 (sy + self.height) > ny
+    end
