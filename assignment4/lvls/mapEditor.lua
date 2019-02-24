@@ -18,9 +18,6 @@ gRC = {}
 APP = Class{}
 -- ------------------------------------------------------------------
 local function Initial()
-    -- fetch  and store all resourses use in the application
-    -- (sprites, tiles, sounds, quads and constants )
-    gRC = LoadResources()
     -- initialize our nearest-neighbor filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
     -- set window bar title
@@ -42,17 +39,23 @@ end
 function APP:init()
     -- create a game pad interface
     self.gamePad = GamePad()
-    Initial()
 end
 
 function APP:run()
     local button
     local hInput
     local vInput
+    -- read the level file
+    local lines = read_file('oteron','oteron.L1')
+    -- fetch  and store all resourses use in the application
+    -- (sprites, tiles, sounds, quads and constants )
+    gRC = LoadResources(lines)
+    -- inital the virtual world
+    Initial()
 
     -- create the level
     local level =  Level()
-    local map = level:load('oteronL1')
+    local map = level:load(lines)
     local canvas = Canvas(map)
     local sprites = {}
 

@@ -6,7 +6,6 @@ Canvas = Class{}
 function Canvas:init(map)
     self.w = map.pixel_width
     self.h = map.pixel_height
-    self.bkgnd = map.background
     self.pos = 0
     self.map = map
     self.fgCanvas = love.graphics.newCanvas(self.w, self.h)
@@ -15,14 +14,15 @@ function Canvas:init(map)
 end
 
 function Canvas:updateBG(textures,frames)
+    local bkgnd = self.map.background
     local bkgnds = 'backgrounds'
     local sy = textures[bkgnds]:getHeight() / 3 * 2
     love.graphics.setCanvas(self.bgCanvas)
     love.graphics.clear(0,0,0,0)
-    love.graphics.draw(textures[bkgnds], frames[bkgnds][self.bkgnd], 0, 0)
-    love.graphics.draw(textures[bkgnds], frames[bkgnds][self.bkgnd], 0, sy,0, 1, -1)
-    love.graphics.draw(textures[bkgnds], frames[bkgnds][self.bkgnd], 256, 0)
-    love.graphics.draw(textures[bkgnds], frames[bkgnds][self.bkgnd], 256, sy, 0, 1, -1)
+    love.graphics.draw(textures[bkgnds], frames[bkgnds][bkgnd], 0, 0)
+    love.graphics.draw(textures[bkgnds], frames[bkgnds][bkgnd], 0, sy,0, 1, -1)
+    love.graphics.draw(textures[bkgnds], frames[bkgnds][bkgnd], 256, 0)
+    love.graphics.draw(textures[bkgnds], frames[bkgnds][bkgnd], 256, sy, 0, 1, -1)
     love.graphics.setCanvas()
 end
 

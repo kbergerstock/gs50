@@ -21,7 +21,8 @@ function TileMap:init(level)
     self.tiles  = level.tiles
     self.pixel_width = level:get_pixel_width()
     self.pixel_height = level:get_pixel_height()
-    self.background = level:get_background()
+    self.background = level.background
+    self.gravity = level.gravity
 end
 
 -- retrieve a tile given the col, row coordinates of a tile

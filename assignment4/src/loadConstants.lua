@@ -7,58 +7,41 @@ require 'lib/readonly'
 -- luacheck: allow_defined, no unused, globals readOnly
 -- luacheck: ignore loadConstants
 
-function loadConstants()
+function loadConstants(lines)
     local p = {
         -- size of our actual window
-        WINDOW_WIDTH = 1280,
-        WINDOW_HEIGHT = 800,
+        WINDOW_WIDTH = read_number(lines, 'window_width:='),
+        WINDOW_HEIGHT = read_number(lines, 'window_height:='),
 
         -- size we're trying to emulate with push
-        VIRTUAL_WIDTH = 256,
-        VIRTUAL_HEIGHT = 160,
+        VIRTUAL_WIDTH = read_number(lines, 'virtual_width:='),
+        VIRTUAL_HEIGHT = read_number(lines, 'virtual_height:='),
 
         -- camera scrolling speed
-        CAMERA_SPEED = 100,
+        CAMERA_SPEED = read_number(lines, 'camera_speed:='),
 
         -- speed of scrolling background
-        BACKGROUND_SCROLL_SPEED = 10,
+        -- BACKGROUND_SCROLL_SPEED = (),
 
         -- standard tile size
-        TILE_SIZE = 16,
+        TILE_SIZE = read_number(lines, 'tile_size:='),
 
         -- number of tiles in each tile set
-        TILE_SET_WIDTH  = 5,
-        TILE_SET_HEIGHT = 4,
+        TILE_SET_WIDTH  = read_number(lines, 'tile_set_width:='),
+        TILE_SET_HEIGHT = read_number(lines, 'tile_set_height:='),
 
         -- number of tile sets in sheet
-        TILE_SETS_WIDE = 6,
-        TILE_SETS_TALL = 10,
+        TILE_SETS_WIDE = read_number(lines, 'tile_sets_wide:='),
+        TILE_SETS_TALL = read_number(lines, 'tile_sets_tall:='),
 
         -- number of topper sets in sheet
-        TOPPER_SETS_WIDE = 6,
-        TOPPER_SETS_TALL = 18,
-
-
-
-        -- player walking speed
-        PLAYER_WALK_SPEED = 60,
-
-        -- player jumping velocity
-        PLAYER_JUMP_VELOCITY = -150,
-
-        -- snail movement speed
-        SNAIL_MOVE_SPEED = 10,
+        TOPPER_SETS_WIDE = read_number(lines, 'topper_sets_wide:='),
+        TOPPER_SETS_TALL = read_number(lines, 'topper_sets_tall:='),
     }
 
     -- width and height of screen in tiles
     p.SCREEN_TILE_WIDTH = p.VIRTUAL_WIDTH / p.TILE_SIZE
     p.SCREEN_TILE_HEIGHT = p.VIRTUAL_HEIGHT / p.TILE_SIZE
-    -- total number of topper and tile sets
-    p.TOPPER_SETS = p.TOPPER_SETS_WIDE * p.TOPPER_SETS_TALL
-    p.TILE_SETS = p.TILE_SETS_WIDE * p.TILE_SETS_TALL
-
-    -- table of tiles that should trigger a collision
-    p.COLLIDABLE_TILES = readOnly{ p.TILE_ID_GROUND }
 
     return p
 end

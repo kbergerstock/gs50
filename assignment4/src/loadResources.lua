@@ -31,9 +31,9 @@ require 'src/loadConstants'
 -- luacheck: globals love readOnly GenerateQuads GenerateTileSets
 -- luacheck: ignore LoadResources loadConstants
 
-function LoadResources()
+function LoadResources(lines)
     -- the resources are loaded into read only tables
-    local p = loadConstants()
+    local p = loadConstants(lines)
     -- sounds and music
     local sounds = {
         ['jump'] = love.audio.newSource('sounds/jump.wav','static'),
