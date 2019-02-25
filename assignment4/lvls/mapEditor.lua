@@ -8,10 +8,12 @@ push = require 'lib/push'
 require 'lib/GamePad'
 require 'lib/sprite'
 require 'lib/displayFPS'
+require 'lvls/Level'
 require 'src/loadResources'
 require 'src/canvas'
 require 'src/readGamePad'
-require 'lvls/Level'
+require 'src/entity'
+
 
 gRC = {}
 
@@ -67,9 +69,10 @@ function APP:run()
     def.frames  = gRC.frames['blue-alien']
     def.interval = 250
     def.playFrames = {8,9,10,11}
-    def.sx = 4.5 * 16
+    def.sx = 0 * 16
     def.sy = 8 * 16
-    sprites[1] = Sprite(def)
+    def.gravity = map.gravity
+    sprites[1] = Entity(def)
 
     canvas:updateBG(gRC.textures, gRC.frames)
     canvas:updateFG(sprites)
@@ -95,7 +98,7 @@ function APP:run()
         button,  hInput, vInput = readGamePad(self.gamePad)
         for i, sprite in pairs(sprites) do
             sprite:update(dt)
-            sprite:move(hInput + hInput * dt * 60,vInput)
+            sprite:move(hInput + hInput * dt * 60, 0, map, dt)
             sprite:constrain(canvas.pos, canvas.pos + 120,146,0)
         end
         canvas:updateRLpos(hInput)
@@ -109,6 +112,10 @@ function APP:run()
         love.graphics.push()
         canvas:render()
         displayFPS(gRC.fonts['small'])
+        love.graphics.print('gravity '..tostring(map.gravity,20,20))
+        love.graphics.print('sprite SY '..tostring(sprites[1].sy),20,50)
+        love.graphics.print('sprite gv '..tostring(sprites[1].gv),20,60)
+        love.graphics.print('sprite gd '..tostring(sprites[1].gd),20,70)
         love.graphics.pop()
 
         push:finish()

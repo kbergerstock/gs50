@@ -10,16 +10,17 @@
 -- luacheck: globals Message StateMachine Class setColor love gRC
 
 baseTile = Class{}
-function baseTile:init() end
+function baseTile:init(def)
+    baseTile.__init(self, def)
+end
 
 function baseTile:__init(def)
     -- tx and ty are zero based indices
-    self.v  = def
     self.id = def.id
     self.tx = def.tx
     self.ty = def.ty
-    self.mx = def.tx * def.tile_size
-    self.my = 144 - (def.ty * def.tile_size)
+    self.sx = def.tx * def.tile_size
+    self.sy = def.ty * def.tile_size
 end
 
 function baseTile:render() assert(false,'oops') end
@@ -49,10 +50,12 @@ function Tile:init(def)
 end
 
 function Tile:render()
-    love.graphics.draw(self.texture,self.frame, self.mx, self.my)
+    local mx = self.sx
+    local my = 144 - self.sy
+    love.graphics.draw(self.texture,self.frame, mx, my)
     -- tile top layer for graphical variety
     if self.id == ID.TOPPER then
-         love.graphics.draw(self.topper_texture, self.topper_frame, self.mx, self.my)
+         love.graphics.draw(self.topper_texture, self.topper_frame, mx, my)
     end
 end
 -- --------------------------------------------------------------------
@@ -68,7 +71,9 @@ function Wave:init(def)
 end
 
 function Wave:render()
-    love.graphics.draw(self.texture, self.frame, self.mx, self.my)
+    local mx = self.sx
+    local my = 144 - self.sy
+    love.graphics.draw(self.texture, self.frame, mx, my)
 end
 -- --------------------------------------------------------------------
 aTile = Class{__include = baseTile}
@@ -80,5 +85,7 @@ function aTile:init(def)
 end
 
 function aTile:render()
-    love.graphics.draw(self.texture, self.frame, self.mx, self.my)
+    local mx = self.sx
+    local my = 144 - self.sy
+    love.graphics.draw(self.texture, self.frame, mx, my)
 end

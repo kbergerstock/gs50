@@ -11,7 +11,7 @@
 require 'lib/Animation'
 
 function Sprite(def)
-     self = Animation()
+    self = Animation()
     -- coodinates in tiles from bottom left corner (zero based)
     self.sx = def.sx
     self.sy = def.sy
@@ -38,10 +38,10 @@ function Sprite(def)
     end
 
     function self.render(self)
-        local mx = self.sx
-        local my = self.offset - self.sy - self.height
         if self.sdx > 0 then
-            love.graphics.draw(self.texture,self.frames[self.sdx],mx,my)
+            local mx = self.sx
+            local my = self.offset - self.height - self.sy
+            love.graphics.draw(self.texture,self.frames[self.sdx], mx, my)
         end
     end
     -- end of class defination
