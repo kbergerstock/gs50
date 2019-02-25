@@ -24,6 +24,7 @@ function TileMap:init(level)
     self.pixel_height = level:get_pixel_height()
     self.background = level.background   --  back drop to be displayed
     self.gravity = level.gravity         --   gravity constant to be used for level
+    self.player_jump_speed = level.pc_jump_speed
 end
 
 -- given sx and sy find the tile location tx and ty

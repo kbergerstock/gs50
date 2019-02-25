@@ -75,5 +75,9 @@ function Entity(def)
         self.sy = self.sy + dy - self.apply_gravity(self, map, dt)
     end
 
+    function self.bounce(self,velocity)
+        self.gv = self.gv - velocity
+    end
+
     return self
 end

@@ -69,10 +69,11 @@ function APP:run()
     def.frames  = gRC.frames['blue-alien']
     def.interval = 250
     def.playFrames = {8,9,10,11}
-    def.sx = 0 * 16
+    def.sx = 2 * 16
     def.sy = 8 * 16
     def.gravity = map.gravity
-    sprites[1] = Entity(def)
+    local player = Entity(def)
+    sprites[1] = player
 
     canvas:updateBG(gRC.textures, gRC.frames)
     canvas:updateFG(sprites)
@@ -96,6 +97,7 @@ function APP:run()
     function love.update(dt)
         -- pass the inputs to be processed
         button,  hInput, vInput = readGamePad(self.gamePad)
+        if button == 'GPb' then player:bounce(map.player_jump_speed) end
         for i, sprite in pairs(sprites) do
             sprite:update(dt)
             sprite:move(hInput + hInput * dt * 60, 0, map, dt)
