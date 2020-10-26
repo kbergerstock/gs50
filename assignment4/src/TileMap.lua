@@ -8,7 +8,7 @@
 require 'lib/mod'
 require 'src/Tile'
 
--- luacheck: no unused, globals Class love
+-- luacheck: no unused, globals Class love mod2 ID
 -- luacheck: ignore TileMap
 
 TileMap = Class{}
@@ -18,21 +18,25 @@ function TileMap:init(level)
     self.pos    = 0
     self.width  = level.map_width       -- number of horizntal tiles in map
     self.height = level.map_height      -- number of vertical tiles  in map
-    self.tiles  = level.tiles       -- array og tiles ie the virtual world
+    self.tiles  = level.tiles           -- array og tiles ie the virtual world
     self.tile_size = level.tile_size    -- size of tiles in pixels
     self.pixel_width = level:get_pixel_width()
     self.pixel_height = level:get_pixel_height()
     self.background = level.background   --  back drop to be displayed
     self.gravity = level.gravity         --   gravity constant to be used for level
     self.player_jump_speed = level.pc_jump_speed
+    self.player_walk_speed = level.pc_walk_speed
+    self.transparent_ids = level.transparent_ids
+    self.collide_ids = level.collide_ids
+    assert(self.transparent_ids,'oops no search list')
 end
 
 -- given sx and sy find the tile location tx and ty
 function TileMap:screen_to_tile(sx, sy)
-    local r , tx , ty
-    tx, r = mod2(sx, self.tile_size)
-    ty, r = mod2(sy, self.tile_size)
-    return tx, ty
+    local rx, ry , tx , ty
+    tx, rx = mod2(sx, self.tile_size)
+    ty, ry = mod2(sy, self.tile_size)
+    return tx, ty, rx, ry
 end
 
 -- retrieve a tile given the col, row coordinates of a tile

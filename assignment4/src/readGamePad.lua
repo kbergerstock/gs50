@@ -30,15 +30,15 @@ function readGamePad(gamePad)
         gamePad.io_states['y'] = false
     end
     local hInput = 0
-    if  gamePad.io_states['j1lt'] or love.keyboard.isDown('left') then
+    if  gamePad.io_states['j2lt'] or love.keyboard.isDown('left') then
         hInput = -1
-    elseif  gamePad.io_states['j1rt'] or love.keyboard.isDown('right')  then
+    elseif  gamePad.io_states['j2rt'] or love.keyboard.isDown('right')  then
         hInput = 1
     end
     local vInput = 0
-    if  gamePad.io_states['j1up'] or love.keyboard.isDown('up') then
+    if  gamePad.io_states['j2up'] or love.keyboard.isDown('up') then
         vInput = 1
-    elseif  gamePad.io_states['j1dn'] or love.keyboard.isDown('down')  then
+    elseif  gamePad.io_states['j2dn'] or love.keyboard.isDown('down')  then
         vInput = -1
     end
     return button, hInput, vInput

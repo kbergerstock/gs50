@@ -44,8 +44,7 @@ end
 function Ball:collides(paddle)
     -- first, check to see if the left edge of either is farther to the right
     -- than the right edge of the other
-    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then
-        return false
+    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then        return false
     end
 
     -- then check to see if the bottom edge of either is higher than the top

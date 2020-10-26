@@ -4,7 +4,7 @@
 
 require 'lib/readonly'
 
--- luacheck: allow_defined, no unused, globals readOnly
+-- luacheck: allow_defined, no unused, globals readOnly read_number
 -- luacheck: ignore loadConstants
 
 function loadConstants(lines)

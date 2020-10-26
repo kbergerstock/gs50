@@ -78,9 +78,9 @@ function HighScoreTracker:get()
     return self.highScores
 end
 
--- retuns true if given score belons on the list otherwise false
+-- retuns true if given score belongs on the list otherwise false
 -- given that the list is sorted we only need to check the score 
--- afainst the bottom of the list
+-- against the bottom of the list
 function  HighScoreTracker:checkScore(score)
     local ndx = self.highScores.count
     local item = self.highScores[ndx]

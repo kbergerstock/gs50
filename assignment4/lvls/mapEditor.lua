@@ -76,7 +76,7 @@ function APP:run()
     sprites[1] = player
 
     canvas:updateBG(gRC.textures, gRC.frames)
-    canvas:updateFG(sprites)
+    canvas:updateFG()
 
        -- define love callbacks in this fuction body so they have access to local's
     function love.resize(w, h)
@@ -91,21 +91,39 @@ function APP:run()
     function love.keypressed(key)
         if key == 'escape' then
             stop()
+        elseif key == 'r' then
+            restart()
         end
     end
 
+    function restart()
+        -- player.reset( def.playFrames )
+        -- player.sx = def.sx
+        -- player.sy = def.sy
+        -- map.sx = 0
+        -- player.state = 1
+    end
+    
     function love.update(dt)
-        -- pass the inputs to be processed
-        button,  hInput, vInput = readGamePad(self.gamePad)
-        if button == 'GPb' then player:bounce(map.player_jump_speed) end
-        for i, sprite in pairs(sprites) do
-            sprite:update(dt)
-            sprite:move(hInput + hInput * dt * 60, 0, map, dt)
-            sprite:constrain(canvas.pos, canvas.pos + 120,146,0)
+        local dx = 0
+            -- pass the inputs to be processed
+            button,  hInput, vInput = readGamePad(self.gamePad)
+        if player.state == PS.DEAD then
+            -- fix display player died
+            player:setFrames( { 4, } )
+        else
+            if button == 'GPb' then player:bounce(map.player_jump_speed) end
+            for i, sprite in pairs(sprites) do
+                sprite:update(dt)
+                sprite:move(hInput , 0, map)
+            end
+            player:constrain(canvas.pos, canvas.pos + 126, 146,0)
+            if player.sx == canvas.pos + 126 then
+                canvas:updateRLpos(1)
+            end
+            canvas:updateFG()
+            canvas:updateSprites(sprites)
         end
-        canvas:updateRLpos(hInput)
-        canvas:updateFG()
-        canvas:updateSprites(sprites)
     end
 
     function love.draw()
@@ -114,10 +132,9 @@ function APP:run()
         love.graphics.push()
         canvas:render()
         displayFPS(gRC.fonts['small'])
-        love.graphics.print('gravity '..tostring(map.gravity,20,20))
+        love.graphics.print('walk speed '..tostring(map.player_walk_speed,20,20))
         love.graphics.print('sprite SY '..tostring(sprites[1].sy),20,50)
-        love.graphics.print('sprite gv '..tostring(sprites[1].gv),20,60)
-        love.graphics.print('sprite gd '..tostring(sprites[1].gd),20,70)
+        love.graphics.print('sprite Sx '..tostring(sprites[1].sx),20,60)
         love.graphics.pop()
 
         push:finish()

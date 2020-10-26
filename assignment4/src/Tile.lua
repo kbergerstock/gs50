@@ -7,20 +7,16 @@
 ]]
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals Message StateMachine Class setColor love gRC
+-- luacheck: globals Class mod2 setColor love gRC ID
 
 baseTile = Class{}
 function baseTile:init(def)
-    baseTile.__init(self, def)
-end
-
-function baseTile:__init(def)
-    -- tx and ty are zero based indices
-    self.id = def.id
-    self.tx = def.tx
-    self.ty = def.ty
-    self.sx = def.tx * def.tile_size
-    self.sy = def.ty * def.tile_size
+        -- tx and ty are zero based indices
+        self.id = def.id
+        self.tx = def.tx
+        self.ty = def.ty
+        self.sx = def.tx * def.tile_size
+        self.sy = def.ty * def.tile_size
 end
 
 function baseTile:render() assert(false,'oops') end
@@ -28,7 +24,7 @@ function baseTile:render() assert(false,'oops') end
 Tile = Class{__include = baseTile}
 
 function Tile:init(def)
-    baseTile.__init(self,def)
+    baseTile.init(self,def)
     self.texture = gRC.textures['tiles']
     assert(self.texture, 'missing ground texture -> id '..tostring(def.id) )
     local x, y
@@ -62,7 +58,7 @@ end
 Wave = Class{__include = baseTile}
 
 function Wave:init(def)
-    baseTile.__init(self,def)
+    baseTile.init(self,def)
     self.texture = gRC.textures['water']
     assert(self.texture,'missing water image -> id = '..tostring(def.id) )
     local tdx = def.sdx + def.wave_set - 1
@@ -77,8 +73,9 @@ function Wave:render()
 end
 -- --------------------------------------------------------------------
 aTile = Class{__include = baseTile}
+
 function aTile:init(def)
-    baseTile.__init(self,def)
+    baseTile.init(self,def)
     self.texture = gRC.textures[def.tile_set]
     self.frame = gRC.frames[def.tile_set][def.sdx]
     assert(self.frame,'tile set  '..def.tile_set..'  sdx  '.. tostring(def.sdx) )

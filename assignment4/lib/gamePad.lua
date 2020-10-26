@@ -27,6 +27,15 @@ function GamePad()
             self.io_states['f1lt'] = false
             self.io_states['f1rt'] = false
 
+            self.io_states['j2up'] = false
+            self.io_states['j2dn'] = false
+            self.io_states['j2lt'] = false
+            self.io_states['j2rt'] = false
+            self.io_states['f2up'] = false
+            self.io_states['f2dn'] = false
+            self.io_states['f2lt'] = false
+            self.io_states['f2rt'] = false
+
     local game_pad = nil
 
     function love.joystickadded(joystick)
@@ -60,21 +69,36 @@ function GamePad()
             self.ry = game_pad:getGamepadAxis('righty')
             self.lx = game_pad:getGamepadAxis('leftx')
             self.ly = game_pad:getGamepadAxis('lefty')
-            -- determine on/off state for joystick 1
-            local right = (self.rx > 0.6)
-            local left  = (self.rx < -0.6)
-            local down  = (self.ry > 0.6)
-            local up    =  (self.ry < -0.6)
+            -- determine on/off state for joysticks1
+            local right_1 = (self.rx > 0.6)
+            local left_1  = (self.rx < -0.6)
+            local down_1  = (self.ry > 0.6)
+            local up_1    = (self.ry < -0.6)
             -- oneshot:determine if this reading is first high detected after a low
-            self.io_states['f1rt'] = right and not(right == self.io_states['j1rt'])
-            self.io_states['f1lt'] = left  and not(left  == self.io_states['j1lt'])
-            self.io_states['f1dn'] = down  and not(down  == self.io_states['j1dn'])
-            self.io_states['f1up'] = up    and not(up    == self.io_states['j1up'])
+            self.io_states['f1rt'] = right_1 and not(right_1 == self.io_states['j1rt'])
+            self.io_states['f1lt'] = left_1  and not(left_1  == self.io_states['j1lt'])
+            self.io_states['f1dn'] = down_1  and not(down_1  == self.io_states['j1dn'])
+            self.io_states['f1up'] = up_1    and not(up_1    == self.io_states['j1up'])
             -- store digital state for joy 1
-            self.io_states['j1rt'] = right
-            self.io_states['j1lt'] = left
-            self.io_states['j1dn'] = down
-            self.io_states['j1up'] = up
+            self.io_states['j1rt'] = right_1
+            self.io_states['j1lt'] = left_1
+            self.io_states['j1dn'] = down_1
+            self.io_states['j1up'] = up_1
+            -- determine on/off state for joysticks2
+            local right_2 = (self.lx > 0.6)
+            local left_2  = (self.lx < -0.6)
+            local down_2  = (self.ly > 0.6)
+            local up_2    = (self.ly < -0.6)
+            -- oneshot:determine if this reading is first high detected after a low
+            self.io_states['f2rt'] = right_2 and not(right_2 == self.io_states['j2rt'])
+            self.io_states['f2lt'] = left_2  and not(left_2  == self.io_states['j2lt'])
+            self.io_states['f2dn'] = down_2  and not(down_2  == self.io_states['j2dn'])
+            self.io_states['f2up'] = up_2    and not(up_2    == self.io_states['j2up'])
+            -- store digital state for joy 1
+            self.io_states['j2rt'] = right_2
+            self.io_states['j2lt'] = left_2
+            self.io_states['j2dn'] = down_2
+            self.io_states['j2up'] = up_2
         end
         return self.io_states
     end

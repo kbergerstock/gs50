@@ -1,4 +1,4 @@
-    function self.collides(self, npc)
+     function self.collides(self, npc)
         local sx = self:csx()
         local sy = self:csy()
         local nx = npc:csx()

@@ -56,6 +56,7 @@ function Canvas:updatePos(dir)
         self.pos = self.w - 256
     end
 end
+
 -- allows scanvas to only move from the right to the left
 function Canvas:updateRLpos(dir)
     if dir == 1 then

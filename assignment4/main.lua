@@ -12,6 +12,7 @@ require 'lib/handy'         -- setColor
 require 'lib/dTimer'        -- digital timer input is dt
 require 'lib/Log'
 require 'lib/mod'
+require 'lib/sign'
 require 'lib/push'
 
 -- utility

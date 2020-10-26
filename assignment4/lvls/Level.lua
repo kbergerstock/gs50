@@ -2,7 +2,7 @@
 -- k.r.bergerstock  @ 2019.02.02
 
 -- luacheck: allow_defined, no unused
--- luacheck: globals o Class love readOnly Tile Bush Wave TileMap
+-- luacheck: globals o Class love readOnly Tile Wave aTile TileMap
 
 if not rawget(getmetatable(o) or {},'__Class') then
 	Class = require 'lib/class'
@@ -69,6 +69,17 @@ function read_array(lines, sb, se)
         i = i + 1
     end
     return A
+end-- ---------------------------------------------------------------
+function read_search_table(lines, sb, se)
+    local A = {}
+    local i, j, k, l, m
+    i, j = string.find(lines,sb)
+    k, l = string.find(lines,se,j)
+    m = string.sub(lines, j+1 , k-1)
+    for n in string.gmatch(m,"(%d+)") do
+        A[tonumber(n)] = true
+    end
+    return A
 end
 -- ---------------------------------------------------------------
 function read_file(identity, file_name)
@@ -103,7 +114,7 @@ function Level:load(lines)
     def_gnd.topper_set = read_number(lines,'topper_set:=')
     def.wave_set = read_number(lines,'wave_set:=')
     -- --------------------------------------------------
-    local function set(tile)
+    local function Set(tile)
         -- tx and ty are zero based indices
         local idx = tile.ty * self.map_width + tile.tx + 1
         self.tiles[idx] = tile
@@ -137,6 +148,10 @@ function Level:load(lines)
 
     -- read in the tile id's for the map
     local ids  = read_array(lines,'map:begin','map:end')
+    -- list of ids that an entity can pass in front of
+    self.transparent_ids = read_search_table(lines,'transparent_ids:=','}end')
+    -- list of ids than an entity will collide with
+    self.collide_ids = read_search_table(lines,'collide_ids:=','}end')
 
     def.tile_size = self.tile_size
     def_gnd.tile_size = self.tile_size
@@ -153,33 +168,33 @@ function Level:load(lines)
         def.ty = ty
         if (id == ID.WATER) or (id == ID.WAVE) then
             def.sdx = tile_mapping[id + 1]
-            set(Wave(def))
+            Set(Wave(def))
         elseif id == ID.BUSH then
             def.tile_set = 'bushes'
             def.sdx = (bush_set - 1) * 7 + bushes()
-            set(aTile(def))
+            Set(aTile(def))
         elseif id == ID.JUMP_BLOCK  then
             def.tile_set = 'jump-blocks'
             def.sdx = jump_blocks()
-            set(aTile(def))
+            Set(aTile(def))
         elseif id == ID.CRATE then
             def.tile_set = 'crates'
             def.sdx = crates()
-            set(aTile(def))
+            Set(aTile(def))
         elseif id == ID.LADDER then
             def.tile_set = 'ladders'
             def.sdx = ladder
-            set(aTile(def))
+            Set(aTile(def))
         elseif id == ID.LADDER_TOP then
             def.tile_set = 'ladders'
             def.sdx = ladder_top
-            set(aTile(def))
+            Set(aTile(def))
         else
             def_gnd.id = id
             def_gnd.sdx = tile_mapping[id + 1]
             def_gnd.tx = tx
             def_gnd.ty = ty
-            set(Tile(def_gnd))
+            Set(Tile(def_gnd))
         end
         ty = ty + 1
         if ty >= self.map_height then
