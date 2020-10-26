@@ -1,0 +1,15 @@
+version.txt
+k. r. bergerstock
+version 0.1.0.0,  oct 2020
+application outline { uses views to control application]}
+const.py added      # constants
+break_out.py        # main    
+gamedata.py         # persistant game data
+                    # load sounds and graphic resources    
+hiscores.py         # high scores moodule
+background.py       # scrolling back ground module
+game_controller.py  # game controller module
+start_view.py       # view of the start screen with high scores
+select_view.py      # game options
+serve_view
+
