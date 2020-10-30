@@ -18,6 +18,7 @@ BRICK_SCALE = 2.3
 BALL_TEXTURES = 'resources/breakout.png'
 BALL_LOCATIOINS = [[96,48,8,8],[104,48,8,8],[112,48,8,8],[120,48,8,8],[96,56,8,8],[104,56,8,8],[112,56,8,8]]
 BALL_SCALE = 2.3
+BALL_VELOCITY = 5
 # PADDLE PROPERTIES 
 PADDLE_TEXTURES = 'resources/breakout.png'
 PADDLE_LOCATIONS  =  [
@@ -27,11 +28,7 @@ PADDLE_LOCATIONS  =  [
                         [0,120,32,16],[32,120,64,16],[96,120,96,16],
                      ]
 PADDLE_SCALE = 2.3
-
-# paddle movement speed
-PADDLE_SPEED = 120
-BALL_SPEED_H = 150
-BALL_SPEED_L = 50
+PADDLE_VELOCITY = 5
 
 GAME_FONT=("RETRO_FONT","ATARI")
 

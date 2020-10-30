@@ -13,3 +13,9 @@ start_view.py       # view of the start screen with high scores
 select_view.py      # game options
 serve_view
 
+version 0.2.0.0     oct 30, 2020
+added the basic motions and boundry constraaints for the paddle and the ball
+new files:
+    fps.py
+    paddle.py
+    ball.py

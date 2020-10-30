@@ -5,9 +5,10 @@
 import const
 import arcade
 from arcade import color
-from game_controller_module import game_device
-from game_controller_module import game_controller
+from game_controller import game_device
+from game_controller import game_controller
 import random
+import time
 
 class gameData():
     def __init__(self):
