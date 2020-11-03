@@ -8,12 +8,13 @@ class BALL(arcade.Sprite):
         super().__init__()            
         self.speed = const.BALL_VELOCITY
         self.scale = const.BALL_SCALE
-        self.angle = 22
+        self.angle = 75
         self.dx = 0
         self.dy = 0
         self.update_dx_dy()
 
     def update_dx_dy(self):
+        self.angle *= -1
         rad = self.angle * math.pi / 180.0
         self.dx = self.speed * math.cos(rad)
         self.dy = self.speed * math.sin(rad)
@@ -22,21 +23,52 @@ class BALL(arcade.Sprite):
         self.center_x += self.dx
         self.center_y += self.dy
 
-    def update(self):
-        top = self.center_y + self.height / 2
-        bottom = self.center_y - self.height /2
-        left = self.center_x - self.width /2
-        right = self.center_x + self.width / 2
-        
-        if top >= const.SCREEN_HEIGHT - 5 :
-            self.angle *= -1
-            self.update_dx_dy()    
-        elif bottom < 5 :
-            self.angle *= -1
-            self.update_dx_dy()
+    def update(self,paddle,bricks):
+        collision  = False
+        h2 = self.height / 2
+        w2 = self.width / 2
+        #  screen constraints
+        TOP = const.SCREEN_HEIGHT - 5
+        BOTTOM = 5
+        LEFT = 1
+        RIGHT = const.SCREEN_WIDTH - 1
 
-        if right >= const.SCREEN_WIDTH  or self.left <= 1:
-            self.angle *= -1
-            self.speed *= -1          
+        
+        if self.top >= TOP :
+            self.center_y = TOP - h2
+            collision = True  
+        elif self.bottom <= BOTTOM :
+            self.center_y == BOTTOM + h2
+            collision = True
+
+        if self.right >= RIGHT:
+            self.center_x = RIGHT - w2 
+            self.speed *= -1
+            collision = True          
+        elif self.left <= LEFT:    
+            self.center_x = LEFT + w2  
+            self.speed *= -1
+            collision = True
+
+        if self.collides_with_sprite(paddle):
+            if self.center_y < paddle.top and self.center_y > paddle.bottom:
+                self.speed *= -1
+            collision = True
+
+        _bricks = self.collides_with_list(bricks)
+        if _bricks:
+            brick = _bricks[0]
+
+            if self.center_y < brick.center_y:
+                self.center_y = brick.bottom - w2 - 1
+            else:
+                self.center_y = brick.top + w2 + 1  
+                
+            if self.center_y >= brick.bottom and self.center_y < brick.top:
+                self.speed *= -1
+            collision = True
+
+        if collision: 
             self.update_dx_dy()
         self.move()            
+        return
