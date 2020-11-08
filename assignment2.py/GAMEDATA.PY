@@ -20,10 +20,11 @@ class gameData():
         self.snds = {}                      # game sounds list
         self.gc = None                      # game controller
         # texture lists
-        self.bricks = None 
-        self.balls = None
-        self.paddles = None
-        self.arrows = None
+        self.textures = {}
+        self.textures['bricks'] = None 
+        self.textures['balls'] = None
+        self.textures['paddles'] = None
+        self.textures['arrows'] = None
         # views (ie lua states)
         self.start_view = None              # view references    
         self.select_view = None
@@ -33,6 +34,7 @@ class gameData():
 
     def __start__(self):    
         random.seed()
+        # load the sounds
         self.snds['music']  = arcade.Sound('resources/music.wav',True)
         self.snds['victory'] = arcade.Sound('resources/victory.wav')
         self.snds['select'] = arcade.Sound('resources/select.wav')
@@ -50,11 +52,13 @@ class gameData():
         arcade.set_viewport(0,const.SCREEN_WIDTH,5,const.SCREEN_HEIGHT-5)
         self.snds['music'].play(const.VOLUME)
 
-        # fetch the brick textures
-        self.bricks = arcade.load_spritesheet(const.BRICK_TEXTURES,const.BRICK_WIDTH, 
+        # load the textures
+        self.textures['bricks'] = arcade.load_spritesheet(const.BRICK_TEXTURES,const.BRICK_WIDTH, 
                const.BRICK_HEIGHT,const.BRICK_COL,const.BRICK_COUNT )
-        self.balls = arcade.load_textures(const.BALL_TEXTURES,const.BALL_LOCATIOINS)
-        self.paddles = arcade.load_textures(const.PADDLE_TEXTURES,const.PADDLE_LOCATIONS)
+        self.textures['balls'] = arcade.load_textures(const.BALL_TEXTURES,const.BALL_LOCATIOINS)
+        self.textures['paddles'] = arcade.load_textures(const.PADDLE_TEXTURES,const.PADDLE_LOCATIONS)
+        self.textures['arrows'] = arcade.load_textures(const.ARROW_TEXTURES,const.ARROW_LOCATIONS)
+        # create the game controller interface
         self.gc = game_controller(game_device.setup())
     
     def show_view(self,view):

@@ -30,12 +30,12 @@ class selectView(arcade.View):
     def setup(self,game_data):
         self.gd = game_data
         self.bricks = levels.level_1(self.gd)
-        self.ball.append_texture(self.gd.balls[3])
+        for i in range(7):
+            self.ball.append_texture(self.gd.textures['balls'][i])
         self.ball.set_position(900,30)
-        self.ball.set_texture(0)
-        self.paddle.append_texture(self.gd.paddles[0])
-        self.paddle.append_texture(self.gd.paddles[1])
-        self.paddle.append_texture(self.gd.paddles[2])
+        self.ball.set_texture(2)
+        for i in range(4):
+            self.paddle.append_texture(self.gd.textures['paddles'][i])
         self.paddle.set_position(600,30)
         self.paddle.set_texture(1)
 

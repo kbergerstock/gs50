@@ -11,6 +11,9 @@ import random
 
 from GAMEDATA import gameData
 from background import Background
+from paddle import PADDLE 
+from ball import BALL
+import levels
 
 class serveView(arcade.View):
     def __init__(self):

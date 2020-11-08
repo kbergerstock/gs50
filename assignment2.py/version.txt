@@ -23,4 +23,7 @@ new files:
 version 0.3.0.0 nov 3 2020
 added collision detection and level 1
 new files:
-    levels.py    
+    levels.py  
+
+version 0.3.1.0 nov 8 2020
+updated variable names for textures           

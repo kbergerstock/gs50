@@ -19,7 +19,7 @@ def level_1(gd,n = 3):
     for i in range(n):
         for j in range(14):
             brick = arcade.Sprite()
-            brick.append_texture(gd.bricks[colors[j]])
+            brick.append_texture(gd.textures['bricks'][colors[j]])
             brick.set_position(cx,cy)
             brick.set_texture(0)
             brick.scale = const.BRICK_SCALE
