@@ -8,8 +8,6 @@ import const
 import arcade
 from arcade import color
 
-from GAMEDATA import gameData
-
 class LeftMargin():
     def __init__(self):
         self.left = 0

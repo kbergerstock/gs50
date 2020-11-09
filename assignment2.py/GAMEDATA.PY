@@ -7,6 +7,10 @@ import arcade
 from arcade import color
 from game_controller import game_device
 from game_controller import game_controller
+from ball import BALL
+from paddle import PADDLE
+from background import Background
+
 import random
 import time
 
@@ -14,11 +18,17 @@ class gameData():
     def __init__(self):
         self.score =  0
         self.health = 0
+        self.level = 0 
         self.high_scores = None             # high scores list
         self.backgnd = None                 # moving background sprite list    
         self.window = None                  # window handle
         self.snds = {}                      # game sounds list
         self.gc = None                      # game controller
+        # sprite lists
+        self.bricks = None
+        self.ball = None
+        self.paddle = None
+        self.sprites = None
         # texture lists
         self.textures = {}
         self.textures['bricks'] = None 
@@ -60,6 +70,7 @@ class gameData():
         self.textures['arrows'] = arcade.load_textures(const.ARROW_TEXTURES,const.ARROW_LOCATIONS)
         # create the game controller interface
         self.gc = game_controller(game_device.setup())
+        self.sprites = arcade.SpriteList()
     
     def show_view(self,view):
         """ activate the draw,update methods for the current view """

@@ -11,7 +11,12 @@ class BALL(arcade.Sprite):
         self.angle = 75
         self.dx = 0
         self.dy = 0
-        self.update_dx_dy()
+
+    def createSprite(self,gd):
+        for i in range(7):
+            self.append_texture(gd.textures['balls'][i])
+        self.set_position(900,30)
+        self.set_texture(2)
 
     def update_dx_dy(self):
         self.angle *= -1

@@ -11,11 +11,19 @@ from hiscores import hiscores
 from background import Background
 from start_view import startView      
 from select_view import selectView
-   
+from serve_view  import serveView
+from ball import BALL
+from paddle import PADDLE
+
+from memory_profiler import profile
+
+@profile 
 def main():
     """ Main method """
     gd = gameData()
     gd.backgnd = Background()
+    gd.ball = BALL()
+    gd.paddle = PADDLE()
     gd.high_scores = hiscores()
 
     # create the games starting function
@@ -23,9 +31,11 @@ def main():
     # this is a linked list with the tail pointing to the head
     gd.start_view =  startView()
     gd.select_view = selectView()
-    # store a refence to game data in start_view
+    gd.serve_view = serveView()
+    # store a refence to game data in all views
     gd.start_view.setup(gd)
     gd.select_view.setup(gd)
+    gd.serve_view.setup(gd)
     # activate the starting view 
     gd.show_view(gd.start_view)
     

@@ -25,5 +25,5 @@ added collision detection and level 1
 new files:
     levels.py  
 
-version 0.3.1.0 nov 8 2020
-updated variable names for textures           
+version 0.3.1.0 nov 8 2020 >> updated variable names for textures           
+version 0.3.2.0 nov 0 2020 >> refactored sprite code
