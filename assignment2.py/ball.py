@@ -42,7 +42,7 @@ class BALL(arcade.Sprite):
         BOTTOM = 5
         LEFT = 1
         RIGHT = const.SCREEN_WIDTH - 1
-        
+        # check bounds
         if self.top >= TOP :
             self.center_y = TOP - h2
             collision = True  
@@ -64,12 +64,12 @@ class BALL(arcade.Sprite):
             self.center_x = LEFT + w2  
             self.speed *= -1
             collision = True
-
+        # check for collision with paddle
         if self.collides_with_sprite(paddle):
-            if self.center_y < paddle.top and self.center_y > paddle.bottom:
+            if self.center_y < paddle.top and self.center_y >= paddle.center_x:
                 self.speed *= -1
             collision = True
-
+        # check for collision with brick array
         _bricks = self.collides_with_list(bricks)
         if _bricks:
             brick = _bricks[0]
@@ -82,6 +82,7 @@ class BALL(arcade.Sprite):
             if self.center_y >= brick.bottom and self.center_y < brick.top:
                 self.speed *= -1
             collision = True
+            # remove sprite from board
             brick.kill()
 
         if collision: 
