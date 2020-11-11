@@ -15,16 +15,16 @@ from background import Background
 from fps import FPS
 
 class startView(arcade.View):
-    def __init__(self):
+    def __init__(self,game_data):
         super().__init__()
         self.gd = None                  # reference to the game data
         self.fps = FPS()
         self.counter = 0
         self.time_delta = 0
-
-    def setup(self,game_data):
         self.gd = game_data
-        arcade.set_background_color(color.ALABAMA_CRIMSON)        
+
+    def setup(self):
+        pass
   
     def on_show(self):
         self.fps.reset()
@@ -41,7 +41,6 @@ class startView(arcade.View):
         self.gd.render_score(const.SCREEN_WIDTH-150,const.SCREEN_HEIGHT-35,color.ALICE_BLUE,24,const.GAME_FONT[0])
         arcade.draw_text('to start press button  "B"',250,150,color.ALICE_BLUE,font_size=24,width=700,align='center',font_name=const.GAME_FONT[1])
         arcade.draw_text('FPS{0:3}'.format(self.fps.get()),20,20,color.ALICE_BLUE,font_size=12,font_name=const.GAME_FONT[1])
-        #arcade.draw_text('buttonB {0}'.format(self.gd.gc.buttonB()),50,40,color.ALICE_BLUE,font_size=8,font_name=const.GAME_FONT[1])
         arcade.set_viewport(0,const.SCREEN_WIDTH,5,const.SCREEN_HEIGHT - 5) 
     
     def update(self,delta_time):

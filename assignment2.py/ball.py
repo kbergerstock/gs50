@@ -11,11 +11,12 @@ class BALL(arcade.Sprite):
         self.angle = 75
         self.dx = 0
         self.dy = 0
+        self.update_dx_dy()
 
     def createSprite(self,gd):
         for i in range(7):
             self.append_texture(gd.textures['balls'][i])
-        self.set_position(900,30)
+        self.set_position(600,55)
         self.set_texture(2)
 
     def update_dx_dy(self):
@@ -29,6 +30,10 @@ class BALL(arcade.Sprite):
         self.center_y += self.dy
 
     def update(self,paddle,bricks):
+        """
+         checks ball for boundry conditions and collisions
+         returns true if out of bounds
+        """
         collision  = False
         h2 = self.height / 2
         w2 = self.width / 2
@@ -37,15 +42,20 @@ class BALL(arcade.Sprite):
         BOTTOM = 5
         LEFT = 1
         RIGHT = const.SCREEN_WIDTH - 1
-
         
         if self.top >= TOP :
             self.center_y = TOP - h2
             collision = True  
         elif self.bottom <= BOTTOM :
-            self.center_y == BOTTOM + h2
-            collision = True
-
+            #out of bounds
+            self.angle = 75
+            self.dx = 0
+            self.dy = 0 
+            self.set_position(paddle.center_x,55)
+            self.set_texture(2)
+            self.update_dx_dy()
+            return True
+                      
         if self.right >= RIGHT:
             self.center_x = RIGHT - w2 
             self.speed *= -1
@@ -76,4 +86,4 @@ class BALL(arcade.Sprite):
         if collision: 
             self.update_dx_dy()
         self.move()            
-        return
+        return False

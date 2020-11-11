@@ -17,8 +17,9 @@ import time
 class gameData():
     def __init__(self):
         self.score =  0
-        self.health = 0
+        self.health = 3
         self.level = 0 
+        self.msg = 1                        #message to be displayed
         self.high_scores = None             # high scores list
         self.backgnd = None                 # moving background sprite list    
         self.window = None                  # window handle
@@ -38,7 +39,7 @@ class gameData():
         # views (ie lua states)
         self.start_view = None              # view references    
         self.select_view = None
-        self.serve_view = None
+        self.level_view = None
         #initialize main screen
         self.__start__()                    
 
@@ -79,6 +80,9 @@ class gameData():
     def setup(self):
         self.score = 0
         self.health = 3
+        self.level = 1
+        self.msg = 1
+
 
     def render_score(self,x,y,color,size,Font):
         arcade.draw_text('{0:08}'.format(self.score),x,y,color,font_size=size,font_name=Font)

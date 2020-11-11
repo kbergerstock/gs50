@@ -1,6 +1,6 @@
 """
 python BREAK_OUT 
-start_view.py
+level_view.py
 krbergerstck june ,2020
 """
 
@@ -13,21 +13,19 @@ from GAMEDATA import gameData
 from background import Background
 from paddle import PADDLE 
 from ball import BALL
-import levels
 
-class serveView(arcade.View):
-    def __init__(self):
+class levelView(arcade.View):
+    def __init__(self,game_data):
         super().__init__()
         self.gd = None                  # reference to the game data
-
-    def setup(self,game_data):
         self.gd = game_data
-        self.gd.sprites = arcade.SpriteList()
-        self.gd.sprites.extend(self.gd.bricks)
-        self.gd.sprites.append(self.gd.ball)
-        self.gd.sprites.append(self.gd.paddle)
-  
+        self.dir = 0
+
+    def setup(self):
+        pass
+ 
     def on_show(self):
+        self.dir = 0
         arcade.set_background_color(const.SCREEN_COLOR)
 
     def on_draw(self):
@@ -36,18 +34,26 @@ class serveView(arcade.View):
         arcade.start_render()
         self.gd.backgnd.draw()
         self.gd.sprites.draw()
-        arcade.draw_text('to serve press button  "B"',250,50,color.ALICE_BLUE,font_size=32,width=700,align='center',font_name=const.GAME_FONT[0])
+        self.gd.render_score(const.SCREEN_WIDTH-150,const.SCREEN_HEIGHT-35,color.ALICE_BLUE,24,const.GAME_FONT[0])
         arcade.set_viewport(0,const.SCREEN_WIDTH,5,const.SCREEN_HEIGHT - 5)      
     
     def update(self,delta_time):
         self.gd.backgnd.update()
-        self.gd.paddle.update(self.gd.gc.axisX())
-        self.gd.ball.update(self.gd.paddle,self.gd.bricks)
-        if self.gd.gc.buttonB():
-            self.gd.show_view(self.gd.serve_view)
+        if self.dir == 0:
+            self.dir = self.gd.gc.axisX()
+        self.gd.paddle.update(self.dir)
+        if self.gd.ball.update(self.gd.paddle,self.gd.bricks):
+            self.gd.msg = 2
+            self.gd.show_view(self.gd.select_view)
 
     def on_key_press(self, symbol: int, modifiers: int):
-        if symbol == 32 or symbol == 98:
-            self.gd.show_view(self.gd.serve_view)
+        if symbol == 65361:
+            self.dir = -1
+        elif symbol == 65363:
+            self.dir = 1
+
+    def on_key_release(self, _symbol: int, _modifiers: int):
+        if _symbol == 65361 or _symbol == 65363:
+            self.dir = 0
 
 
