@@ -82,6 +82,7 @@ class BALL(arcade.Sprite):
             if self.center_y >= brick.bottom and self.center_y < brick.top:
                 self.speed *= -1
             collision = True
+            brick.kill()
 
         if collision: 
             self.update_dx_dy()
