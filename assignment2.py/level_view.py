@@ -27,7 +27,7 @@ class levelView(arcade.View):
     def on_show(self):
         self.dir = 0
         arcade.set_background_color(const.SCREEN_COLOR)
-
+    
     def on_draw(self):
         # This command should happen before we start drawing. It will clear
         # the screen to the background color, and erase what we drew last frame.            

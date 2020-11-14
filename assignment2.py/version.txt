@@ -25,9 +25,10 @@ added collision detection and level 1
 new files:
     levels.py  
 
-version 0.3.1.0 nov 8 2020 >> updated variable names for textures           
+version 0.3.1.0 nov  8 2020 >> updated variable names for textures           
 version 0.3.2.0 nov 10 2020 >> refactored sprite code
-version 0.3.3.0 mob 11 2020 >> added basic game play
+version 0.3.3.0 nov 11 2020 >> added basic game play
         got keyboard controls working
 new files : 
     Level_view.py
+version  0.3.4.0 mov 14  2020 added brick classm changed  lists in consts to tuples    

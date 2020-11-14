@@ -15,8 +15,8 @@ from level_view import levelView
 from ball import BALL
 from paddle import PADDLE
 
-from memory_profiler import profile
-
+# from memory_profiler import profile
+# @profile
 def main():
     """ Main method """
     gd = gameData()
