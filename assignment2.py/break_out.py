@@ -6,7 +6,7 @@ krbergerstck june ,2020
 
 import arcade
 
-from GAMEDATA import gameData
+from game_data import gameData
 from hiscores import hiscores
 from background import Background
 from start_view import startView      

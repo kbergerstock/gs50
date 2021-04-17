@@ -9,8 +9,7 @@ import pyglet
 import arcade
 from arcade import color
 import random
-
-from GAMEDATA import gameData
+from game_data import gameData
 from background import Background
 from fps import FPS
 

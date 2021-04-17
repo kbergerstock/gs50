@@ -8,8 +8,7 @@ import const
 import arcade
 from arcade import color
 import random
-
-from GAMEDATA import gameData
+#from game_data import gameData
 from background import Background
 from paddle import PADDLE 
 from ball import BALL
